@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Scene\QuestScene.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\Fader.cpp" />
     <ClCompile Include="Src\Common\Vector2.cpp" />
@@ -41,6 +42,7 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Scene\QuestScene.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Color.h" />
     <ClInclude Include="Src\Common\Fader.h" />

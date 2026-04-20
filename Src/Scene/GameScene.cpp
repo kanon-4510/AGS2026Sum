@@ -19,20 +19,34 @@
 //初期化処理
 void GameScene::Init(void)
 {
+
 }
 
 //更新処理
 void GameScene::Update(void)
 {
-	auto& ins = InputManager::GetInstance();
+	/*if (ins.IsTrgDown(KEY_INPUT_RETURN))
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::QUEST);
+	}*/
 
-	if (ins.IsTrgDown(KEY_INPUT_RETURN))
+	//フェーズ選択の処理
+	ProcessPhaseSelection();
+
+	if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
-	}
-	if (CheckHitKey(KEY_INPUT_SPACE) == 1)
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+		switch (phase_) {
+		case QUEST_PHASE::PHASE_QUEST:
+			// シーンマネージャーにクエストシーンへの変更を命令
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::QUEST);
+			break;
+		case QUEST_PHASE::PHASE_CLASSWORK:
+			// 授業シーン、あるいは授業内処理へ
+			break;
+		case QUEST_PHASE::PHASE_JOB_CHANGE:
+			// 資格試験シーンへ
+			break;
+		}
 	}
 }
 
@@ -41,15 +55,36 @@ void GameScene::Draw(void)
 {
 	DrawString(0, 0, "Scene : Game", 0xFFFFFF);
 
-	DrawBox(50
-		, 50
-		, Application::SCREEN_SIZE_X - 50
-		, Application::SCREEN_SIZE_Y - 50
-		, 0xFFFF00
-		, true);
+	int color = GetColor(255, 255, 255);
+	int selectColor = GetColor(255, 255, 0); // 選択中は黄色にする
+
+	DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_QUEST ? selectColor : color), "クエストに出発");
+	DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "授業を受ける");
+	DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
 }
 
 //解放処理
 void GameScene::Release(void)
 {
+}
+
+void GameScene::ProcessPhaseSelection(void)
+{
+	//フェーズ選択の処理
+	if (ins.IsTrgDown(KEY_INPUT_UP) ||
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
+	{
+		//statusType_ = (statusType_ + 3) % 4;
+		int index = static_cast<int>(phase_);
+		index = (index - 1 + static_cast<int>(QUEST_PHASE::MAX)) % static_cast<int>(QUEST_PHASE::MAX);
+		phase_ = static_cast<QUEST_PHASE>(index);
+	}
+	if (ins.IsTrgDown(KEY_INPUT_DOWN) ||
+		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
+	{
+		int index = static_cast<int>(phase_);
+		index = (index + 1) % static_cast<int>(QUEST_PHASE::MAX);
+		phase_ = static_cast<QUEST_PHASE>(index);
+	}
+
 }

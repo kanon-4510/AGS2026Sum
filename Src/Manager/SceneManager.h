@@ -16,8 +16,8 @@ public:
 	{
 		NONE,
 		TITLE,
-		DEMO,
 		GAME,
+		QUEST,
 		OVER,
 		CLEAR
 	};

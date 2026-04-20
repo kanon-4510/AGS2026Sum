@@ -1,10 +1,17 @@
-//#pragma once
-
+#pragma once
+#include "../Manager/InputManager.h"
 #include "SceneBase.h"
 
 class GameScene : public SceneBase
 {
 public:
+	enum QUEST_PHASE {
+		PHASE_QUEST,		//戦闘
+		PHASE_CLASSWORK,	//授業
+		PHASE_JOB_CHANGE,	//資格試験
+		MAX					//資格試験
+	};
+
 	//GameScene(void);		//デフォルトコンストラクタ
 	//~GameScene(void);		//デストラクタ
 
@@ -14,5 +21,11 @@ public:
 	void Release(void) override;	//解放処理
 
 private:
-	int bgImage_;			//背景画像格納領域
+
+	InputManager& ins = InputManager::GetInstance();
+
+	QUEST_PHASE phase_;	//クエストのフェーズ
+
+	void ProcessPhaseSelection(void);	//フェーズ選択の処理
+
 };
