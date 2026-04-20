@@ -36,13 +36,6 @@ void OverScene::Update(void)
 void OverScene::Draw(void)
 {
 	DrawString(0, 0, "Scene : GameOver", 0xFFFFFF);
-
-	DrawBox(50
-		, 50
-		, Application::SCREEN_SIZE_X - 50
-		, Application::SCREEN_SIZE_Y - 50
-		, 0xFF00FF
-		, true);
 }
 
 //‰ğ•úˆ—

@@ -38,13 +38,6 @@ void TitleScene::Update(void)
 void TitleScene::Draw(void)
 {
 	DrawString(0, 0, "Scene : Title", 0xFFFFFF);
-
-	DrawBox(50
-		, 50
-		, Application::SCREEN_SIZE_X - 50
-		, Application::SCREEN_SIZE_Y - 50
-		, 0x00FFFF
-		, true);
 }
 
 //‰ğ•úˆ—
