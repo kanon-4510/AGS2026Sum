@@ -2,6 +2,9 @@
 #include "../Application.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "Phase/QuestPhase.h"
+#include "Phase/ClassWorkPhase.h"
+#include "Phase/JobChangePhase.h"
 #include "GameScene.h"
 
 ////デフォルトコンストラクタ
@@ -33,18 +36,17 @@ void GameScene::Update(void)
 	//フェーズ選択の処理
 	ProcessPhaseSelection();
 
-	if (ins.IsTrgDown(KEY_INPUT_RETURN) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		switch (phase_) {
 		case QUEST_PHASE::PHASE_QUEST:
-			// シーンマネージャーにクエストシーンへの変更を命令
-			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::QUEST);
+			currentPhase_ = std::make_unique<QuestPhase>();
 			break;
 		case QUEST_PHASE::PHASE_CLASSWORK:
-			// 授業シーン、あるいは授業内処理へ
+			currentPhase_ = std::make_unique<ClassWorkPhase>();
 			break;
 		case QUEST_PHASE::PHASE_JOB_CHANGE:
-			// 資格試験シーンへ
+			currentPhase_ = std::make_unique<JobChangePhase>();
 			break;
 		}
 	}
@@ -53,14 +55,22 @@ void GameScene::Update(void)
 //描画処理
 void GameScene::Draw(void)
 {
-	DrawString(0, 0, "Scene : Game", 0xFFFFFF);
+	if (currentPhase_) {
+		// ここが呼ばれていないと、どれだけ切り替わっても画面は変わりません
+		currentPhase_->Draw();
+	}
+	else {
+		// メニュー画面の描画処理
+		DrawString(0, 0, "Scene : Game", 0xFFFFFF);
 
-	int color = GetColor(255, 255, 255);
-	int selectColor = GetColor(255, 255, 0); // 選択中は黄色にする
+		int color = GetColor(255, 255, 255);
+		int selectColor = GetColor(255, 255, 0); // 選択中は黄色にする
 
-	DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_QUEST ? selectColor : color), "クエストに出発");
-	DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "授業を受ける");
-	DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
+		DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_QUEST ? selectColor : color), "クエストに出発");
+		DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "授業を受ける");
+		DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
+
+	}
 }
 
 //解放処理
@@ -71,16 +81,16 @@ void GameScene::Release(void)
 void GameScene::ProcessPhaseSelection(void)
 {
 	//フェーズ選択の処理
-	if (ins.IsTrgDown(KEY_INPUT_UP) ||
-		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
+	if (ins_.IsTrgDown(KEY_INPUT_UP) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
 	{
 		//statusType_ = (statusType_ + 3) % 4;
 		int index = static_cast<int>(phase_);
 		index = (index - 1 + static_cast<int>(QUEST_PHASE::MAX)) % static_cast<int>(QUEST_PHASE::MAX);
 		phase_ = static_cast<QUEST_PHASE>(index);
 	}
-	if (ins.IsTrgDown(KEY_INPUT_DOWN) ||
-		ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
+	if (ins_.IsTrgDown(KEY_INPUT_DOWN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
 	{
 		int index = static_cast<int>(phase_);
 		index = (index + 1) % static_cast<int>(QUEST_PHASE::MAX);

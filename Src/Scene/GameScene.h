@@ -1,5 +1,7 @@
 #pragma once
+#include <memory>
 #include "../Manager/InputManager.h"
+#include "Phase/PhaseBase.h"
 #include "SceneBase.h"
 
 class GameScene : public SceneBase
@@ -22,7 +24,11 @@ public:
 
 private:
 
-	InputManager& ins = InputManager::GetInstance();
+	InputManager& ins_ = InputManager::GetInstance();
+
+	//ポインタの取得
+	//フェーズの管理
+	std::unique_ptr<PhaseBase> currentPhase_;
 
 	QUEST_PHASE phase_;	//クエストのフェーズ
 
