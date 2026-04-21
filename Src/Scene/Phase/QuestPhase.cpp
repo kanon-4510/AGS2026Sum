@@ -7,13 +7,9 @@
 void QuestPhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
-	if (ins.IsTrgDown(KEY_INPUT_RETURN))
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
-	}
 	if (ins.IsTrgDown(KEY_INPUT_SPACE))
 	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+		isFinished_ = true;
 	}
 }
 
@@ -24,5 +20,5 @@ void QuestPhase::Draw(void)
 
 bool QuestPhase::IsFinished() const
 {
-	return false;
+	return isFinished_;
 }

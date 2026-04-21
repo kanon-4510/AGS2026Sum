@@ -15,5 +15,8 @@ public:
 	virtual bool IsFinished() const override;
 
 private:
+
+	bool isFinished_ = false; // フェーズが終了したかどうかを管理するフラグ
+
 };
 

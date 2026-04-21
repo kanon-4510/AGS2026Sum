@@ -50,6 +50,14 @@ void GameScene::Update(void)
 			break;
 		}
 	}
+
+	if (currentPhase_) {
+		currentPhase_->Update();
+		// フェーズが終了したかどうかを確認
+		if (currentPhase_->IsFinished()) {
+			currentPhase_.reset(); // フェーズを終了してメニューに戻る
+		}
+	}
 }
 
 //描画処理
