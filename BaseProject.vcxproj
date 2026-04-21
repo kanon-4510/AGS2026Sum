@@ -19,11 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <ClCompile Include="Src\Scene\QuestScene.cpp" />
-=======
-    <ClCompile Include="Src\Object\Player.cpp" />
->>>>>>> Status
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\Fader.cpp" />
     <ClCompile Include="Src\Common\Vector2.cpp" />
@@ -39,20 +34,14 @@
     <ClCompile Include="Src\Object\Common\Pause.cpp" />
     <ClCompile Include="Src\Object\Common\UIPanel.cpp" />
     <ClCompile Include="Src\Scene\ClearScene.cpp" />
+    <ClCompile Include="Src\Scene\QuestScene.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\GameScene.cpp" />
     <ClCompile Include="Src\Scene\OverScene.cpp" />
     <ClCompile Include="Src\Scene\TitleScene.cpp" />
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
-    <ClCompile Include="Src\Object\PlayerStatus.cpp" />
-    <ClCompile Include="Src\Object\BaceStatus.cpp" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <ClInclude Include="Src\Scene\QuestScene.h" />
-=======
-    <ClInclude Include="Src\Object\Player.h" />
->>>>>>> Status
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Color.h" />
     <ClInclude Include="Src\Common\Fader.h" />
@@ -69,13 +58,12 @@
     <ClInclude Include="Src\Object\Common\Pause.h" />
     <ClInclude Include="Src\Object\Common\UIPanel.h" />
     <ClInclude Include="Src\Scene\ClearScene.h" />
+    <ClInclude Include="Src\Scene\QuestScene.h" />
     <ClInclude Include="Src\Scene\SceneBase.h" />
     <ClInclude Include="Src\Scene\GameScene.h" />
     <ClInclude Include="Src\Scene\OverScene.h" />
     <ClInclude Include="Src\Scene\TitleScene.h" />
     <ClInclude Include="Src\Utility\AsoUtility.h" />
-    <ClInclude Include="Src\Object\PlayerStatus.h" />
-    <ClInclude Include="Src\Object\BaceStatus.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
