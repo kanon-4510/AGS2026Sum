@@ -75,7 +75,17 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Src\Scene\QuestScene.cpp">
+=======
+    <ClCompile Include="Src\Object\PlayerStatus.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Object\Player.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Object\BaceStatus.cpp">
+>>>>>>> Status
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,7 +153,17 @@
     <ClInclude Include="Src\Common\Color.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Src\Scene\QuestScene.h">
+=======
+    <ClInclude Include="Src\Object\PlayerStatus.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Object\Player.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Object\BaceStatus.h">
+>>>>>>> Status
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
