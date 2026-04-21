@@ -75,10 +75,16 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="Src\Scene\QuestScene.cpp">
-=======
-    <ClCompile Include="Src\Object\PlayerStatus.cpp">
+    <ClCompile Include="Src\Scene\Phase\QuestPhase.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Phase\ClassWorkPhase.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Phase\JobChangePhase.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Phase\PhaseBase.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Src\Object\Player.cpp">
@@ -153,17 +159,16 @@
     <ClInclude Include="Src\Common\Color.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="Src\Scene\QuestScene.h">
-=======
-    <ClInclude Include="Src\Object\PlayerStatus.h">
+    <ClInclude Include="Src\Scene\Phase\QuestPhase.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Object\Player.h">
+    <ClInclude Include="Src\Scene\Phase\ClassWorkPhase.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Object\BaceStatus.h">
->>>>>>> Status
+    <ClInclude Include="Src\Scene\Phase\JobChangePhase.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Phase\PhaseBase.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

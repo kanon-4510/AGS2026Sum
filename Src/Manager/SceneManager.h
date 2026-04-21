@@ -17,7 +17,6 @@ public:
 		NONE,
 		TITLE,
 		GAME,
-		QUEST,
 		OVER,
 		CLEAR
 	};
