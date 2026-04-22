@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\BaseStatus.cpp" />
+    <ClCompile Include="Src\Object\Player.cpp" />
+    <ClCompile Include="Src\Object\PlayerStatus.cpp" />
     <ClCompile Include="Src\Scene\Phase\PhaseBase.cpp" />
     <ClCompile Include="Src\Scene\Phase\ClassWorkPhase.cpp" />
     <ClCompile Include="Src\Scene\Phase\JobChangePhase.cpp" />
@@ -45,6 +48,9 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\BaseStatus.h" />
+    <ClInclude Include="Src\Object\Player.h" />
+    <ClInclude Include="Src\Object\PlayerStatus.h" />
     <ClInclude Include="Src\Scene\Phase\PhaseBase.h" />
     <ClInclude Include="Src\Scene\Phase\ClassWorkPhase.h" />
     <ClInclude Include="Src\Scene\Phase\JobChangePhase.h" />
