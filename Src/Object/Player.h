@@ -8,10 +8,11 @@ public:
 	Player();
 	~Player();
 
-	const PlayerStatus& getStatus() const;
+	//ステータスのゲッター
+	const PlayerStatus* getStatus() const;
 
 private:
 
-	PlayerStatus status;
+	PlayerStatus* status;
 };
 

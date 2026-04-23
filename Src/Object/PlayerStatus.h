@@ -1,9 +1,15 @@
 #pragma once
-#include "BaceStatus.h"
+#include "BaseStatus.h"
 
-class PlayerStatus : public BaceStatus
+class PlayerStatus : public BaseStatus
 {
 public:
-	int level = 1;
+	int level;
+
+	PlayerStatus();
+
+	void Draw();
+
+	void Death() override;
 };
 
