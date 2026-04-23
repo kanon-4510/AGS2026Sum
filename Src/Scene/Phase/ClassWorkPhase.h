@@ -5,6 +5,9 @@
 class ClassWorkPhase : public PhaseBase
 {
 public:
+
+	static constexpr int COUNT_MAX = 100; // フェーズが終了するまでのカウントの最大値
+
 	//ClassWorkPhase(void);		//デフォルトコンストラクタ
 	//~ClassWorkPhase(void);		//デストラクタ
 
@@ -15,6 +18,8 @@ public:
 	virtual bool IsFinished() const override;
 
 private:
+
+	int timer_ = 0; // フェーズの経過時間を管理するタイマー
 
 	bool isFinished_ = false; // フェーズが終了したかどうかを管理するフラグ
 

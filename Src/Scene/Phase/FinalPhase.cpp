@@ -2,30 +2,26 @@
 #include "../../Application.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
-#include "ClassWorkPhase.h"
+#include "FinalPhase.h"
 
-void ClassWorkPhase::Update(void)
+void FinalPhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
 	timer_++; // フェーズの経過時間を増加させる
 
 	if (timer_ > COUNT_MAX) // 例えば、300フレーム経過したらフェーズを終了する
 	{
-		isFinished_ = true;
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
-	/*if (ins.IsTrgDown(KEY_INPUT_SPACE))
-	{
-		isFinished_ = true;
-	}*/
 }
 
-void ClassWorkPhase::Draw(void)
+void FinalPhase::Draw(void)
 {
-	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
+	DrawString(0, 0, "Scene : Final Phase", 0xFFFFFF);
 	DrawFormatString(0, 20, 0xFFFFFF, "カウント %d", timer_);
 }
 
-bool ClassWorkPhase::IsFinished() const
+bool FinalPhase::IsFinished() const
 {
 	return isFinished_;
 }
