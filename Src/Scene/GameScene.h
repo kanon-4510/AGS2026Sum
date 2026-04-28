@@ -3,6 +3,7 @@
 #include "../Manager/InputManager.h"
 #include "Phase/PhaseBase.h"
 #include "SceneBase.h"
+#include "../Object/PlayerStatus.h"
 
 class GameScene : public SceneBase
 {
@@ -14,8 +15,8 @@ public:
 		MAX					//資格試験
 	};
 
-	//GameScene(void);		//デフォルトコンストラクタ
-	//~GameScene(void);		//デストラクタ
+	GameScene(void);		//デフォルトコンストラクタ
+	~GameScene(void);		//デストラクタ
 
 	void Init(void) override;		//初期化処理
 	void Update(void) override;		//更新処理
@@ -25,6 +26,7 @@ public:
 private:
 
 	InputManager& ins_ = InputManager::GetInstance();
+	PlayerStatus* playerStatus_;
 
 	//ポインタの取得
 	//フェーズの管理

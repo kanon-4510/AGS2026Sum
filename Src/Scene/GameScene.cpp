@@ -7,17 +7,18 @@
 #include "Phase/JobChangePhase.h"
 #include "GameScene.h"
 
-////デフォルトコンストラクタ
-//GameScene::GameScene(void)
-//{
-//
-//}
-//
-////デストラクタ
-//GameScene::~GameScene(void)
-//{
-//
-//}
+//デフォルトコンストラクタ
+GameScene::GameScene(void)
+{
+		playerStatus_ = new PlayerStatus();
+}
+
+//デストラクタ
+GameScene::~GameScene(void)
+{
+	delete playerStatus_;
+	playerStatus_ = nullptr;
+}
 
 //初期化処理
 void GameScene::Init(void)
@@ -77,6 +78,8 @@ void GameScene::Draw(void)
 		DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_QUEST ? selectColor : color), "クエストに出発");
 		DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "授業を受ける");
 		DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
+
+		playerStatus_->Draw();
 
 	}
 }

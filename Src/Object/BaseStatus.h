@@ -3,12 +3,12 @@
 class BaseStatus
 {
 public:
-	int maxHp;
-	int hp;
-	int pow;
-	int mPow;
-	int speed;
-	int luck;
+	int maxHp_;
+	int hp_;
+	int pow_;
+	int magic_;
+	int speed_;
+	int luck_;
 
 	BaseStatus();
 	virtual ~BaseStatus() {};

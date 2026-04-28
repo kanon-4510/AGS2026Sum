@@ -2,20 +2,20 @@
 
 BaseStatus::BaseStatus()
 {
-	maxHp = 10;
-	hp = maxHp;
-	pow = 10;
-	mPow = 10;
-	speed = 10;
-	luck = 10;
+	maxHp_ = 10;
+	hp_ = maxHp_;
+	pow_ = 10;
+	magic_ = 10;
+	speed_ = 10;
+	luck_ = 10;
 }
 
 void BaseStatus::Damage(int damage)
 {
-	hp -= damage;
-	if (hp < 0)
+	hp_ -= damage;
+	if (hp_ < 0)
 	{
-		hp = 0;
+		hp_ = 0;
 		Death();
 	}
 }
