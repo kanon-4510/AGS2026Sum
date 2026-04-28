@@ -3,6 +3,7 @@
 #include "../Manager/InputManager.h"
 #include "Phase/PhaseBase.h"
 #include "SceneBase.h"
+#include "../Object/PlayerStatus.h"
 
 class GameScene : public SceneBase
 {
@@ -30,6 +31,7 @@ public:
 private:
 
 	InputManager& ins_ = InputManager::GetInstance();
+	PlayerStatus* playerStatus_;
 
 	//ポインタの取得
 	//フェーズの管理

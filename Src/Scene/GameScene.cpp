@@ -89,6 +89,8 @@ void GameScene::Draw(void)
 		DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "Žö‹Æ‚ðŽó‚¯‚é");
 		DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "Ž‘ŠiŽŽŒ±");
 
+		playerStatus_->Draw();
+
 	}
 }
 
