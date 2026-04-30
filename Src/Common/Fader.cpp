@@ -24,7 +24,7 @@ void Fader::Init(void)
 	LoadDivGraph(
 		"Data/Image/Load.png",	//スプライトシート
 		15,						//分割数
-		15, 1,					//横4コマ、縦1コマ
+		15, 1,					//横15コマ、縦1コマ
 		128,128,				//各コマのサイズ
 		imgLoad_);				//グラフィックIDを格納
 
