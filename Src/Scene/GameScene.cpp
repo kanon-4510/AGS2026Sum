@@ -13,12 +13,14 @@ GameScene::GameScene(void)
 {
 	turn_ = 0;
 	phase_ = QUEST_PHASE::PHASE_QUEST;
+	playerStatus_ = new PlayerStatus();
 }
 
 //デストラクタ
 GameScene::~GameScene(void)
 {
-
+	delete playerStatus_;
+	playerStatus_ = nullptr;
 }
 
 //初期化処理
