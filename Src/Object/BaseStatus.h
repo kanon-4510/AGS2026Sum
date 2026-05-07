@@ -5,7 +5,7 @@ class BaseStatus
 public:
 	int maxHp_;
 	int hp_;
-	int pow_;
+	int power_;
 	int magic_;
 	int speed_;
 	int luck_;
