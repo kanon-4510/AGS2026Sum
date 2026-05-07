@@ -91,6 +91,7 @@ void GameScene::Draw(void)
 		DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "授業を受ける");
 		DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
 
+		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();
 
 	}
@@ -132,7 +133,7 @@ void GameScene::ProcessPhaseDecision()
 	{
 		switch (phase_) {
 		case QUEST_PHASE::PHASE_QUEST:
-			currentPhase_ = std::make_unique<QuestPhase>();
+			currentPhase_ = std::make_unique<QuestPhase>(playerStatus_);
 			break;
 		case QUEST_PHASE::PHASE_CLASSWORK:
 			currentPhase_ = std::make_unique<ClassWorkPhase>();
