@@ -133,7 +133,7 @@ void GameScene::ProcessPhaseDecision()
 	{
 		switch (phase_) {
 		case QUEST_PHASE::PHASE_QUEST:
-			currentPhase_ = std::make_unique<QuestPhase>(playerStatus_);
+			currentPhase_ = std::make_unique<QuestPhase>();
 			break;
 		case QUEST_PHASE::PHASE_CLASSWORK:
 			currentPhase_ = std::make_unique<ClassWorkPhase>();
