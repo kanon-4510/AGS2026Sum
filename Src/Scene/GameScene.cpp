@@ -50,6 +50,14 @@ void GameScene::Update(void)
 	}
 }
 
+	//フェーズが実行中でない場合（メニュー選択）
+	//上のif文の中でreturnしていれば、最終ターン終了時はここは実行されない
+	if (!currentPhase_) {
+		ProcessPhaseSelection();
+		ProcessPhaseDecision();
+	}
+}
+
 //描画処理
 void GameScene::Draw(void)
 {
