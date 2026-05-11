@@ -41,6 +41,7 @@ private:
 
 	//メンバー変数の宣言
 	int turn_;		//現在のターン数
+	bool isInputBlocked_ = false; //入力ブロックフラグ
 
 	//メンバー関数
 	void ProcessPhaseSelection(void);	//フェーズ選択の処理

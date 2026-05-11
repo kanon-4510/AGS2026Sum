@@ -6,6 +6,13 @@
 class Vector2;
 class Vector2F;
 
+namespace Utility {
+	// ...Šù‘¶‚ÌŠÖ”‚½‚¿...
+
+	// ˆø”‚É vector ‚ğg‚¤‚±‚Æ‚ÅA3‘ğ‚Å‚à4‘ğ‚Å‚à‘Î‰‰Â”\‚É‚µ‚Ü‚·
+	void DrawCommandMenu(int x, int y, const std::vector<std::string>& labels, int cursor);
+}
+
 class AsoUtility
 {
 public:
