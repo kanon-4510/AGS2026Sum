@@ -56,14 +56,6 @@ void GameScene::Update(void)
 		}
 	}
 
-	//2.フェーズが実行中でない場合（メニュー選択）
-	//上のif文の中でreturnしていれば、最終ターン終了時はここは実行されない
-	if (!currentPhase_) {
-		ProcessPhaseSelection();
-		ProcessPhaseDecision();
-	}
-}
-
 	//フェーズが実行中でない場合（メニュー選択）
 	//上のif文の中でreturnしていれば、最終ターン終了時はここは実行されない
 	if (!currentPhase_) {
@@ -88,7 +80,8 @@ void GameScene::Draw(void)
 		DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_FINAL ? selectColor : color), "ボスバトル");
 
 	}
-	else {
+	else 
+	{
 		//メニュー画面の描画処理
 		DrawFormatString(0, 0, 0xFFFFFF, "Scene : Game 現在のターン %d", turn_);
 
@@ -100,7 +93,6 @@ void GameScene::Draw(void)
 		DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
 
 		playerStatus_->Draw();
-
 	}
 }
 
@@ -138,7 +130,8 @@ void GameScene::ProcessPhaseDecision()
 {
 	if (ins_.IsTrgUp(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
-		switch (phase_) {
+		switch (phase_) 
+		{
 		case QUEST_PHASE::PHASE_QUEST:
 			currentPhase_ = std::make_unique<QuestPhase>();
 			break;
