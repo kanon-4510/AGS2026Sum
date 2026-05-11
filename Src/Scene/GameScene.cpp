@@ -33,19 +33,20 @@ void GameScene::Init(void)
 //更新処理
 void GameScene::Update(void)
 {
-	// 1. まず現在のフェーズのUpdateを回す
+	//まず現在のフェーズのUpdateを回す
 	if (currentPhase_) {
 		currentPhase_->Update();
 
-		// 2. フェーズが終わった瞬間の処理
+		//フェーズが終わった瞬間の処理
 		if (currentPhase_->IsFinished()) {
 			currentPhase_.reset(); // クエスト終了！
+			turn_++; //ターンを進める
 			isInputBlocked_ = true; // ←ここで「次のフレームは入力を受け付けない」フラグを立てる
 			return;
 		}
 	}
 
-	// 3. 入力ブロック中なら解除して飛ばす
+	//入力ブロック中なら解除して飛ばす
 	if (isInputBlocked_) {
 		isInputBlocked_ = false;
 		return;
