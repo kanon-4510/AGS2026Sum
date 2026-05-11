@@ -33,27 +33,22 @@ void GameScene::Init(void)
 //更新処理
 void GameScene::Update(void)
 {
-	//現在のフェーズの更新処理
+	// 1. まず現在のフェーズのUpdateを回す
 	if (currentPhase_) {
-
 		currentPhase_->Update();
 
-		//フェーズが終了したかどうかを確認
+		// 2. フェーズが終わった瞬間の処理
 		if (currentPhase_->IsFinished()) {
-
-			//ターン数を増やす
-			turn_++;
-
-			//フェーズを終了してメニューに戻る
-			currentPhase_.reset();
-
-			if (turn_ > MAX_TURN) {
-				//ゲームオーバーなどの処理をここに書く
-				//今回はとりあえずターン数が最大を超えたらゲーム終了
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
-				return;
-			}
+			currentPhase_.reset(); // クエスト終了！
+			isInputBlocked_ = true; // ←ここで「次のフレームは入力を受け付けない」フラグを立てる
+			return;
 		}
+	}
+
+	// 3. 入力ブロック中なら解除して飛ばす
+	if (isInputBlocked_) {
+		isInputBlocked_ = false;
+		return;
 	}
 
 	//2.フェーズが実行中でない場合（メニュー選択）
@@ -115,7 +110,7 @@ void GameScene::ProcessPhaseSelection(void)
 	{
 		//statusType_ = (statusType_ + 3) % 4;
 		int index = static_cast<int>(phase_);
-		index = (index - 1 + static_cast<int>(QUEST_PHASE::PHASE_FINAL)) % static_cast<int>(QUEST_PHASE::PHASE_FINAL);
+		index = ((index - 1) + static_cast<int>(QUEST_PHASE::PHASE_FINAL)) % static_cast<int>(QUEST_PHASE::PHASE_FINAL);
 		phase_ = static_cast<QUEST_PHASE>(index);
 	}
 	else if (ins_.IsTrgDown(KEY_INPUT_DOWN) ||
@@ -129,7 +124,7 @@ void GameScene::ProcessPhaseSelection(void)
 
 void GameScene::ProcessPhaseDecision()
 {
-	if (ins_.IsTrgUp(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		switch (phase_) {
 		case QUEST_PHASE::PHASE_QUEST:
