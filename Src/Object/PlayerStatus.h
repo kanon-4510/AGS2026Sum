@@ -7,6 +7,11 @@
 class PlayerStatus
 {
 public:
+	constexpr static int STATUS_X = 300;	//ステータスの描画位置X
+	constexpr static int STATUS_COLOR = 0xFFFFFF;	//ステータスの描画色
+
+	constexpr static int NEED_EXP = 10;	//必要経験値
+
 	int level_ = 1;
 	int maxHp_ = 10;
 	int hp_ = maxHp_;
@@ -50,14 +55,20 @@ public:
 	//死亡処理
 	void Death();
 
+	//経験値処理
+	void GetExp(int exp);
+
 	//レベルアップした時の処理
 	void LevelUp();
 
 	//技能を成長させる処理
-	void GrowSkill(SkillType type, int amount);
+	void SkillUp(SkillType type, int amount);
 
 	//転職可能かどうかを判定する関数
 	bool JobCheck(const JobData& job);
+
+	//職業別でステータスにボーナス
+	void JobBonus(const JobData& job);
 
 	//全職業リストを外から参照できるようにする
 	const std::vector<JobData>& GetJobList() const { return jobList; }
