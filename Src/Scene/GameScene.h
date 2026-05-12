@@ -8,7 +8,8 @@
 class GameScene : public SceneBase
 {
 public:
-	enum QUEST_PHASE {
+	enum QUEST_PHASE 
+	{
 		PHASE_QUEST,		//戦闘
 		PHASE_CLASSWORK,	//授業
 		PHASE_JOB_CHANGE,	//資格試験
@@ -41,8 +42,8 @@ private:
 
 	//メンバー変数の宣言
 	int turn_;		//現在のターン数
+	bool isInputBlocked_ = false; //入力ブロックフラグ
 
 	//メンバー関数
 	void ProcessPhaseSelection(void);	//フェーズ選択の処理
-
 };
