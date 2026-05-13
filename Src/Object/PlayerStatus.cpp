@@ -9,15 +9,15 @@ PlayerStatus::PlayerStatus()
 void PlayerStatus::Draw()
 {
 	//ステータスの描画処理
-	DrawFormatString(300, 10, GetColor(255, 255, 255), "Level: %d", level_);
-	DrawFormatString(300, 30, GetColor(255, 255, 255), "HP: %d/%d", hp_, maxHp_);
-	DrawFormatString(300, 50, GetColor(255, 255, 255), "Power: %d", power_);
-	DrawFormatString(300, 70, GetColor(255, 255, 255), "Magic Power: %d", magic_);
-	DrawFormatString(300, 90, GetColor(255, 255, 255), "Speed: %d", speed_);
-	DrawFormatString(300, 110, GetColor(255, 255, 255), "Luck: %d", luck_);
+	DrawFormatString(STATUS_X, 10, STATUS_COLOR, "Level: %d", level_);
+	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, maxHp_);
+	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Power: %d", power_);
+	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magic Power: %d", magic_);
+	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
+	DrawFormatString(STATUS_X, 110, STATUS_COLOR, "Luck: %d", luck_);
 
-	DrawFormatString(300, 130, GetColor(255, 255, 255), "Job: %s", job.c_str());
-	DrawFormatString(300, 150, GetColor(255, 255, 255), "Faith: %d", faith_);
+	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
+	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "Faith: %d", faith_);
 }
 
 void PlayerStatus::InitJob()
@@ -47,19 +47,48 @@ void PlayerStatus::Death()
 	SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
 }
 
+void PlayerStatus::GetExp(int exp)
+{
+	//経験値処理
+	static int exp_ = 0;
+	exp_ += exp;
+	if (exp_ >= NEED_EXP) {
+		exp_ -= NEED_EXP;
+		LevelUp();
+	}
+}
+
 void PlayerStatus::LevelUp()
 {
 	//レベルアップした時の処理
 	level_++;
 	maxHp_ += 5;
 	hp_ = maxHp_;
-	power_ += 2;
-	magic_ += 2;
-	speed_ += 1;
-	luck_ += 1;
+
+	//各ステータスの抽選処理
+
+	//60%の確率でPOWアップ
+	if ((rand() % 100) < 60) {
+		power_ += 1;
+	}
+
+	//60%の確率でMAGICアップ
+	if ((rand() % 100) < 60) {
+		magic_ += 1;
+	}
+
+	//60%の確率でSPEEDアップ
+	if ((rand() % 100) < 60) {
+		speed_ += 1;
+	}
+
+	//60%の確率でLUCKアップ
+	if ((rand() % 100) < 60) {
+		luck_ += 1;
+	}
 }
 
-void PlayerStatus::GrowSkill(SkillType type, int amount)
+void PlayerStatus::SkillUp(SkillType type, int amount)
 {
 	//指定された技能を増加させる
 	switch (type) {
@@ -91,4 +120,16 @@ bool PlayerStatus::JobCheck(const JobData& job)
 	if (this->astrology_ < job.status.reqAstrology_) return false;
 
 	return true;
+}
+
+void PlayerStatus::JobBonus(const JobData& job)
+{
+	//職業に応じたステータスアップ
+	if (job.status.name == "聖職者") {
+		this->maxHp_ += 50;
+		this->hp_ = this->maxHp_; //全回復
+	}
+	else if (job.status.name == "魔導師") {
+		this->magic_ += 10;
+	}
 }
