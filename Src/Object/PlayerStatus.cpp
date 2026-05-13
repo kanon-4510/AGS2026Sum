@@ -65,10 +65,27 @@ void PlayerStatus::LevelUp()
 	maxHp_ += 5;
 	hp_ = maxHp_;
 
-	/*power_ += 2;
-	magic_ += 2;
-	speed_ += 1;
-	luck_ += 1;*/
+	//各ステータスの抽選処理
+
+	//60%の確率でPOWアップ
+	if ((rand() % 100) < 60) {
+		power_ += 1;
+	}
+
+	//60%の確率でMAGICアップ
+	if ((rand() % 100) < 60) {
+		magic_ += 1;
+	}
+
+	//60%の確率でSPEEDアップ
+	if ((rand() % 100) < 60) {
+		speed_ += 1;
+	}
+
+	//60%の確率でLUCKアップ
+	if ((rand() % 100) < 60) {
+		luck_ += 1;
+	}
 }
 
 void PlayerStatus::SkillUp(SkillType type, int amount)
