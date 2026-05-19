@@ -44,7 +44,6 @@ void QuestPhase::Draw(void)
 			DrawString(0, 170, "EnterƒL[‚ÅŸ‚Ö", 0xFF0000);
 		}
 	}
-	
 }
 
 bool QuestPhase::IsFinished() const
