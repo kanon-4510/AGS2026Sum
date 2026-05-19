@@ -17,7 +17,12 @@ void PlayerStatus::Draw()
 	DrawFormatString(300, 110, GetColor(255, 255, 255), "Luck: %d", luck_);
 
 	DrawFormatString(300, 130, GetColor(255, 255, 255), "Job: %s", job.c_str());
-	DrawFormatString(300, 150, GetColor(255, 255, 255), "Faith: %d", faith_);
+	DrawFormatString(300, 150, GetColor(255, 255, 255), "ñÚ: %d", pharmacy_);
+	DrawFormatString(300, 170, GetColor(255, 255, 255), "ïê: %d", martialArts_);
+	DrawFormatString(300, 190, GetColor(255, 255, 255), "ñÇ: %d", magicKnowledge_);
+	DrawFormatString(300, 210, GetColor(255, 255, 255), "êM: %d", faith_);
+	DrawFormatString(300, 230, GetColor(255, 255, 255), "å√: %d", archaeology_);
+	DrawFormatString(300, 250, GetColor(255, 255, 255), "êØ: %d", astrology_);
 }
 
 void PlayerStatus::InitJob()

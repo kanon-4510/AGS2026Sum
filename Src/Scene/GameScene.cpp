@@ -40,6 +40,7 @@ void GameScene::Update(void)
 		// 2. フェーズが終わった瞬間の処理
 		if (currentPhase_->IsFinished()) {
 			currentPhase_.reset(); // クエスト終了！
+			turn_++;
 			isInputBlocked_ = true; // ←ここで「次のフレームは入力を受け付けない」フラグを立てる
 			return;
 		}
@@ -132,7 +133,7 @@ void GameScene::ProcessPhaseDecision()
 			currentPhase_ = std::make_unique<QuestPhase>(playerStatus_);
 			break;
 		case QUEST_PHASE::PHASE_CLASSWORK:
-			currentPhase_ = std::make_unique<ClassWorkPhase>();
+			currentPhase_ = std::make_unique<ClassWorkPhase>(playerStatus_);
 			break;
 		case QUEST_PHASE::PHASE_JOB_CHANGE:
 			currentPhase_ = std::make_unique<JobChangePhase>();
