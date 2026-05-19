@@ -6,35 +6,45 @@
 #include "../../Utility/AsoUtility.h"
 #include "QuestPhase.h"
 
-QuestPhase::QuestPhase(PlayerStatus* playerStatus) : playerStatus_(playerStatus), command_(COMMAND::ATTACK)
+QuestPhase::QuestPhase(PlayerStatus* playerStatus) 
+	: playerStatus_(playerStatus)
+	, command_(COMMAND::ATTACK)
+	, battleStep_(BATTLE_STEP::COMMAND_SELECTION)
 {
 }
 
 void QuestPhase::Update(void)
 {
-	// --- ターン管理 ---
 	ManageTurn();
-
-	if (enemyHp_ <= 0)
-	{
-		isFinished_ = true;
-		playerStatus_->LevelUp();
-	}
 }
 
 void QuestPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
-	DrawFormatString(0, 20, 0xFFFFFF, "command %d", static_cast<int>(command_));
-
-	DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
-	DrawFormatString(0, 120, 0xFFFFFF, "敵のHP %d", enemyHp_);
-
-	Utility::DrawCommandMenu(0, 200, { "攻撃", "魔法", "アイテム" }, static_cast<int>(command_));
-
-	if (battleMessage_ != "") {
-		DrawFormatString(0, 150, 0xFF0000, battleMessage_.c_str());
+	if (battleStep_ == BATTLE_STEP::RESULT)
+	{
+		DrawString(0, 150, "経験値を10獲得した！", 0xFFFFFF);
+		DrawString(0, 170, "LVが1上がった！", 0xFFFFFF);
+		DrawString(0, 190, "基礎ステータスが上がった！", 0xFFFFFF);
+		
+		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
 	}
+	else
+	{
+		DrawFormatString(0, 20, 0xFFFFFF, "command %d", static_cast<int>(command_));
+
+		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
+		DrawFormatString(0, 120, 0xFFFFFF, "敵のHP %d　/ %d", enemyHp_, enemyMaxHp_);
+
+		Utility::DrawCommandMenu(0, 200, { "攻撃", "魔法", "アイテム" }, static_cast<int>(command_));
+
+		if (battleMessage_ != "")
+		{
+			DrawFormatString(0, 150, 0xFF0000, battleMessage_.c_str());
+			DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
+		}
+	}
+	
 }
 
 bool QuestPhase::IsFinished() const
@@ -71,126 +81,136 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.clear();
 
 	// プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
+	//（名前、速度、プレイヤーかどうか、ターゲット、行動の種類、ダメージ）
 	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0 });
 
 	// 敵追加 (とりあえず1体)
-	if (enemyHp_ > 0) {
+	if (enemyHp_ > 0) 
+	{
 		actionOrder_.push_back({ "スライム", enemySpeed_, false, 0, 0, 0 });
 	}
 
 	// ソート
-	std::sort(
-		actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b) {
-		return a.speed > b.speed;
-		});
+	std::sort(actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b)
+		{
+			return a.speed > b.speed;
+		}
+	);
 
 	// currentActionIdx_ の初期化もここで行うのが良いです
-	//currentActionIdx_ = 0;
+	currentActionIdx_ = 0;
 	battleStep_ = BATTLE_STEP::ACTION_LOOP;
 
 }
 
 void QuestPhase::ProcessActionLoop(void)
 {
-	/*
-	//全員の行動が終わったら、次のターン（コマンド選択）へ戻る
-	if (currentActionIdx_ >= actionOrder_.size()) {
+	if (currentActionIdx_ >= actionOrder_.size())
+	{
+		// ターン終了時にフラグを更新
+		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 		currentActionIdx_ = 0;
-		return;
-	}
-
-	//現在の行動者を取得
-	auto& unit = actionOrder_[currentActionIdx_];
-
-	// --- ここで行なうこと ---
-	//unit.isPlayer が true なら、プレイヤーの行動（ProcessPlayerAction）を呼ぶ
-	if(unit.isPlayer)
-	{
-		ProcessPlayerAction();
-	}
-	else //false なら、敵の行動を計算する
-	{
-		//今回は仮に、敵は常に攻撃するものとする
-		playerStatus_->Damage(enemyPow_);
-	}
-
-	// 4. Enterキーが押されたら、次の人へ（currentActionIdx_++）
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN)) {
-		currentActionIdx_++;
-	}
-	*/
-	if (currentActionIdx_ >= actionOrder_.size()) {
-		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
-		currentActionIdx_ = 0;
-		battleMessage_ = ""; // ターン終了時にメッセージを消す
+		battleMessage_ = "";
 		return;
 	}
 
 	auto& unit = actionOrder_[currentActionIdx_];
 
-	// まだメッセージが空なら（＝この人の行動開始の瞬間なら）セット
-	if (battleMessage_ == "") {
-		if (unit.isPlayer) {
+	if (battleMessage_ == "")
+	{
+		if (unit.isPlayer && command_ == COMMAND::ATTACK)
+		{
 			battleMessage_ = unit.name + " の攻撃！";
-			// ここで実際に敵のHPを減らす処理を1回だけ呼ぶ
 			enemyHp_ -= playerStatus_->power_;
 		}
-		else {
+		else if (unit.isPlayer && command_ == COMMAND::MAGIC)
+		{
+			battleMessage_ = unit.name + " の魔法攻撃！";
+			enemyHp_ -= playerStatus_->magic_;
+		}
+		else if (unit.isPlayer && command_ == COMMAND::ITEM)
+		{
+			battleMessage_ = unit.name + " がアイテム使用！";
+			playerStatus_->hp_ += 200;
+		}
+		else
+		{
 			battleMessage_ = unit.name + " の攻撃！";
-			// ここでプレイヤーのHPを減らす処理を1回だけ呼ぶ
 			playerStatus_->Damage(enemyPow_);
+		}
+		if (enemyHp_ <= 0)
+		{
+			battleMessage_ = unit.name + " が敵を倒した！";
 		}
 	}
 
-	// Enterが押されたらメッセージをリセットして次へ
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN)) {
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	{
 		battleMessage_ = "";
 		currentActionIdx_++;
+
+		// 判定：敵を倒したか？
+		if (enemyHp_ <= 0)
+		{
+			//戦闘終了時にも忘れずに魔法フラグを更新する
+			wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+
+			battleStep_ = BATTLE_STEP::RESULT;
+			return;
+		}
 	}
 }
 
 void QuestPhase::DisplayResult(void)
 {
-	
+	//ここで勝敗の結果を表示する処理を書く
+	//Enterが押されたらメッセージをリセットして次へ
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	{
+		playerStatus_->GetExp(10);
+		isFinished_ = true; //フェーズ終了
+	}
+
 }
 
 void QuestPhase::ProcessPlayerAction()
 {
-	// 選択肢の数（今回は仮に3つ：「攻撃」「魔法」「アイテム」）
+	//選択肢の数（今回は仮に3つ：「攻撃」「魔法」「アイテム」）
 	int maxItems = static_cast<int>(COMMAND::MAX);
 
-	// --- カーソル移動 ---
-	if (ins_.IsTrgDown(KEY_INPUT_UP)) {
-		command_ = static_cast<COMMAND>((static_cast<int>(command_) - 1 + maxItems) % maxItems); // 上にループ
+	//--- カーソル移動 ---
+	if (ins_.IsTrgDown(KEY_INPUT_UP))
+	{
+		command_ = static_cast<COMMAND>((static_cast<int>(command_) - 1 + maxItems) % maxItems); //上にループ
 	}
-	if (ins_.IsTrgDown(KEY_INPUT_DOWN)) {
-		command_ = static_cast<COMMAND>((static_cast<int>(command_) + 1) % maxItems); // 下にループ
+	if (ins_.IsTrgDown(KEY_INPUT_DOWN)) 
+	{
+		command_ = static_cast<COMMAND>((static_cast<int>(command_) + 1) % maxItems); //下にループ
 	}
+
 
 	// --- 決定処理 ---
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN)) {
-		// ここで command_ の値を見て処理を分岐させる
-		// 0: 攻撃, 1: 魔法, 2: アイテム
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	{
+		// 1. 魔法を選択している、かつ前回魔法を使っていたら決定させない
+		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_)
+		{
+			// ここで「今は使えない！」というSEを鳴らしたり、
+			// メッセージを一時的に出すと親切です
+			return;
+		}
 
-		if (command_ == COMMAND::ATTACK)
-		{
-			//攻撃の処理
-			battleStep_ = BATTLE_STEP::DETERMINE;
-			/*playerStatus_->Damage(enemyPow_);
-			enemyHp_ -= playerStatus_->power_;*/
+		// 2. 今回魔法を使うかどうかを記録しておく
+		if (command_ == COMMAND::MAGIC) {
+			magicUsedThisTurn_ = true;
 		}
-		if (command_ == COMMAND::MAGIC)
-		{
-			//魔法の処理
-			playerStatus_->Damage(enemyPow_);
-			enemyHp_ -= playerStatus_->magic_;
+		else {
+			magicUsedThisTurn_ = false;
 		}
-		if (command_ == COMMAND::ITEM)
-		{
-			//アイテムの処理
-			playerStatus_->hp_ += 10;
-			playerStatus_->Damage(enemyPow_);
-		}
+
+		// 3. 次のステップへ
+		battleStep_ = BATTLE_STEP::DETERMINE;
 	}
 }
