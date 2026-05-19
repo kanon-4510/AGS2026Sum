@@ -11,7 +11,6 @@ public:
         int reqLevel_;   //レベル
         int reqPower_;   //攻撃力
         int reqMagic_;   //魔法攻撃力
-        int reqSpeed_;   //速度
 
         //技術ステータスの条件
         int reqPharmacy_;       //薬学
@@ -25,6 +24,6 @@ public:
     JobDatas status;
 
     JobData(std::string n, int lv = 0, int pow = 0, int mag = 0,
-        int spd = 0, int pha = 0, int mar = 0, int mkn = 0,
+        int pha = 0, int mar = 0, int mkn = 0,
         int fai = 0, int arc = 0, int ast = 0);
 };

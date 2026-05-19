@@ -136,7 +136,7 @@ void GameScene::ProcessPhaseDecision()
 			currentPhase_ = std::make_unique<ClassWorkPhase>();
 			break;
 		case QUEST_PHASE::PHASE_JOB_CHANGE:
-			currentPhase_ = std::make_unique<JobChangePhase>();
+			currentPhase_ = std::make_unique<JobChangePhase>(playerStatus_);
 			break;
 		case QUEST_PHASE::PHASE_FINAL:
 			currentPhase_ = std::make_unique<FinalPhase>();

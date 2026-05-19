@@ -22,11 +22,14 @@ void PlayerStatus::Draw()
 
 void PlayerStatus::InitJob()
 {
+	//すでに職業が初期化されている場合は何もしない
+	if (!jobList.empty()) return;
+
 	//職業の初期化
 	//名前, LV, POW, MAG, 薬学, 武術, 魔法知, 信仰, 考古, 占星
 	jobList.push_back(JobData("聖職者"	, 1, 0, 0, 0, 0, 0, 5, 0, 0));
 	jobList.push_back(JobData("占い師"	, 1, 0, 0, 0, 0, 0, 0, 0, 5));
-	jobList.push_back(JobData("詠唱者"	, 1, 0, 5, 0, 0, 5, 0, 0, 0));
+	jobList.push_back(JobData("詠唱者"	, 1, 0, 5, 0, 0, 0, 0, 5, 0));
 
 	jobList.push_back(JobData("魔導師"	, 1, 0, 5, 0, 0, 5, 0, 0, 0));
 	jobList.push_back(JobData("魔剣士"	, 1, 3, 3, 0, 2, 2, 0, 0, 0));
@@ -50,7 +53,6 @@ void PlayerStatus::Death()
 void PlayerStatus::GetExp(int exp)
 {
 	//経験値処理
-	static int exp_ = 0;
 	exp_ += exp;
 	if (exp_ >= NEED_EXP) {
 		exp_ -= NEED_EXP;
@@ -68,22 +70,22 @@ void PlayerStatus::LevelUp()
 	//各ステータスの抽選処理
 
 	//60%の確率でPOWアップ
-	if ((rand() % 100) < 60) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
 		power_ += 1;
 	}
 
 	//60%の確率でMAGICアップ
-	if ((rand() % 100) < 60) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
 		magic_ += 1;
 	}
 
 	//60%の確率でSPEEDアップ
-	if ((rand() % 100) < 60) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
 		speed_ += 1;
 	}
 
 	//60%の確率でLUCKアップ
-	if ((rand() % 100) < 60) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
 		luck_ += 1;
 	}
 }

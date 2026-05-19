@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PhaseBase.h"
+#include "../../Object/PlayerStatus.h"
 
 class JobChangePhase : public PhaseBase
 {
@@ -8,7 +9,7 @@ public:
 
 	static constexpr int COUNT_MAX = 100; // フェーズが終了するまでのカウントの最大値
 
-	//QuestPhase(void);		//デフォルトコンストラクタ
+	JobChangePhase(PlayerStatus* playerStatus);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ
 
 	void Update(void) override;		//更新処理
@@ -18,6 +19,8 @@ public:
 	virtual bool IsFinished() const override;
 
 private:
+	PlayerStatus* playerStatus_; // プレイヤーのステータスへのポインタ
+	int selectedIndex_ = 0; // 現在選択されている職業のインデックス
 
 	int timer_ = 0; // フェーズの経過時間を管理するタイマー
 

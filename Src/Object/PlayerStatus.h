@@ -7,12 +7,15 @@
 class PlayerStatus
 {
 public:
-	constexpr static int STATUS_X = 300;	//ステータスの描画位置X
+	constexpr static int STATUS_X = 300;			//ステータスの描画位置X
 	constexpr static int STATUS_COLOR = 0xFFFFFF;	//ステータスの描画色
 
-	constexpr static int NEED_EXP = 10;	//必要経験値
+	constexpr static int NEED_EXP = 10;			//必要経験値
+	constexpr static int RATE_BASE = 100;		//ステータスアップの確率の基準値
+	constexpr static int SKILL_UP_RATE = 60;	//ステータスアップの確率
 
 	int level_ = 1;
+	int exp_ = 0;
 	int maxHp_ = 10;
 	int hp_ = maxHp_;
 	int power_ = 10;
