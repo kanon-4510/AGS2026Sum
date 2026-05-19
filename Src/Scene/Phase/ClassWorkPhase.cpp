@@ -4,27 +4,26 @@
 #include "../../Manager/InputManager.h"
 #include "ClassWorkPhase.h"
 
+ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus):playerStatus_(playerstatus)
+{
+
+}
+
+ClassWorkPhase::~ClassWorkPhase(void)
+{
+}
+
 void ClassWorkPhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
 
 	ProcessClassworkSelection();
 	ProcessClassworkDecision();
-
-	if (timer_ >= COUNT_MAX) // 例えば、300フレーム経過したらフェーズを終了する
-	{
-		//isFinished_ = true;
-	}
-	/*if (ins.IsTrgDown(KEY_INPUT_SPACE))
-	{
-		isFinished_ = true;
-	}*/
 }
 
 void ClassWorkPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
-	DrawFormatString(0, 20, 0xFFFFFF, "カウント %d", timer_);
 
 	int color = GetColor(255, 255, 255);
 	int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
@@ -62,13 +61,36 @@ void ClassWorkPhase::ProcessClassworkSelection(void)
 
 void ClassWorkPhase::ProcessClassworkDecision()
 {
+	//技能値の上昇
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
+		int rand = GetRand(35)-15;	//乱数の取得
+		int skill = SKILL_UP + rand;//上昇幅の確定
+
 		switch (select_) 
 		{
 		case CLASSWORK_SELECT::PHARMACY:
-			timer_++; // フェーズの経過時間を増加させる
-
+			playerStatus_->pharmacy_ += skill;
+			isFinished_ = true;
+			break;
+		case CLASSWORK_SELECT::MARTIALARTS:
+			playerStatus_->martialArts_ += skill;
+			isFinished_ = true;
+			break;
+		case CLASSWORK_SELECT::MAGICKNOWLEDGE:
+			playerStatus_->magicKnowledge_ += skill;
+			isFinished_ = true;
+			break;
+		case CLASSWORK_SELECT::FAITH:
+			playerStatus_->faith_ += skill;
+			isFinished_ = true;
+			break;
+		case CLASSWORK_SELECT::ARCHAEOLOGY:
+			playerStatus_->archaeology_ += skill;
+			isFinished_ = true;
+			break;
+		case CLASSWORK_SELECT::ASTROLOGY:
+			playerStatus_->astrology_ += skill;
 			isFinished_ = true;
 			break;
 		}

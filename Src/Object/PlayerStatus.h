@@ -24,7 +24,8 @@ public:
 	int luck_ = 10;
 
 	//技能の種類
-	enum class SkillType {
+	enum class SkillType 
+	{
 		Pharmacy,		//薬学
 		MartialArts,	//武術
 		MagicKnowledge,	//魔法知識
