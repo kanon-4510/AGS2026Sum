@@ -34,12 +34,14 @@ public:
 		MAX
 	};
 
-	int enemyHp_ = 20; //敵のHPを管理する変数（仮）
-	int enemyPow_ = 5; //敵のPOWを管理する変数（仮）
+
+	static constexpr int MAX_HP = 30; //
+
+	int enemyMaxHp_ = MAX_HP; //敵の最大HPを管理する変数（仮）
+	int enemyHp_ = MAX_HP; //敵のHPを管理する変数（仮）
+	int enemyPow_ = 3; //敵のPOWを管理する変数（仮）
 	int enemySpeed_ = 20; //敵のSPEEDを管理する変数（仮）
 	bool enemyFlag_ = true; //敵の行動のフラグ（仮）
-
-	static constexpr int COUNT_MAX = 100; // フェーズが終了するまでのカウントの最大値
 
 	QuestPhase(PlayerStatus* playerStatus);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ
@@ -70,13 +72,20 @@ private:
 	//現在のバトルステップを管理する変数
 	BATTLE_STEP battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 
+	//------フラグ---------
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 
+	//魔法攻撃のインターバル(1ターン)
+	bool wasMagicUsedLastTurn_ = false; // 前のターンに魔法を使ったか
+	bool magicUsedThisTurn_ = false;    // 今のターンに魔法を使ったか（更新用）
+	
+	//-------変数---------
 	int currentActionIdx_ = 0; //行動リストの何番目かを指す
 
+
+	//------関数---------
 	//ターンを管理する関数
 	void ManageTurn(void);
-
 	
 	//行動の順番を決定する関数
 	void DetermineActionOrder(void);
