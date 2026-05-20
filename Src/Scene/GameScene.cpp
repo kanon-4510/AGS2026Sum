@@ -38,13 +38,15 @@ void GameScene::Update(void)
 		currentPhase_->Update();
 
 		//フェーズが終わった瞬間の処理
-		if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::NEXT_TURN) {
+		if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::NEXT_TURN
+			&& currentPhase_->IsFinished()) {
 			currentPhase_.reset(); // クエスト終了！
 			turn_++; //ターンを進める
 			isInputBlocked_ = true; // ←ここで「次のフレームは入力を受け付けない」フラグを立てる
 			return;
 		}
-		else if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::CANCEL)
+		else if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::CANCEL
+			&& currentPhase_->IsFinished())
 		{
 			currentPhase_.reset(); // クエスト終了！
 			isInputBlocked_ = true;

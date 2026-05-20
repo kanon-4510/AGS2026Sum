@@ -23,8 +23,6 @@ void PlayerStatus::Draw()
 	DrawFormatString(300, 210, GetColor(255, 255, 255), "êM: %d", faith_);
 	DrawFormatString(300, 230, GetColor(255, 255, 255), "å√: %d", archaeology_);
 	DrawFormatString(300, 250, GetColor(255, 255, 255), "êØ: %d", astrology_);
-	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
-	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "Faith: %d", faith_);
 }
 
 void PlayerStatus::InitJob()
