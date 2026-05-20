@@ -155,7 +155,7 @@ void QuestPhase::ProcessActionLoop(void)
 		{
 			//戦闘終了時にも忘れずに魔法フラグを更新する
 			wasMagicUsedLastTurn_ = magicUsedThisTurn_;
-
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
 			battleStep_ = BATTLE_STEP::RESULT;
 			return;
 		}
@@ -211,5 +211,11 @@ void QuestPhase::ProcessPlayerAction()
 
 		// 3. 次のステップへ
 		battleStep_ = BATTLE_STEP::DETERMINE;
+	}
+
+	if(ins_.IsTrgDown(KEY_INPUT_TAB))
+	{
+		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
+		isFinished_ = true; //フェーズ終了
 	}
 }
