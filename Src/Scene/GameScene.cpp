@@ -38,11 +38,17 @@ void GameScene::Update(void)
 		currentPhase_->Update();
 
 		//フェーズが終わった瞬間の処理
-		if (currentPhase_->IsFinished()) {
+		if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::NEXT_TURN) {
 			currentPhase_.reset(); // クエスト終了！
 			turn_++; //ターンを進める
 			isInputBlocked_ = true; // ←ここで「次のフレームは入力を受け付けない」フラグを立てる
 			return;
+		}
+		else if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::CANCEL)
+		{
+			currentPhase_.reset(); // クエスト終了！
+			isInputBlocked_ = true;
+			return; //コマンド選択をやり直す
 		}
 	}
 
@@ -74,7 +80,6 @@ void GameScene::Draw(void)
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
 
 		DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_FINAL ? selectColor : color), "ボスバトル");
-
 	}
 	else 
 	{
@@ -139,7 +144,7 @@ void GameScene::ProcessPhaseDecision()
 			currentPhase_ = std::make_unique<JobChangePhase>(playerStatus_);
 			break;
 		case QUEST_PHASE::PHASE_FINAL:
-			currentPhase_ = std::make_unique<FinalPhase>();
+			currentPhase_ = std::make_unique<FinalPhase>(playerStatus_);
 			break;
 		}
 	}
