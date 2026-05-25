@@ -16,13 +16,34 @@ void PlayerStatus::Draw()
 	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
 	DrawFormatString(STATUS_X, 110, STATUS_COLOR, "Luck: %d", luck_);
 
-	DrawFormatString(300, 130, GetColor(255, 255, 255), "Job: %s", job.c_str());
-	DrawFormatString(300, 150, GetColor(255, 255, 255), "薬: %d", pharmacy_);
-	DrawFormatString(300, 170, GetColor(255, 255, 255), "武: %d", martialArts_);
-	DrawFormatString(300, 190, GetColor(255, 255, 255), "魔: %d", magicKnowledge_);
-	DrawFormatString(300, 210, GetColor(255, 255, 255), "信: %d", faith_);
-	DrawFormatString(300, 230, GetColor(255, 255, 255), "古: %d", archaeology_);
-	DrawFormatString(300, 250, GetColor(255, 255, 255), "星: %d", astrology_);
+	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
+	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "薬: %d", pharmacy_);
+	DrawFormatString(STATUS_X, 170, STATUS_COLOR, "武: %d", martialArts_);
+	DrawFormatString(STATUS_X, 190, STATUS_COLOR, "魔: %d", magicKnowledge_);
+	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "信: %d", faith_);
+	DrawFormatString(STATUS_X, 230, STATUS_COLOR, "古: %d", archaeology_);
+	DrawFormatString(STATUS_X, 250, STATUS_COLOR, "星: %d", astrology_);
+
+	//技能ステータスのボーナス分を描画
+	unsigned int GREEN = STATUS_BONUS_COLOR;
+
+	int itemBonus = SkillBonus(BonusType::ItemBonus, 0);
+	if (itemBonus > 0) DrawFormatString(STATUS_BONUS_X, 150, GREEN, "(回復+%d)", itemBonus);
+
+	int atkBonus = SkillBonus(BonusType::AttackBonus, 0); //基準値0で呼ぶとボーナス量だけが返る
+	if (atkBonus > 0) DrawFormatString(STATUS_BONUS_X, 170, GREEN, "(攻撃+%d)", atkBonus);
+
+	int magBonus = SkillBonus(BonusType::MagicBonus, 0);
+	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 190, GREEN, "(魔法+%d)", magBonus);
+
+	int defBonus = (faith_ / 5); //軽減するダメージ量
+	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 210, GREEN, "(防御+%d)", defBonus);
+
+	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
+	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 230, GREEN, "(EXP+%d)", expBonus);
+
+	int luckBonus = SkillBonus(BonusType::LuckBonus, 0);
+	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(運+%d)", luckBonus);
 }
 
 void PlayerStatus::InitJob()
@@ -41,9 +62,21 @@ void PlayerStatus::InitJob()
 	jobList.push_back(JobData("付加術師", 1, 0, 3, 2, 0, 3, 0, 0, 0));
 }
 
+int PlayerStatus::Attack()
+{
+	return SkillBonus(BonusType::AttackBonus, power_);
+}
+
+int PlayerStatus::MagicAttack()
+{
+	return SkillBonus(BonusType::MagicBonus, magic_);
+}
+
 void PlayerStatus::Damage(int damage)
 {
-	hp_ -= damage;
+	int finalDamage = SkillBonus(BonusType::DefenseBonus, damage);
+
+	hp_ -= finalDamage;
 	if (hp_ <= 0) {
 		hp_ = 0;
 		Death();
@@ -58,8 +91,10 @@ void PlayerStatus::Death()
 void PlayerStatus::GetExp(int exp)
 {
 	//経験値処理
-	exp_ += exp;
-	if (exp_ >= NEED_EXP) {
+	int finalExp = SkillBonus(BonusType::ExpBonus, exp);
+
+	exp_ += finalExp;
+	while (exp_ >= NEED_EXP) {
 		exp_ -= NEED_EXP;
 		LevelUp();
 	}
@@ -95,22 +130,6 @@ void PlayerStatus::LevelUp()
 	}
 }
 
-void PlayerStatus::SkillUp(SkillType type, int amount)
-{
-	//指定された技能を増加させる
-	switch (type) {
-	case SkillType::Pharmacy:       pharmacy_ += amount; break;
-	case SkillType::MartialArts:    martialArts_ += amount; break;
-	case SkillType::MagicKnowledge: magicKnowledge_ += amount; break;
-	case SkillType::Faith:          faith_ += amount; break;
-	case SkillType::Archaeology:    archaeology_ += amount; break;
-	case SkillType::Astrology:      astrology_ += amount; break;
-	}
-
-	//技能が上がったことで「新しく転職可能になった職業」があるかチェック
-	//CheckNewJobAvailability();
-}
-
 bool PlayerStatus::JobCheck(const JobData& job)
 {
 	//基礎ステータスのチェック
@@ -129,14 +148,39 @@ bool PlayerStatus::JobCheck(const JobData& job)
 	return true;
 }
 
-void PlayerStatus::JobBonus(const JobData& job)
+int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 {
-	//職業に応じたステータスアップ
-	if (job.status.name == "聖職者") {
-		this->maxHp_ += 50;
-		this->hp_ = this->maxHp_; //全回復
+	switch (type) {
+	case BonusType::ItemBonus:
+		//薬学10につき、アイテム回復量を+1する
+		//基本回復50、薬学30 → 50 + (30 / 10) = 53
+		return baseValue + (pharmacy_ / 10);
+
+	case BonusType::AttackBonus:
+		//武術10につき、物理攻撃のダメージを+1する
+		return baseValue + (martialArts_ / 10);
+
+	case BonusType::MagicBonus:
+		//魔法知10につき、魔法威力を+1する
+		return baseValue + (magicKnowledge_ / 10);
+
+	case BonusType::DefenseBonus:
+	{
+		//信仰10につき、受けるダメージを-1する
+		int finalDamage = baseValue - (faith_ / 10);
+		//ダメージがマイナス（回復）になってしまうのを防ぐため、最低でも1ダメージは受ける
+		if (finalDamage < 1) finalDamage = 1;
+		return finalDamage;
 	}
-	else if (job.status.name == "魔導師") {
-		this->magic_ += 10;
+
+	case BonusType::ExpBonus:
+		//考古学10につき、獲得経験値を+2する（固定値追加）
+		//例：基本経験値10、考古学10 → 10 + (10 / 10 * 2) = 12
+		return baseValue + (archaeology_ / 10 * 2);
+
+	case BonusType::LuckBonus:
+		//占星術10につき、運のステータスを+1する
+		return baseValue + (astrology_ / 10);
 	}
+	return baseValue;
 }

@@ -10,6 +10,9 @@ public:
 	constexpr static int STATUS_X = 300;			//ステータスの描画位置X
 	constexpr static int STATUS_COLOR = 0xFFFFFF;	//ステータスの描画色
 
+	constexpr static int STATUS_BONUS_X = 380;	//ステータスのボーナス分の描画位置X
+	constexpr static int STATUS_BONUS_COLOR = 0x00FF00;	//ステータスのボーナス分の描画色
+
 	constexpr static int NEED_EXP = 10;			//必要経験値
 	constexpr static int RATE_BASE = 100;		//ステータスアップの確率の基準値
 	constexpr static int SKILL_UP_RATE = 60;	//ステータスアップの確率
@@ -42,6 +45,16 @@ public:
 	int archaeology_ = 0;
 	int astrology_ = 0;
 
+	//追加効果の種類
+	enum class BonusType {
+		ItemBonus,      // 薬学：アイテム効果上昇
+		AttackBonus,    // 武術：攻撃力上昇
+		MagicBonus,     // 魔法知識：魔法威力上昇
+		DefenseBonus,   // 信仰：ダメージ軽減
+		ExpBonus,       // 考古学：経験値上昇
+		LuckBonus       // 占星術：運の上昇
+	};
+
 	std::string job = "魔法使い";	//現在の職業
 	std::vector<JobData> jobList;	//職業リストを作成
 
@@ -52,6 +65,12 @@ public:
 
 	//職業の初期化
 	void InitJob();
+
+	//攻撃処理
+	int Attack();
+
+	//魔法攻撃処理
+	int MagicAttack();
 
 	//ダメージ処理
 	void Damage(int damage);
@@ -65,14 +84,11 @@ public:
 	//レベルアップした時の処理
 	void LevelUp();
 
-	//技能を成長させる処理
-	void SkillUp(SkillType type, int amount);
-
 	//転職可能かどうかを判定する関数
 	bool JobCheck(const JobData& job);
 
-	//職業別でステータスにボーナス
-	void JobBonus(const JobData& job);
+	//技能ごとの追加効果を処理する関数
+	int SkillBonus(BonusType type, int baseValue);
 
 	//全職業リストを外から参照できるようにする
 	const std::vector<JobData>& GetJobList() const { return jobList; }
