@@ -43,7 +43,7 @@ void JobChangePhase::Update(void)
         if (playerStatus_->JobCheck(selectedJob)) {
             //条件クリア！職業を変更する
             playerStatus_->SetJob(selectedJob.status.name);
-
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
             //転職成功のSEなどを鳴らすと良い
             isFinished_ = true;
         }
@@ -51,6 +51,11 @@ void JobChangePhase::Update(void)
             //条件を満たしていない
         }
     }
+    else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB)) {
+        //キャンセルキーが押されたらフェーズを終了する
+        PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
+        isFinished_ = true;
+	}
 }
 
 void JobChangePhase::Draw(void)
