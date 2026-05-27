@@ -11,6 +11,9 @@ namespace Utility {
 
 	// 引数に vector を使うことで、3択でも4択でも対応可能にします
 	void DrawCommandMenu(int x, int y, const std::vector<std::string>& labels, int cursor);
+
+	// DrawCommandMenuの数に合わせて選択をできるようにする
+	void ProcessCommandMenuSelection(int& cursor, int maxItems);
 }
 
 class AsoUtility

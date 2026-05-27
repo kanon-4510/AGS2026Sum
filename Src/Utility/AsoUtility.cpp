@@ -2,6 +2,7 @@
 #include <sstream>
 #include "../Common/Vector2.h"
 #include "../Common/Vector2F.h"
+#include "../Manager/InputManager.h"
 #include "AsoUtility.h"
 
 
@@ -55,5 +56,19 @@ void Utility::DrawCommandMenu(int x, int y, const std::vector<std::string>& labe
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
 		DrawFormatString(x, y + i * 40, (cursor == i ? selectColor : color), labels[i].c_str());
+	}
+}
+
+void Utility::ProcessCommandMenuSelection(int& cursor, int maxItems)
+{
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_UP) ||
+		InputManager::GetInstance().IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
+	{
+		cursor = (cursor - 1 + maxItems) % maxItems; //上にループ
+	}
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_DOWN) ||
+		InputManager::GetInstance().IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
+	{
+		cursor = (cursor + 1) % maxItems; //下にループ
 	}
 }

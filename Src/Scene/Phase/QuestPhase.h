@@ -16,13 +16,21 @@ public:
 		int targetIdx;    // 攻撃対象が誰か
 	};
 
-
+	//難易度
+	enum class DIFFICULTY{
+		EASY,
+		NORMAL,
+		HARD,
+		MAX
+	};
+	
 	enum class BATTLE_STEP
 	{
-		COMMAND_SELECTION,	//コマンド選択
-		DETERMINE,			//コマンド決定
-		ACTION_LOOP,		//行動ループ
-		RESULT,				//結果表示
+		DIFFICULTY_SELECTION,	//難易度選択
+		COMMAND_SELECTION,		//コマンド選択
+		DETERMINE,				//コマンド決定
+		ACTION_LOOP,			//行動ループ
+		RESULT,					//結果表示
 		MAX
 	};
 
@@ -34,14 +42,26 @@ public:
 		MAX
 	};
 
+	//経験値（仮）
+	static constexpr int EXP_GAIN = 10;
 
 	static constexpr int MAX_HP = 30; //
+	static constexpr int HP_RECOVERY_AMOUNT = 20; //アイテム使用時のHP回復量
 
-	int enemyMaxHp_ = MAX_HP; //敵の最大HPを管理する変数（仮）
-	int enemyHp_ = MAX_HP; //敵のHPを管理する変数（仮）
-	int enemyPow_ = 3; //敵のPOWを管理する変数（仮）
-	int enemySpeed_ = 20; //敵のSPEEDを管理する変数（仮）
+	//敵の強さの上がり幅
+	static constexpr float ENEMY_INCREASE = 0.7f;
+	static constexpr float HARD_INCREASE = 1.5f;
+
+	static constexpr int ENEMY_HP = MAX_HP;		//敵のHPを管理する変数（仮）
+	static constexpr int ENEMY_POW = 5;			//敵のPOWを管理する変数（仮）
+	static constexpr int ENEMY_SPEED = 10;		//敵のSPEEDを管理する変数（仮）
+
+	int enemyMaxHp_;
+	int enemyHp_;
+	int enemyPow_;
+	int enemySpeed_;
 	bool enemyFlag_ = true; //敵の行動のフラグ（仮）
+	int expGain_;
 
 	QuestPhase(PlayerStatus* playerStatus);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ
@@ -65,12 +85,15 @@ private:
 
 	//inputManagerのインスタンスを取得
 	InputManager& ins_ = InputManager::GetInstance();
-
-	//プレイヤーの選択したコマンドを管理する変数
-	COMMAND command_; 
 	
+	//難易度を管理する変数
+	DIFFICULTY difficulty_ = DIFFICULTY::EASY;
+
 	//現在のバトルステップを管理する変数
 	BATTLE_STEP battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+
+	//プレイヤーの選択したコマンドを管理する変数
+	COMMAND command_;
 
 	//------フラグ---------
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
@@ -84,9 +107,13 @@ private:
 
 
 	//------関数---------
+	
 	//ターンを管理する関数
 	void ManageTurn(void);
 	
+	//難易度選択の処理
+	void ProcessDifficulty(void);
+
 	//行動の順番を決定する関数
 	void DetermineActionOrder(void);
 	//行動の順番に従って処理を行う関数
@@ -95,6 +122,9 @@ private:
 	void DisplayResult(void);
 	//プレイヤーの行動の処理などをここに書く
 	void ProcessPlayerAction(void);
+
+	//Draw関数内でコマンド選択の描画を行う関数
+	void DrawCommandSelection(void);
 
 };
 
