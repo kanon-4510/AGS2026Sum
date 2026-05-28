@@ -1,5 +1,4 @@
 #pragma once
-#include "BaseStatus.h"
 #include "JobData.h"
 #include <string>
 #include <vector>
