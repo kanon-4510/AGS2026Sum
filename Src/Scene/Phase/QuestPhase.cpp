@@ -255,6 +255,7 @@ void QuestPhase::DisplayResult(void)
 	//経験値獲得は ProcessActionLoop内で敵を倒すたびに行うように変更したため、ここは次へ進む処理のみ
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
+		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 		isFinished_ = true; //フェーズ終了
 	}
 }
