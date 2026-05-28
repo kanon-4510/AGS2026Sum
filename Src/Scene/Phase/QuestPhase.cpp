@@ -182,12 +182,12 @@ void QuestPhase::ProcessActionLoop(void)
 			if (command_ == COMMAND::ATTACK) 
 			{
 				battleMessage_ = unit.name + " ‚ÌUŒ‚I";
-				activeEnemy_->TakeDamage(playerStatus_->power_);
+				activeEnemy_->TakeDamage(playerStatus_->Attack());
 			}
 			else if (command_ == COMMAND::MAGIC) 
 			{
 				battleMessage_ = unit.name + " ‚Ì–‚–@UŒ‚I";
-				activeEnemy_->TakeDamage(playerStatus_->magic_);
+				activeEnemy_->TakeDamage(playerStatus_->MagicAttack());
 			}
 			else if (command_ == COMMAND::ITEM) 
 			{
