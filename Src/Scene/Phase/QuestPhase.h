@@ -28,6 +28,7 @@ public:
 	{
 		DIFFICULTY_SELECTION,	//難易度選択
 		COMMAND_SELECTION,		//コマンド選択
+		COMMAND_SUB_SELECTION,	//サブコマンド選択
 		DETERMINE,				//コマンド決定
 		ACTION_LOOP,			//行動ループ
 		RESULT,					//結果表示
@@ -79,6 +80,9 @@ private:
 
 	//画面に表示する文字列
 	std::string battleMessage_; 
+	std::vector<std::string> subActionMessages_; // サブメッセージの配列
+	std::vector<std::string> resultMessages_; // リザルトメッセージの配列
+	size_t messageDisplayIdx_ = 0; //文字列を1行ずつ表示する
 
 	//プレイヤーのステータスの情報を渡す
 	PlayerStatus* playerStatus_;
@@ -103,7 +107,8 @@ private:
 	bool magicUsedThisTurn_ = false;    // 今のターンに魔法を使ったか（更新用）
 	
 	//-------変数---------
-	int currentActionIdx_ = 0; //行動リストの何番目かを指す
+	int currentActionIdx_ = 0;	//行動リストの何番目かを指す
+	int subMenuCursor_ = 0;		// サブメニューのカーソル
 
 
 	//------関数---------
@@ -113,18 +118,26 @@ private:
 	
 	//難易度選択の処理
 	void ProcessDifficulty(void);
-
-	//行動の順番を決定する関数
-	void DetermineActionOrder(void);
-	//行動の順番に従って処理を行う関数
-	void ProcessActionLoop(void);
-	//結果を表示する関数
-	void DisplayResult(void);
+	
 	//プレイヤーの行動の処理などをここに書く
 	void ProcessPlayerAction(void);
+	
+	//プレイヤーの行動の処理などをここに書く
+	void ProcessPlayerSubAction(void);
+	
+	//行動の順番を決定する関数
+	void DetermineActionOrder(void);
+	
+	//行動の順番に従って処理を行う関数
+	void ProcessActionLoop(void);
+	
+	//結果を表示する関数
+	void DisplayResult(void);
 
 	//Draw関数内でコマンド選択の描画を行う関数
 	void DrawCommandSelection(void);
 
+	//結果のメッセージを配列に格納する関数
+	void DrawResultMessage();
 };
 

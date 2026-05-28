@@ -38,13 +38,23 @@ void QuestPhase::Draw(void)
 	{
 		DrawCommandSelection();
 	}
+	else if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
+	{
+		DrawString(0, 160, "TABで戻る", 0xFF0000);
+		Utility::DrawCommandMenu(0, 200, subActionMessages_, static_cast<int>(subMenuCursor_));
+	}
 	else if (battleStep_ == BATTLE_STEP::RESULT)
 	{
-		DrawFormatString(0, 150, 0xFFFFFF, "経験値を%d獲得した！", expGain_);
-		DrawFormatString(0, 170, 0xFFFFFF, "LVが上がった！");
-		DrawFormatString(0, 190, 0xFFFFFF, "基礎ステータスが上がった！");
-		
-		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
+		int yOffset = 150;
+
+		for (size_t i = 0; i <= messageDisplayIdx_ && i < resultMessages_.size(); ++i)
+		{
+			DrawString(0, yOffset, resultMessages_[i].c_str(), 0xFFFFFF);
+			yOffset += 20;
+		}
+
+		// 「Enterキーで次へ」は常に一番下に出す
+		DrawString(0, yOffset + 20, "Enterキーで次へ", 0xFFFFFF);
 	}
 	if (battleMessage_ != "")
 	{
@@ -112,13 +122,20 @@ void QuestPhase::ManageTurn(void)
 		//プレイヤーの行動の処理などをここに書く
 		ProcessPlayerAction();
 		break;
+	case QuestPhase::BATTLE_STEP::COMMAND_SUB_SELECTION:
+		//プレイヤーの行動の処理などをここに書く
+		ProcessPlayerSubAction();
+		break;
 	case QuestPhase::BATTLE_STEP::DETERMINE:
+		//行動の順番を決定する関数
 		DetermineActionOrder();
 		break;
 	case QuestPhase::BATTLE_STEP::ACTION_LOOP:
+		//行動の順番に従って処理を行う関数
 		ProcessActionLoop();
 		break;
 	case QuestPhase::BATTLE_STEP::RESULT:
+		//結果表示の処理などをここに書く
 		DisplayResult();
 		break;
 	default:
@@ -173,12 +190,12 @@ void QuestPhase::ProcessActionLoop(void)
 		if (unit.isPlayer && command_ == COMMAND::ATTACK)
 		{
 			battleMessage_ = unit.name + " の攻撃！";
-			enemyHp_ -= playerStatus_->power_;
+			enemyHp_ -= playerStatus_->Attack();
 		}
 		else if (unit.isPlayer && command_ == COMMAND::MAGIC)
 		{
 			battleMessage_ = unit.name + " の魔法攻撃！";
-			enemyHp_ -= playerStatus_->magic_;
+			enemyHp_ -= playerStatus_->MagicAttack();
 		}
 		else if (unit.isPlayer && command_ == COMMAND::ITEM)
 		{
@@ -206,6 +223,9 @@ void QuestPhase::ProcessActionLoop(void)
 		{
 			//戦闘終了時にも忘れずに魔法フラグを更新する
 			wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+			
+			DrawResultMessage();
+			
 			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
 			battleStep_ = BATTLE_STEP::RESULT;
 			return;
@@ -213,14 +233,44 @@ void QuestPhase::ProcessActionLoop(void)
 	}
 }
 
-void QuestPhase::DisplayResult(void)
+void QuestPhase::DrawResultMessage()
 {
-	//ここで勝敗の結果を表示する処理を書く
-	//Enterが押されたらメッセージをリセットして次へ
+	//次のリザルト画面のために、配列とインデックスをリセットする
+	resultMessages_.clear();
+	messageDisplayIdx_ = 0; //0に初期化
+
+	//配列（resultMessages_）に順番に文字列を埋め込んでいく（push_back）
+	resultMessages_.push_back(std::to_string(expGain_) + " の経験値を獲得した！");
+
+	//プレイヤーに経験値を与えて、レベルアップしたかチェック
+	int oldLevel = playerStatus_->level_;
+	playerStatus_->GetExp(expGain_); //内部の経験値・レベル加算処理
+	int newLevel = playerStatus_->level_;
+
+	//レベルが上がっていた場合のみ、追加のメッセージを配列に埋め込む
+	if (newLevel > oldLevel)
+	{
+		resultMessages_.push_back("LVが " + std::to_string(newLevel) + " に上がった！");
+		resultMessages_.push_back("基礎ステータスが上がった！");
+	}
+}
+
+void QuestPhase::DisplayResult(void)
+{	
+	// Enterが押されたときの処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		playerStatus_->GetExp(expGain_);
-		isFinished_ = true; //フェーズ終了
+		//まだ表示していないメッセージの行がある場合
+		if (messageDisplayIdx_ + 1 < resultMessages_.size())
+		{
+			messageDisplayIdx_++; // 次の行を表示に加える
+		}
+		else
+		{
+			//すべての行が出きった状態でさらにEnterが押されたら、終了処理へ
+			playerStatus_->GetExp(expGain_); //(※経験値の獲得タイミングはここで調整してください)
+			isFinished_ = true;        //フェーズ終了して拠点へ
+		}
 	}
 }
 
@@ -238,11 +288,9 @@ void QuestPhase::ProcessPlayerAction()
 		//魔法を選択している、かつ前回魔法を使っていたら決定させない
 		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_)
 		{
-			//ここで「今は使えない！」というSEを鳴らしたり、
-			//メッセージを一時的に出すと親切です
+			//【重要】魔法を選択しているのに決定させない場合、次のステップへ進まないようにすること！
 			return;
 		}
-
 		//今回魔法を使うかどうかを記録しておく
 		if (command_ == COMMAND::MAGIC) {
 			magicUsedThisTurn_ = true;
@@ -251,14 +299,54 @@ void QuestPhase::ProcessPlayerAction()
 			magicUsedThisTurn_ = false;
 		}
 
+		subActionMessages_.clear(); //一度リセット
+		subMenuCursor_ = 0;    //カーソルを先頭に
+
+		switch (command_)
+		{
+		case QuestPhase::COMMAND::ATTACK:
+			subActionMessages_ = { "単体攻撃", "全体攻撃" }; 
+			break;
+		case QuestPhase::COMMAND::MAGIC:
+			subActionMessages_ = { "単体魔法","回復", "強化", "状態異常付与" };
+			break;
+		case QuestPhase::COMMAND::ITEM:
+			subActionMessages_ = { "回復", "状態異常回復" };
+			break;
+		case QuestPhase::COMMAND::MAX:
+			break;
+		default:
+			break;
+		}
+
 		//次のステップへ
+		battleStep_ = BATTLE_STEP::COMMAND_SUB_SELECTION;
+	}
+}
+
+void QuestPhase::ProcessPlayerSubAction(void)
+{
+	// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
+	int maxSubItems = static_cast<int>(subActionMessages_.size());
+	if (maxSubItems == 0) return; // 念のため
+
+	
+	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
+
+	// --- 決定処理 ---
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	{
+		// 【重要】ここで「何番のサブメニューを選んだか」を記憶しておく！
+		// 例：chosenSubMenuIdx_ = subMenuCursor_; 
+		// この数値を、後の DetermineActionOrder や ActionUnit に引き渡します。
+
+		// 行動決定へ進む
 		battleStep_ = BATTLE_STEP::DETERMINE;
 	}
 
-	if(ins_.IsTrgDown(KEY_INPUT_TAB))
+	if (ins_.IsTrgDown(KEY_INPUT_TAB))
 	{
-		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
-		isFinished_ = true; //フェーズ終了
+		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
 }
 
