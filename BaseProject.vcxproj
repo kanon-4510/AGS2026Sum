@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Item\Item.cpp" />
     <ClCompile Include="Src\Scene\Phase\FinalPhase.cpp" />
     <ClCompile Include="Src\Object\JobData.cpp" />
-    <ClCompile Include="Src\Object\Player.cpp" />
     <ClCompile Include="Src\Object\PlayerStatus.cpp" />
     <ClCompile Include="Src\Scene\Phase\PhaseBase.cpp" />
     <ClCompile Include="Src\Scene\Phase\ClassWorkPhase.cpp" />
@@ -49,9 +49,9 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Item\Item.h" />
     <ClInclude Include="Src\Scene\Phase\FinalPhase.h" />
     <ClInclude Include="Src\Object\JobData.h" />
-    <ClInclude Include="Src\Object\Player.h" />
     <ClInclude Include="Src\Object\PlayerStatus.h" />
     <ClInclude Include="Src\Scene\Phase\PhaseBase.h" />
     <ClInclude Include="Src\Scene\Phase\ClassWorkPhase.h" />
