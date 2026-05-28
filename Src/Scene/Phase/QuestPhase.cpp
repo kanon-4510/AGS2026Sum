@@ -274,25 +274,25 @@ void QuestPhase::ProcessPlayerAction()
 		if (command_ == COMMAND::MAGIC) magicUsedThisTurn_ = true;
 		else magicUsedThisTurn_ = false;
 
-		subActionMessages_.clear(); //一度リセット
-		subMenuCursor_ = 0;    //カーソルを先頭に
+		//subActionMessages_.clear(); //一度リセット
+		//subMenuCursor_ = 0;    //カーソルを先頭に
 
-		switch (command_)
-		{
-		case QuestPhase::COMMAND::ATTACK:
-			subActionMessages_ = { "単体攻撃", "全体攻撃" }; 
-			break;
-		case QuestPhase::COMMAND::MAGIC:
-			subActionMessages_ = { "単体魔法","回復", "強化", "状態異常付与" };
-			break;
-		case QuestPhase::COMMAND::ITEM:
-			subActionMessages_ = { "回復", "状態異常回復" };
-			break;
-		case QuestPhase::COMMAND::MAX:
-			break;
-		default:
-			break;
-		}
+		//switch (command_)
+		//{
+		//case QuestPhase::COMMAND::ATTACK:
+		//	subActionMessages_ = { "単体攻撃", "全体攻撃" }; 
+		//	break;
+		//case QuestPhase::COMMAND::MAGIC:
+		//	subActionMessages_ = { "単体魔法","回復", "強化", "状態異常付与" };
+		//	break;
+		//case QuestPhase::COMMAND::ITEM:
+		//	subActionMessages_ = { "回復", "状態異常回復" };
+		//	break;
+		//case QuestPhase::COMMAND::MAX:
+		//	break;
+		//default:
+		//	break;
+		//}
 
 		//次のステップへ
 		battleStep_ = BATTLE_STEP::COMMAND_SUB_SELECTION;
@@ -301,12 +301,12 @@ void QuestPhase::ProcessPlayerAction()
 
 void QuestPhase::ProcessPlayerSubAction(void)
 {
-	// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
-	int maxSubItems = static_cast<int>(subActionMessages_.size());
-	if (maxSubItems == 0) return; // 念のため
+	//// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
+	//int maxSubItems = static_cast<int>(subActionMessages_.size());
+	//if (maxSubItems == 0) return; // 念のため
 
-	
-	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
+	//
+	//Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
 	// --- 決定処理 ---
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
