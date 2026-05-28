@@ -71,7 +71,7 @@ void QuestPhase::Draw(void)
 			DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
 		}
 	}
-}
+
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
 		Utility::DrawCommandMenu(0, 40, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
@@ -79,14 +79,6 @@ void QuestPhase::Draw(void)
 	else if(battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
 	{
 		DrawCommandSelection();
-	}
-	else if (battleStep_ == BATTLE_STEP::RESULT)
-	{
-		DrawFormatString(0, 150, 0xFFFFFF, "経験値を%d獲得した！", expGain_);
-		DrawFormatString(0, 170, 0xFFFFFF, "LVが上がった！");
-		DrawFormatString(0, 190, 0xFFFFFF, "基礎ステータスが上がった！");
-		
-		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
 	}
 	if (battleMessage_ != "")
 	{
@@ -110,34 +102,6 @@ void QuestPhase::ProcessDifficulty(void)
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		//難易度に応じて敵のステータスを変える
-		switch (difficulty_)
-		{
-		case DIFFICULTY::EASY:
-			enemyMaxHp_ = static_cast<int>(MAX_HP * ENEMY_INCREASE);
-			enemyHp_ = enemyMaxHp_;
-			enemyPow_ = static_cast<int>(ENEMY_POW * ENEMY_INCREASE);
-			enemySpeed_ = static_cast<int>(ENEMY_SPEED * ENEMY_INCREASE);
-			expGain_ = static_cast<int>(EXP_GAIN * ENEMY_INCREASE);
-			break;
-		case DIFFICULTY::NORMAL:
-			enemyMaxHp_ = MAX_HP;
-			enemyHp_ = enemyMaxHp_;
-			enemyPow_ = ENEMY_POW;
-			enemySpeed_ = ENEMY_SPEED;
-			expGain_ = EXP_GAIN;
-			break;
-		case DIFFICULTY::HARD:
-			enemyMaxHp_ = static_cast<int>(MAX_HP * HARD_INCREASE);
-			enemyHp_ = enemyMaxHp_;
-			enemyPow_ = static_cast<int>(ENEMY_POW * HARD_INCREASE);
-			enemySpeed_ = static_cast<int>(ENEMY_SPEED * HARD_INCREASE);
-			expGain_ = static_cast<int>(EXP_GAIN * HARD_INCREASE);
-			break;
-		default:
-			break;
-		}
-		
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION; //次のステップへ
 	}
 }

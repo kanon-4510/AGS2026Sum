@@ -80,9 +80,6 @@ private:
 	//プレイヤーの選択したコマンドを管理する変数
 	COMMAND command_; 
 	
-	//inputManagerのインスタンスを取得
-	InputManager& ins_ = InputManager::GetInstance();
-	
 	//難易度を管理する変数
 	DIFFICULTY difficulty_ = DIFFICULTY::EASY;
 
