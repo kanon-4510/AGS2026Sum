@@ -1,19 +1,24 @@
 #pragma once
 
 #include "PhaseBase.h"
+#include "../../Scene/GameScene.h"
 #include "../../Object/PlayerStatus.h"
+#include <vector>
+#include <string>
 
+class GameScene;
+class Enemy;
 class QuestPhase : public PhaseBase
 {
 public:
-
-	struct ActionUnit {
-		std::string name; // 表示用（プレイヤー or 敵の名前）
-		int speed;        // 素早さ（ソート用）
-		bool isPlayer;    // 誰の行動か判別用
-		int id;           // 敵が複数いる場合の識別番号
-		int command;      // 選択した行動（0:攻撃, 1:防御, 2:アイテムなど）
-		int targetIdx;    // 攻撃対象が誰か
+	struct ActionUnit 
+	{
+		std::string name; //表示用（プレイヤー or 敵の名前）
+		int speed;        //素早さ（ソート用）
+		bool isPlayer;    //誰の行動か判別用
+		int id;           //敵が複数いる場合の識別番号
+		int command;      //選択した行動（0:攻撃, 1:防御, 2:アイテムなど）
+		int targetIdx;    //攻撃対象が誰か
 	};
 
 	//難易度
@@ -56,33 +61,25 @@ public:
 	static constexpr int ENEMY_POW = 5;			//敵のPOWを管理する変数（仮）
 	static constexpr int ENEMY_SPEED = 10;		//敵のSPEEDを管理する変数（仮）
 
-	int enemyMaxHp_;
-	int enemyHp_;
-	int enemyPow_;
-	int enemySpeed_;
-	bool enemyFlag_ = true; //敵の行動のフラグ（仮）
-	int expGain_;
-
-	QuestPhase(PlayerStatus* playerStatus);		//デフォルトコンストラクタ
-	//~QuestPhase(void);		//デストラクタ
+	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene);		//デフォルトコンストラクタ
+	virtual~QuestPhase(void);		//デストラクタ
 
 	void Update(void) override;		//更新処理
 	void Draw(void) override;		//描画処理
 
-	// フェーズが終了したかどうかを親に伝える
+	//フェーズが終了したかどうかを親に伝える
 	virtual bool IsFinished() const override;
-
 private:
+	std::vector<ActionUnit> actionOrder_;//行動の順番を管理するためのリスト
+	std::string battleMessage_;			 //画面に表示する文字列
 
-	//行動の順番を管理するためのリスト
-	std::vector<ActionUnit> actionOrder_;
+	PlayerStatus* playerStatus_;//プレイヤーのステータスの情報を渡す
+	GameScene& gameScene_;		//親の情報を渡す
+	InputManager& ins_ = InputManager::GetInstance();//inputManagerのインスタンスを取得
 
-	//画面に表示する文字列
-	std::string battleMessage_; 
-
-	//プレイヤーのステータスの情報を渡す
-	PlayerStatus* playerStatus_;
-
+	//プレイヤーの選択したコマンドを管理する変数
+	COMMAND command_; 
+	
 	//inputManagerのインスタンスを取得
 	InputManager& ins_ = InputManager::GetInstance();
 	
@@ -92,19 +89,19 @@ private:
 	//現在のバトルステップを管理する変数
 	BATTLE_STEP battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 
-	//プレイヤーの選択したコマンドを管理する変数
-	COMMAND command_;
+	//魔法攻撃のインターバル(1ターン)
+	bool wasMagicUsedLastTurn_ = false; //前のターンに魔法を使ったか
+	bool magicUsedThisTurn_ = false;    //今のターンに魔法を使ったか（更新用）
 
+	Enemy* activeEnemy_ = nullptr; //現在戦っている敵のポインタ
+	int currentWave_ = 1;          //現在の連戦数（1戦目からスタート）
+	const int MAX_WAVES = 3;       //1回の遠征での最大連戦数（例：3連戦）
+	
 	//------フラグ---------
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 
-	//魔法攻撃のインターバル(1ターン)
-	bool wasMagicUsedLastTurn_ = false; // 前のターンに魔法を使ったか
-	bool magicUsedThisTurn_ = false;    // 今のターンに魔法を使ったか（更新用）
-	
 	//-------変数---------
 	int currentActionIdx_ = 0; //行動リストの何番目かを指す
-
 
 	//------関数---------
 	

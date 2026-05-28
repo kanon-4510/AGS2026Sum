@@ -4,32 +4,74 @@
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "../../Utility/AsoUtility.h"
+#include "../../Scene/GameScene.h"
+#include "../../Object/Enemy.h"
 #include "QuestPhase.h"
 
-QuestPhase::QuestPhase(PlayerStatus* playerStatus) 
-	: playerStatus_(playerStatus)
+//外部にある敵生成関数（Enemy.cppなどに実装している想定）
+extern Enemy* SpawnEnemyByTurn(int currentTurn);
+
+//コンストラクタ
+QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene)
+	: gameScene_(gameScene)
+	, playerStatus_(playerStatus)
 	, command_(COMMAND::ATTACK)
-	, battleStep_(BATTLE_STEP::DIFFICULTY_SELECTION)
+	, battleStep_(BATTLE_STEP::COMMAND_SELECTION)
+	, currentWave_(1) //Waveの初期化
 {
+	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());//クエスト開始時に1戦目の敵を生成する
 }
 
+//デストラクタ
+QuestPhase::~QuestPhase(void)
+{
+	if (activeEnemy_ != nullptr)
+	{
+		delete activeEnemy_;
+		activeEnemy_ = nullptr;
+	}
+}
+
+//更新処理
 void QuestPhase::Update(void)
 {
 	//ターン管理関数
 	ManageTurn();
 }
 
+//描画処理
 void QuestPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
 
-	if(battleStep_ != BATTLE_STEP::RESULT 
-		&& battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION)
+	if (battleStep_ == BATTLE_STEP::RESULT)
 	{
-		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
-		DrawFormatString(0, 120, 0xFFFFFF, "敵のHP %d　/ %d", enemyHp_, enemyMaxHp_);
+		DrawString(0, 150, "遠征クリア！ 経験値を獲得した！", 0xFFFFFF);
+		DrawString(0, 170, "LVが1上がった！", 0xFFFFFF);
+		DrawString(0, 190, "基礎ステータスが上がった！", 0xFFFFFF);
+		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
 	}
+	else
+	{
+		DrawFormatString(0, 20, 0xFFFFFF, "command %d", static_cast<int>(command_));
+		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
+		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
 
+		//敵のHPを activeEnemy_ から直接もらう
+		if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
+		{
+			DrawFormatString(0, 120, 0xFFFFFF, "%sのHP %d", activeEnemy_->GetName().c_str(), activeEnemy_->GetCurrentHp());
+			//画像を表示する場合はここに activeEnemy_->Draw(); を追加
+		}
+		Utility::DrawCommandMenu(0, 200, { "攻撃", "魔法", "アイテム" }, static_cast<int>(command_));
+
+		if (battleMessage_ != "")
+		{
+			DrawFormatString(0, 150, 0xFF0000, battleMessage_.c_str());
+			DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
+		}
+	}
+}
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
 		Utility::DrawCommandMenu(0, 40, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
@@ -109,7 +151,6 @@ void QuestPhase::ManageTurn(void)
 		ProcessDifficulty();
 		break;
 	case QuestPhase::BATTLE_STEP::COMMAND_SELECTION:
-		//プレイヤーの行動の処理などをここに書く
 		ProcessPlayerAction();
 		break;
 	case QuestPhase::BATTLE_STEP::DETERMINE:
@@ -131,26 +172,20 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.clear();
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
-	//名前、速度、プレイヤーかどうか、ターゲット、行動の種類、ダメージ）
 	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0 });
 
-	//敵追加 (とりあえず1体)
-	if (enemyHp_ > 0) 
+	//敵の追加（DecideActionでランダムに行動を決定）
+	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
 	{
-		actionOrder_.push_back({ "スライム", enemySpeed_, false, 0, 0, 0 });
+		EnemyActionInfo eAction = activeEnemy_->DecideAction();
+		actionOrder_.push_back({ eAction.name, eAction.speed, false, 0, eAction.actionType, 0 });
 	}
 
-	//ソート
-	std::sort(actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b)
-		{
-			return a.speed > b.speed;
-		}
-	);
+	//ソート（スピード順）
+	std::sort(actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b){return a.speed > b.speed;});
 
-	//currentActionIdx_ の初期化もここで行うのが良いです
 	currentActionIdx_ = 0;
 	battleStep_ = BATTLE_STEP::ACTION_LOOP;
-
 }
 
 void QuestPhase::ProcessActionLoop(void)
@@ -168,65 +203,93 @@ void QuestPhase::ProcessActionLoop(void)
 
 	auto& unit = actionOrder_[currentActionIdx_];
 
+	//①ダメージとメッセージの処理
 	if (battleMessage_ == "")
 	{
-		if (unit.isPlayer && command_ == COMMAND::ATTACK)
+		if (unit.isPlayer)
 		{
-			battleMessage_ = unit.name + " の攻撃！";
-			enemyHp_ -= playerStatus_->power_;
-		}
-		else if (unit.isPlayer && command_ == COMMAND::MAGIC)
-		{
-			battleMessage_ = unit.name + " の魔法攻撃！";
-			enemyHp_ -= playerStatus_->magic_;
-		}
-		else if (unit.isPlayer && command_ == COMMAND::ITEM)
-		{
-			battleMessage_ = unit.name + " がアイテム使用！";
-			playerStatus_->hp_ += HP_RECOVERY_AMOUNT;
+			if (command_ == COMMAND::ATTACK) 
+			{
+				battleMessage_ = unit.name + " の攻撃！";
+				activeEnemy_->TakeDamage(playerStatus_->power_);
+			}
+			else if (command_ == COMMAND::MAGIC) 
+			{
+				battleMessage_ = unit.name + " の魔法攻撃！";
+				activeEnemy_->TakeDamage(playerStatus_->magic_);
+			}
+			else if (command_ == COMMAND::ITEM) 
+			{
+				battleMessage_ = unit.name + " がアイテム使用！";
+				playerStatus_->hp_ += 200;
+			}
 		}
 		else
 		{
+			//敵のターン
 			battleMessage_ = unit.name + " の攻撃！";
-			playerStatus_->Damage(enemyPow_);
+			playerStatus_->Damage(1); //とりあえず固定ダメージ10。後で敵の攻撃力に変更。
 		}
-		if (enemyHp_ <= 0)
+
+		//倒した時の上書き
+		if (activeEnemy_->IsDead())
 		{
-			battleMessage_ = unit.name + " が敵を倒した！";
+			battleMessage_ = activeEnemy_->GetName() + " を倒した！";
 		}
 	}
 
+	//②Enterキー待ちと、連戦(Wave)の処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
+		//もし敵を倒していたら
+		if (activeEnemy_->IsDead())
+		{
+			//倒した敵から経験値を獲得
+			playerStatus_->GetExp(activeEnemy_->GetExp());
+
+			//今の敵を消去
+			delete activeEnemy_;
+			activeEnemy_ = nullptr;
+
+			//連戦チェック
+			if (currentWave_ < MAX_WAVES)
+			{
+				currentWave_++; //次のWaveへ
+				activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); // 次の敵を生成
+
+				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+				battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+				currentActionIdx_ = 0;
+				battleMessage_ = "";
+				return;
+			}
+			else
+			{
+				//全Waveクリア！
+				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+				battleStep_ = BATTLE_STEP::RESULT;
+				battleMessage_ = "";
+				return;
+			}
+		}
+
+		//敵がまだ生きていれば、次のキャラの行動へ
 		battleMessage_ = "";
 		currentActionIdx_++;
-
-		// 判定：敵を倒したか？
-		if (enemyHp_ <= 0)
-		{
-			//戦闘終了時にも忘れずに魔法フラグを更新する
-			wasMagicUsedLastTurn_ = magicUsedThisTurn_;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
-			battleStep_ = BATTLE_STEP::RESULT;
-			return;
-		}
 	}
 }
 
 void QuestPhase::DisplayResult(void)
 {
-	//ここで勝敗の結果を表示する処理を書く
-	//Enterが押されたらメッセージをリセットして次へ
+	//経験値獲得は ProcessActionLoop内で敵を倒すたびに行うように変更したため、ここは次へ進む処理のみ
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		playerStatus_->GetExp(expGain_);
 		isFinished_ = true; //フェーズ終了
 	}
 }
 
 void QuestPhase::ProcessPlayerAction()
 {
-	//選択肢の数（今回は仮に3つ：「攻撃」「魔法」「アイテム」）
 	int maxItems = static_cast<int>(COMMAND::MAX);
 	
 	//カーソル移動
@@ -235,21 +298,10 @@ void QuestPhase::ProcessPlayerAction()
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		//魔法を選択している、かつ前回魔法を使っていたら決定させない
-		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_)
-		{
-			//ここで「今は使えない！」というSEを鳴らしたり、
-			//メッセージを一時的に出すと親切です
-			return;
-		}
+		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_)return; //魔法の連続使用制限
 
-		//今回魔法を使うかどうかを記録しておく
-		if (command_ == COMMAND::MAGIC) {
-			magicUsedThisTurn_ = true;
-		}
-		else {
-			magicUsedThisTurn_ = false;
-		}
+		if (command_ == COMMAND::MAGIC) magicUsedThisTurn_ = true;
+		else magicUsedThisTurn_ = false;
 
 		//次のステップへ
 		battleStep_ = BATTLE_STEP::DETERMINE;

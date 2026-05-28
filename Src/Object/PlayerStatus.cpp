@@ -53,13 +53,14 @@ void PlayerStatus::InitJob()
 
 	//E‹Æ‚Ì‰Šú‰»
 	//–¼‘O, LV, POW, MAG, –òŠw, •p, –‚–@’m, M‹Â, lŒÃ, è¯
-	jobList.push_back(JobData("¹EÒ"	, 1, 0, 0, 0, 0, 0, 5, 0, 0));
-	jobList.push_back(JobData("è‚¢t"	, 1, 0, 0, 0, 0, 0, 0, 0, 5));
-	jobList.push_back(JobData("‰r¥Ò"	, 1, 0, 5, 0, 0, 0, 0, 5, 0));
+	jobList.push_back(JobData("ˆê”Ê–‚–@g‚¢",2,0,0, 0,0,10,0,0,0));
 
-	jobList.push_back(JobData("–‚“±t"	, 1, 0, 5, 0, 0, 5, 0, 0, 0));
-	jobList.push_back(JobData("–‚Œ•m"	, 1, 3, 3, 0, 2, 2, 0, 0, 0));
-	jobList.push_back(JobData("•t‰Ápt", 1, 0, 3, 2, 0, 3, 0, 0, 0));
+	jobList.push_back(JobData("•t‰Ápt",3,0,0,100,  0,  0,  0,  0,  0));
+	jobList.push_back(JobData("–‚Œ•m"	,3,0,0,  0,100,  0,  0,  0,  0));
+	jobList.push_back(JobData("–‚“±t"	,3,0,0,  0,  0,130,  0,  0,  0));
+	jobList.push_back(JobData("¹EÒ"	,3,0,0,  0,  0,  0,100,  0,  0));
+	jobList.push_back(JobData("ôpt"	,3,0,0,  0,  0,  0,  0,100,  0));
+	jobList.push_back(JobData("è‚¢t"	,3,0,0,  0,  0,  0,  0,  0,100));
 }
 
 int PlayerStatus::Attack()
