@@ -29,8 +29,8 @@ public:
 	void Draw(void) override;		//描画処理
 	void Release(void) override;	//解放処理
 
+	int GetTurn(void) {return turn_;}
 private:
-
 	InputManager& ins_ = InputManager::GetInstance();
 	PlayerStatus* playerStatus_;
 
@@ -39,9 +39,9 @@ private:
 	std::unique_ptr<PhaseBase> currentPhase_;
 
 	QUEST_PHASE phase_;	//クエストのフェーズ
+	int turn_;		//現在のターン数
 
 	//メンバー変数の宣言
-	int turn_;		//現在のターン数
 	bool isInputBlocked_ = false; //入力ブロックフラグ
 
 	//メンバー関数

@@ -23,8 +23,6 @@ void PlayerStatus::Draw()
 	DrawFormatString(300, 210, GetColor(255, 255, 255), "M: %d", faith_);
 	DrawFormatString(300, 230, GetColor(255, 255, 255), "ŒÃ: %d", archaeology_);
 	DrawFormatString(300, 250, GetColor(255, 255, 255), "¯: %d", astrology_);
-	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
-	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "Faith: %d", faith_);
 }
 
 void PlayerStatus::InitJob()
@@ -34,13 +32,14 @@ void PlayerStatus::InitJob()
 
 	//E‹Æ‚Ì‰Šú‰»
 	//–¼‘O, LV, POW, MAG, –òŠw, •p, –‚–@’m, M‹Â, lŒÃ, è¯
-	jobList.push_back(JobData("¹EÒ"	, 1, 0, 0, 0, 0, 0, 5, 0, 0));
-	jobList.push_back(JobData("è‚¢t"	, 1, 0, 0, 0, 0, 0, 0, 0, 5));
-	jobList.push_back(JobData("‰r¥Ò"	, 1, 0, 5, 0, 0, 0, 0, 5, 0));
+	jobList.push_back(JobData("ˆê”Ê–‚–@g‚¢",2,0,0, 0,0,10,0,0,0));
 
-	jobList.push_back(JobData("–‚“±t"	, 1, 0, 5, 0, 0, 5, 0, 0, 0));
-	jobList.push_back(JobData("–‚Œ•m"	, 1, 3, 3, 0, 2, 2, 0, 0, 0));
-	jobList.push_back(JobData("•t‰Ápt", 1, 0, 3, 2, 0, 3, 0, 0, 0));
+	jobList.push_back(JobData("•t‰Ápt",3,0,0,100,  0,  0,  0,  0,  0));
+	jobList.push_back(JobData("–‚Œ•m"	,3,0,0,  0,100,  0,  0,  0,  0));
+	jobList.push_back(JobData("–‚“±t"	,3,0,0,  0,  0,130,  0,  0,  0));
+	jobList.push_back(JobData("¹EÒ"	,3,0,0,  0,  0,  0,100,  0,  0));
+	jobList.push_back(JobData("ôpt"	,3,0,0,  0,  0,  0,  0,100,  0));
+	jobList.push_back(JobData("è‚¢t"	,3,0,0,  0,  0,  0,  0,  0,100));
 }
 
 void PlayerStatus::Damage(int damage)

@@ -1,5 +1,4 @@
 #pragma once
-#include "BaseStatus.h"
 #include "JobData.h"
 #include <string>
 #include <vector>
@@ -42,7 +41,7 @@ public:
 	int archaeology_ = 0;
 	int astrology_ = 0;
 
-	std::string job = "魔法使い";	//現在の職業
+	std::string job = "見習い魔法使い";	//現在の職業
 	std::vector<JobData> jobList;	//職業リストを作成
 
 	PlayerStatus();
