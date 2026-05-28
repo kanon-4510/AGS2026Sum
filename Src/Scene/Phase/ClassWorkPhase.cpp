@@ -71,28 +71,39 @@ void ClassWorkPhase::ProcessClassworkDecision()
 		{
 		case CLASSWORK_SELECT::PHARMACY:
 			playerStatus_->pharmacy_ += skill;
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 			isFinished_ = true;
 			break;
 		case CLASSWORK_SELECT::MARTIALARTS:
 			playerStatus_->martialArts_ += skill;
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 			isFinished_ = true;
 			break;
 		case CLASSWORK_SELECT::MAGICKNOWLEDGE:
 			playerStatus_->magicKnowledge_ += skill;
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 			isFinished_ = true;
 			break;
 		case CLASSWORK_SELECT::FAITH:
 			playerStatus_->faith_ += skill;
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 			isFinished_ = true;
 			break;
 		case CLASSWORK_SELECT::ARCHAEOLOGY:
 			playerStatus_->archaeology_ += skill;
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 			isFinished_ = true;
 			break;
 		case CLASSWORK_SELECT::ASTROLOGY:
 			playerStatus_->astrology_ += skill;
+			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 			isFinished_ = true;
 			break;
 		}
+	}
+	if (ins_.IsTrgDown(KEY_INPUT_TAB) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	{
+		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL;
+		isFinished_ = true;
 	}
 }
