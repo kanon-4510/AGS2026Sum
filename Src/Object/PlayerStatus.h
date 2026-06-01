@@ -25,6 +25,8 @@ public:
 	int speed_ = 10;
 	int luck_ = 10;
 
+	int heal_ = 2;	//回復量
+
 	//技能の種類
 	enum class SkillType 
 	{
@@ -70,6 +72,9 @@ public:
 
 	//魔法攻撃処理
 	int MagicAttack();
+
+	//回復処理
+	void Heal();
 
 	//ダメージ処理
 	void Damage(int damage);

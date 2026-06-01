@@ -73,6 +73,14 @@ int PlayerStatus::MagicAttack()
 	return SkillBonus(BonusType::MagicBonus, magic_);
 }
 
+void PlayerStatus::Heal()
+{
+	hp_ += SkillBonus(BonusType::ItemBonus, heal_);
+	if (hp_ > maxHp_) {
+		hp_ = maxHp_;
+	}
+}
+
 void PlayerStatus::Damage(int damage)
 {
 	int finalDamage = SkillBonus(BonusType::DefenseBonus, damage);
@@ -154,7 +162,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	switch (type) {
 	case BonusType::ItemBonus:
 		//薬学10につき、アイテム回復量を+1する
-		//基本回復50、薬学30 → 50 + (30 / 10) = 53
+		//基本回復5、薬学30 → 5 + (30 / 10) = 8
 		return baseValue + (pharmacy_ / 10);
 
 	case BonusType::AttackBonus:
