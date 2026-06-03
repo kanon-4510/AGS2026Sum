@@ -58,9 +58,7 @@ public:
 	static constexpr float ENEMY_INCREASE = 0.7f;
 	static constexpr float HARD_INCREASE = 1.5f;
 
-	static constexpr int ENEMY_HP = MAX_HP;		//敵のHPを管理する変数（仮）
-	static constexpr int ENEMY_POW = 5;			//敵のPOWを管理する変数（仮）
-	static constexpr int ENEMY_SPEED = 10;		//敵のSPEEDを管理する変数（仮）
+	//回復量
 
 	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene);		//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
@@ -73,7 +71,8 @@ public:
 private:
 	std::vector<ActionUnit> actionOrder_;//行動の順番を管理するためのリスト
 	std::string battleMessage_;			 //画面に表示する文字列
-
+	std::vector<std::string> subActionMessages_; //サブアクションのメッセージを管理するリスト
+	
 	PlayerStatus* playerStatus_;//プレイヤーのステータスの情報を渡す
 	GameScene& gameScene_;		//親の情報を渡す
 	InputManager& ins_ = InputManager::GetInstance();//inputManagerのインスタンスを取得
