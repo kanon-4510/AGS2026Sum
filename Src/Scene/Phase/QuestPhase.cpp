@@ -16,7 +16,7 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene)
 	: gameScene_(gameScene)
 	, playerStatus_(playerStatus)
 	, command_(COMMAND::ATTACK)
-	, battleStep_(BATTLE_STEP::COMMAND_SELECTION)
+	, battleStep_(BATTLE_STEP::DIFFICULTY_SELECTION)
 	, currentWave_(1) //Waveの初期化
 {
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());//クエスト開始時に1戦目の敵を生成する
@@ -44,16 +44,9 @@ void QuestPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
 
-	if (battleStep_ == BATTLE_STEP::RESULT)
+	if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+		&& battleStep_ != BATTLE_STEP::RESULT)
 	{
-		DrawString(0, 150, "遠征クリア！ 経験値を獲得した！", 0xFFFFFF);
-		DrawString(0, 170, "LVが1上がった！", 0xFFFFFF);
-		DrawString(0, 190, "基礎ステータスが上がった！", 0xFFFFFF);
-		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
-	}
-	else
-	{
-		DrawFormatString(0, 20, 0xFFFFFF, "command %d", static_cast<int>(command_));
 		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
 		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
 
@@ -63,7 +56,15 @@ void QuestPhase::Draw(void)
 			DrawFormatString(0, 120, 0xFFFFFF, "%sのHP %d", activeEnemy_->GetName().c_str(), activeEnemy_->GetCurrentHp());
 			//画像を表示する場合はここに activeEnemy_->Draw(); を追加
 		}
-		Utility::DrawCommandMenu(0, 200, { "攻撃", "魔法", "アイテム" }, static_cast<int>(command_));
+	}
+
+	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
+	{
+		Utility::DrawCommandMenu(0, 40, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
+	}
+	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION) //難易度選択中はコマンドやHPを表示しない
+	{
+		DrawCommandSelection();
 
 		if (battleMessage_ != "")
 		{
@@ -71,19 +72,25 @@ void QuestPhase::Draw(void)
 			DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
 		}
 	}
-
-	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
+	else if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
 	{
-		Utility::DrawCommandMenu(0, 40, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
+		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
+		Utility::DrawCommandMenu(0, 200, subActionMessages_, subMenuCursor_);
+		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
 	}
-	else if(battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
-	{
-		DrawCommandSelection();
-	}
-	if (battleMessage_ != "")
+	
+	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
 	{
 		DrawFormatString(0, 150, 0xFF0000, battleMessage_.c_str());
 		DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
+	}
+
+	if (battleStep_ == BATTLE_STEP::RESULT)
+	{
+		DrawString(0, 150, "遠征クリア！ 経験値を獲得した！", 0xFFFFFF);
+		DrawString(0, 170, "レベルが上がった！", 0xFFFFFF);
+		DrawString(0, 190, "基礎ステータスが上がった！", 0xFFFFFF);
+		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
 	}
 }
 
@@ -192,7 +199,7 @@ void QuestPhase::ProcessActionLoop(void)
 			else if (command_ == COMMAND::ITEM) 
 			{
 				battleMessage_ = unit.name + " がアイテム使用！";
-				playerStatus_->hp_ += 200;
+				playerStatus_->hp_ += 20;
 			}
 		}
 		else
@@ -257,6 +264,7 @@ void QuestPhase::DisplayResult(void)
 	{
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 		isFinished_ = true; //フェーズ終了
+		playerStatus_->hp_ = playerStatus_->maxHp_; //HPを全回復
 	}
 }
 
@@ -275,39 +283,40 @@ void QuestPhase::ProcessPlayerAction()
 		if (command_ == COMMAND::MAGIC) magicUsedThisTurn_ = true;
 		else magicUsedThisTurn_ = false;
 
-		//subActionMessages_.clear(); //一度リセット
-		//subMenuCursor_ = 0;    //カーソルを先頭に
+		subActionMessages_.clear(); //一度リセット
+		subMenuCursor_ = 0;    //カーソルを先頭に
 
-		//switch (command_)
-		//{
-		//case QuestPhase::COMMAND::ATTACK:
-		//	subActionMessages_ = { "単体攻撃", "全体攻撃" }; 
-		//	break;
-		//case QuestPhase::COMMAND::MAGIC:
-		//	subActionMessages_ = { "単体魔法","回復", "強化", "状態異常付与" };
-		//	break;
-		//case QuestPhase::COMMAND::ITEM:
-		//	subActionMessages_ = { "回復", "状態異常回復" };
-		//	break;
-		//case QuestPhase::COMMAND::MAX:
-		//	break;
-		//default:
-		//	break;
-		//}
+		switch (command_)
+		{
+		case QuestPhase::COMMAND::ATTACK:
+			subActionMessages_ = { "単体攻撃", "全体攻撃" }; 
+			break;
+		case QuestPhase::COMMAND::MAGIC:
+			subActionMessages_ = { "単体魔法","回復", "強化", "状態異常付与" };
+			break;
+		case QuestPhase::COMMAND::ITEM:
+			subActionMessages_ = { "回復", "状態異常回復" };
+			break;
+		case QuestPhase::COMMAND::MAX:
+			break;
+		default:
+			break;
+		}
 
 		//次のステップへ
 		battleStep_ = BATTLE_STEP::COMMAND_SUB_SELECTION;
+		//battleStep_ = BATTLE_STEP::DETERMINE;
 	}
 }
 
 void QuestPhase::ProcessPlayerSubAction(void)
 {
 	//// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
-	//int maxSubItems = static_cast<int>(subActionMessages_.size());
-	//if (maxSubItems == 0) return; // 念のため
+	int maxSubItems = static_cast<int>(subActionMessages_.size());
+	if (maxSubItems == 0) return; // 念のため
 
 	//
-	//Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
+	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
 	// --- 決定処理 ---
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
