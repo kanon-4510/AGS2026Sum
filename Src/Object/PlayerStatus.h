@@ -14,7 +14,7 @@ public:
 
 	constexpr static int NEED_EXP = 10;			//必要経験値
 	constexpr static int RATE_BASE = 100;		//ステータスアップの確率の基準値
-	constexpr static int SKILL_UP_RATE = 60;	//ステータスアップの確率
+	constexpr static int SKILL_UP_RATE = 70;	//ステータスアップの確率
 
 	int level_ = 1;
 	int exp_ = 0;

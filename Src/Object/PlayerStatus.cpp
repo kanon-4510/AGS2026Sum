@@ -11,10 +11,10 @@ void PlayerStatus::Draw()
 	//ÉXÉeÅ[É^ÉXÇÃï`âÊèàóù
 	DrawFormatString(STATUS_X, 10, STATUS_COLOR, "Level: %d", level_);
 	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, maxHp_);
-	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Power: %d", power_);
-	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magic Power: %d", magic_);
+	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Physical: %d", power_);
+	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magical: %d", magic_);
 	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
-	DrawFormatString(STATUS_X, 110, STATUS_COLOR, "Luck: %d", luck_);
+	DrawFormatString(STATUS_X, 110,STATUS_COLOR, "Luck: %d", luck_);
 
 	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
 	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "ñÚ: %d", pharmacy_);
@@ -40,10 +40,10 @@ void PlayerStatus::Draw()
 	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 210, GREEN, "(ñhå‰+%d)", defBonus);
 
 	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
-	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 230, GREEN, "(EXP+%d)", expBonus);
+	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 230, GREEN, "(åoå±+%d)", expBonus);
 
 	int luckBonus = SkillBonus(BonusType::LuckBonus, 0);
-	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(â^+%d)", luckBonus);
+	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(çKâ^+%d)", luckBonus);
 }
 
 void PlayerStatus::InitJob()

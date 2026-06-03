@@ -204,9 +204,66 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 		else
 		{
-			//敵のターン
-			battleMessage_ = unit.name + " の攻撃！";
-			playerStatus_->Damage(1); //とりあえず固定ダメージ10。後で敵の攻撃力に変更。
+			//敵の行動分岐
+			battleMessage_ = unit.name + " の " + unit.skillName + "！";
+
+			//技の名前によって特別な効果を発動させる
+			if (unit.skillName == "かいふく" || unit.skillName == "めいそう")
+			{
+				int healAmount = 50; //回復量（必要に応じて調整してください）
+				activeEnemy_->Heal(healAmount);
+				battleMessage_ = unit.name + " のHPが " + std::to_string(healAmount) + " 回復した！";
+			}
+			else if (unit.skillName == "まもる" || unit.skillName == "かまえる" || unit.skillName == "すいへき")
+			{
+				//将来的に防御力アップやダメージ軽減を実装する用の枠です
+				battleMessage_ = unit.name + " は身構えている！";
+			}
+			else if (unit.skillName == "へびにらみ")
+			{
+				//将来的にプレイヤーを状態異常（マヒなど）にする用の枠です
+				battleMessage_ = "プレイヤーは 石化している！";
+			}
+			else
+			{
+				//--- それ以外は通常の攻撃技として処理 ---
+				//unit.command (0:通常行動, 1:中技, 2:大技) で威力を変える
+				int basePower = activeEnemy_->GetPower();
+				int damage = 0;
+
+				if (unit.command == 0) 
+				{
+					damage = basePower;
+				}
+				else if (unit.command == 1)
+				{
+					damage = basePower;
+				}
+				else if (unit.command == 2) 
+				{
+					damage = basePower;
+				}
+
+				//回避判定
+				//計算式：基本回避率 運のステータス×2
+				//※運の数値に合わせて「/ 2」の部分は調整
+				int evasionChance = playerStatus_->luck_ / 2;
+
+				//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
+				if (evasionChance > 90) evasionChance = 90;
+				int roll = GetRand(99);
+
+				if (roll < evasionChance)
+				{
+					//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
+					battleMessage_ = "攻撃を回避！";
+				}
+				else
+				{
+					//回避失敗 通常通りダメージを受ける
+					playerStatus_->Damage(damage);
+				}
+			}
 		}
 
 		//倒した時の上書き
@@ -318,14 +375,14 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	//
 	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
-	// --- 決定処理 ---
+	//--- 決定処理 ---
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		// 【重要】ここで「何番のサブメニューを選んだか」を記憶しておく！
-		// 例：chosenSubMenuIdx_ = subMenuCursor_; 
-		// この数値を、後の DetermineActionOrder や ActionUnit に引き渡します。
+		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく！
+		//例：chosenSubMenuIdx_ = subMenuCursor_; 
+		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡します。
 
-		// 行動決定へ進む
+		//行動決定へ進む
 		battleStep_ = BATTLE_STEP::DETERMINE;
 	}
 
@@ -337,5 +394,5 @@ void QuestPhase::ProcessPlayerSubAction(void)
 
 void QuestPhase::DrawCommandSelection(void)
 {
-	Utility::DrawCommandMenu(0, 200, { "攻撃", "魔法", "アイテム" }, static_cast<int>(command_));
+	Utility::DrawCommandMenu(0,200,{"攻撃","魔法","アイテム"},static_cast<int>(command_));
 }
