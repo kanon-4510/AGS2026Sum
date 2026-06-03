@@ -30,23 +30,25 @@ class Enemy
 {
 public:
 	//コンストラクタ（画像ファイルのパスや、画面のどこに描画するかの座標も受け取るように拡張）
-	Enemy(std::string name, int hp, int speed, int exp,
+	Enemy(std::string name, int hp, int power, int speed, int exp,
 		std::string skill1, std::string skill2, std::string skill3,
 		const char* imagePath, int x, int y);
 
 	//デストラクタ（メモリ解放や画像の削除用）
 	~Enemy();
 
+	//DxLib用の描画関数（グラフィックやHPバーを表示する）
+	void Draw() const;
+
 	//バトル用の関数
 	EnemyActionInfo DecideAction() const;
 	void TakeDamage(int damage);
-
-	//DxLib用の描画関数（グラフィックやHPバーを表示する）
-	void Draw() const;
+	void Heal(int amount); // 回復用の関数
 
 	//ゲッター
 	std::string GetName() const { return name_; }
 	int GetCurrentHp() const { return currentHp_; }
+	int GetPower() const { return power_; }
 	int GetSpeed() const { return speed_; }
 	int GetExp() const { return exp_; }
 	bool IsDead() const { return currentHp_ <= 0; }
@@ -54,6 +56,7 @@ private:
 	std::string name_;
 	int maxHp_;
 	int currentHp_;
+	int power_;
 	int speed_;
 	int exp_;
 	std::string skills_[3];

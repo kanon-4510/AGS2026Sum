@@ -13,16 +13,18 @@ class QuestPhase : public PhaseBase
 public:
 	struct ActionUnit 
 	{
-		std::string name; //表示用（プレイヤー or 敵の名前）
-		int speed;        //素早さ（ソート用）
-		bool isPlayer;    //誰の行動か判別用
-		int id;           //敵が複数いる場合の識別番号
-		int command;      //選択した行動（0:攻撃, 1:防御, 2:アイテムなど）
-		int targetIdx;    //攻撃対象が誰か
+		std::string name;		//表示用（プレイヤー or 敵の名前）
+		int speed;				//素早さ（ソート用）
+		bool isPlayer;			//誰の行動か判別用
+		int id;					//敵が複数いる場合の識別番号
+		int command;			//選択した行動（0:攻撃、1:魔法、2:道具）
+		int targetIdx;			//攻撃対象が誰か
+		std::string skillName;  //使った技を記憶しておく
 	};
 
 	//難易度
-	enum class DIFFICULTY{
+	enum class DIFFICULTY
+	{
 		EASY,
 		NORMAL,
 		HARD,
@@ -57,10 +59,6 @@ public:
 	//敵の強さの上がり幅
 	static constexpr float ENEMY_INCREASE = 0.7f;
 	static constexpr float HARD_INCREASE = 1.5f;
-
-	static constexpr int ENEMY_HP = MAX_HP;		//敵のHPを管理する変数（仮）
-	static constexpr int ENEMY_POW = 5;			//敵のPOWを管理する変数（仮）
-	static constexpr int ENEMY_SPEED = 10;		//敵のSPEEDを管理する変数（仮）
 
 	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene);		//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
@@ -131,4 +129,3 @@ private:
 	//結果のメッセージを配列に格納する関数
 	void DrawResultMessage();
 };
-
