@@ -56,6 +56,15 @@ public:
 		LuckBonus       // 占星術：運の上昇
 	};
 
+	//職業ごとのステータスボーナス
+	struct JobBonus {
+		int hp = 0;
+		int power = 0;
+		int magic = 0;
+		int speed = 0;
+		int luck = 0;
+	};
+
 	std::string job = "魔法使い";	//現在の職業
 	std::vector<JobData> jobList;	//職業リストを作成
 
@@ -82,6 +91,15 @@ public:
 	//死亡処理
 	void Death();
 
+	//HPを外から参照できるようにする
+	int GetMaxHp();
+
+	//速度を外から参照できるようにする
+	int GetSpeed();
+
+	//運を外から参照できるようにする
+	int GetLuck();
+
 	//経験値処理
 	void GetExp(int exp);
 
@@ -93,6 +111,9 @@ public:
 
 	//技能ごとの追加効果を処理する関数
 	int SkillBonus(BonusType type, int baseValue);
+
+	//現在の職業に応じたステータスボーナスを計算する関数
+	JobBonus GetJobBonus();
 
 	//全職業リストを外から参照できるようにする
 	const std::vector<JobData>& GetJobList() const { return jobList; }

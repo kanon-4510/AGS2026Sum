@@ -10,11 +10,11 @@ void PlayerStatus::Draw()
 {
 	//ステータスの描画処理
 	DrawFormatString(STATUS_X, 10, STATUS_COLOR, "Level: %d", level_);
-	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, maxHp_);
-	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Power: %d", power_);
-	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magic Power: %d", magic_);
-	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
-	DrawFormatString(STATUS_X, 110, STATUS_COLOR, "Luck: %d", luck_);
+	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, GetMaxHp());
+	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Power: %d", Attack());
+	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magic Power: %d", MagicAttack());
+	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", GetSpeed());
+	DrawFormatString(STATUS_X, 110, STATUS_COLOR, "Luck: %d", GetLuck());
 
 	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
 	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "薬: %d", pharmacy_);
@@ -44,6 +44,16 @@ void PlayerStatus::Draw()
 
 	int luckBonus = SkillBonus(BonusType::LuckBonus, 0);
 	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(運+%d)", luckBonus);
+
+	//職業ボーナスの描画
+	int jobHpBonus = GetJobBonus().hp; //職業ボーナスも表示
+	if (jobHpBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 30, GREEN, "(職業ボーナス+%d)", jobHpBonus);
+
+	int jobAtkBonus = GetJobBonus().power; //職業ボーナスも表示
+	if (jobAtkBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 50, GREEN, "(職業ボーナス+%d)", jobAtkBonus);
+
+	int jpbSpeedBonus = GetJobBonus().speed;
+	if (jpbSpeedBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 90, GREEN, "(職業ボーナス+%d)", jpbSpeedBonus);
 }
 
 void PlayerStatus::InitJob()
@@ -65,19 +75,32 @@ void PlayerStatus::InitJob()
 
 int PlayerStatus::Attack()
 {
-	return SkillBonus(BonusType::AttackBonus, power_);
+	//基礎攻撃力
+	int base = this->power_;
+
+	//職業ごとのプラス値を加える
+	int jobBonus = GetJobBonus().power;
+	int powerWithJob = base + jobBonus;
+
+	//技能ステータスのボーナスを加える
+	return SkillBonus(BonusType::AttackBonus, powerWithJob);
 }
 
 int PlayerStatus::MagicAttack()
 {
-	return SkillBonus(BonusType::MagicBonus, magic_);
+	int base = this->magic_;
+
+	int jobBonus = GetJobBonus().magic;
+	int magicWithJob = base + jobBonus;
+
+	return SkillBonus(BonusType::MagicBonus, magicWithJob);
 }
 
 void PlayerStatus::Heal()
 {
 	hp_ += SkillBonus(BonusType::ItemBonus, heal_);
-	if (hp_ > maxHp_) {
-		hp_ = maxHp_;
+	if (hp_ > GetMaxHp()) {
+		hp_ = GetMaxHp();
 	}
 }
 
@@ -97,6 +120,42 @@ void PlayerStatus::Death()
 	SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
 }
 
+int PlayerStatus::GetMaxHp()
+{
+	//初期HP
+	int base = this->maxHp_;
+
+	//職業ごとのプラス値を加える
+	int jobBonus = GetJobBonus().hp;
+	int hpWithJob = base + jobBonus;
+
+	return hpWithJob;
+}
+
+int PlayerStatus::GetSpeed()
+{
+	//初期速度
+	int base = this->speed_;
+
+	//職業ごとのプラス値を加える
+	int jobBonus = GetJobBonus().speed;
+	int speedWithJob = base + jobBonus;
+
+	return speedWithJob;
+}
+
+int PlayerStatus::GetLuck()
+{
+	//初期速度
+	int base = this->luck_;
+
+	//職業ごとのプラス値を加える
+	int jobBonus = GetJobBonus().luck;
+	int luckWithJob = base + jobBonus;
+
+	return luckWithJob;
+}
+
 void PlayerStatus::GetExp(int exp)
 {
 	//経験値処理
@@ -114,7 +173,7 @@ void PlayerStatus::LevelUp()
 	//レベルアップした時の処理
 	level_++;
 	maxHp_ += 5;
-	hp_ = maxHp_;
+	hp_ = GetMaxHp();
 
 	//各ステータスの抽選処理
 
@@ -192,4 +251,18 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (astrology_ / 10);
 	}
 	return baseValue;
+}
+
+PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
+{
+	JobBonus bonus;
+
+	//職業ごとのステータスボーナスを設定
+	if (this->job == "一般魔法使い") {
+		bonus.hp = 10;
+		bonus.power = 10;
+		bonus.speed = 10;
+	}
+
+	return bonus;
 }
