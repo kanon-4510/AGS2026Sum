@@ -2,6 +2,7 @@
 #include "../Application.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../Utility/AsoUtility.h"
 #include "Phase/QuestPhase.h"
 #include "Phase/ClassWorkPhase.h"
 #include "Phase/JobChangePhase.h"
@@ -91,9 +92,7 @@ void GameScene::Draw(void)
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
 
-		DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_QUEST ? selectColor : color), "クエストに出発");
-		DrawFormatString(100, 140, (phase_ == QUEST_PHASE::PHASE_CLASSWORK ? selectColor : color), "授業を受ける");
-		DrawFormatString(100, 180, (phase_ == QUEST_PHASE::PHASE_JOB_CHANGE ? selectColor : color), "資格試験");
+		Utility::DrawCommandMenu(100, 100,{"クエスト", "授業", "資格試験"}, (phase_));
 
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();
@@ -113,21 +112,16 @@ void GameScene::ProcessPhaseSelection(void)
 		phase_ = QUEST_PHASE::PHASE_FINAL;
 		return;
 	}
-	if (ins_.IsTrgDown(KEY_INPUT_UP) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
-	{
-		//statusType_ = (statusType_ + 3) % 4;
-		int index = static_cast<int>(phase_);
-		index = ((index - 1) + static_cast<int>(QUEST_PHASE::PHASE_FINAL)) % static_cast<int>(QUEST_PHASE::PHASE_FINAL);
-		phase_ = static_cast<QUEST_PHASE>(index);
-	}
-	else if (ins_.IsTrgDown(KEY_INPUT_DOWN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
-	{
-		int index = static_cast<int>(phase_);
-		index = (index + 1) % static_cast<int>(QUEST_PHASE::PHASE_FINAL);
-		phase_ = static_cast<QUEST_PHASE>(index);
-	}
+
+	//安全に int 型の変数に写し取る
+	int currentIndex = static_cast<int>(phase_);
+	int maxItems = static_cast<int>(QUEST_PHASE::PHASE_FINAL);
+
+	//int型の変数を渡して、メニュー選択処理を行う（currentIndexの中身が更新される）
+	Utility::ProcessCommandMenuSelection(currentIndex, maxItems);
+
+	//更新された int の値を、安全に元の enum class 型に戻して代入する
+	phase_ = static_cast<QUEST_PHASE>(currentIndex);
 }
 
 void GameScene::ProcessPhaseDecision()

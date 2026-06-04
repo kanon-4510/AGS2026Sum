@@ -104,10 +104,14 @@ bool QuestPhase::IsFinished() const
 void QuestPhase::ProcessDifficulty(void)
 {
 	//選択肢の数（今回は仮に3つ：「優しい」「普通」「難しい」）
+	int difficultyIndex = static_cast<int>(difficulty_); //enum class を int に変換して操作する
 	int maxDifficulty = static_cast<int>(DIFFICULTY::MAX);
 	//カーソル移動
-	Utility::ProcessCommandMenuSelection(reinterpret_cast<int&>(difficulty_), maxDifficulty);
+	Utility::ProcessCommandMenuSelection(difficultyIndex, maxDifficulty);
 
+	//更新された int の値を、安全に元の enum class 型に戻して代入する
+	difficulty_ = static_cast<DIFFICULTY>(difficultyIndex);
+	
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
@@ -370,10 +374,13 @@ void QuestPhase::DisplayResult(void)
 
 void QuestPhase::ProcessPlayerAction()
 {
+	int commandIndex = static_cast<int>(command_); //enum class を int に変換して操作する
 	int maxItems = static_cast<int>(COMMAND::MAX);
 	
 	//カーソル移動
-	Utility::ProcessCommandMenuSelection(reinterpret_cast<int&>(command_), maxItems);
+	Utility::ProcessCommandMenuSelection(commandIndex, maxItems);
+	//更新された int の値を、安全に元の enum class 型に戻して代入する
+	command_ = static_cast<COMMAND>(commandIndex);
 
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
@@ -412,7 +419,7 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	int maxSubItems = static_cast<int>(subActionMessages_.size());
 	if (maxSubItems == 0) return; // 念のため
 
-	//
+	//カーソル移動処理
 	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
 	//--- 決定処理 ---
