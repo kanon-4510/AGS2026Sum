@@ -11,16 +11,7 @@ class Enemy;
 class QuestPhase : public PhaseBase
 {
 public:
-	struct ActionUnit 
-	{
-		std::string name;		//表示用（プレイヤー or 敵の名前）
-		int speed;				//素早さ（ソート用）
-		bool isPlayer;			//誰の行動か判別用
-		int id;					//敵が複数いる場合の識別番号
-		int command;			//選択した行動（0:攻撃、1:魔法、2:道具）
-		int targetIdx;			//攻撃対象が誰か
-		std::string skillName;  //使った技を記憶しておく
-	};
+	
 
 	//難易度
 	enum class DIFFICULTY
@@ -31,6 +22,7 @@ public:
 		MAX
 	};
 	
+	//バトルのステップ
 	enum class BATTLE_STEP
 	{
 		DIFFICULTY_SELECTION,	//難易度選択
@@ -42,12 +34,34 @@ public:
 		MAX
 	};
 
+	//プレイヤーのコマンド
 	enum class COMMAND
 	{
-		ATTACK,
-		MAGIC,
-		ITEM,
+		ATTACK,	//物理攻撃
+		MAGIC,	//魔法攻撃
 		MAX
+	};
+
+	//効果の種類
+	enum class MAGIC_TYPE
+	{
+		MAGIC_ATTACK,	//魔法攻撃
+		HEAL,			//回復
+		BUFF,			//強化
+		DEBUFF,			//弱体化
+		MAX
+	};
+
+	struct ActionUnit
+	{
+		std::string name;		//表示用（プレイヤー or 敵の名前）
+		int speed;				//素早さ（ソート用）
+		bool isPlayer;			//誰の行動か判別用
+		int id;					//敵が複数いる場合の識別番号
+		int command;			//選択した行動（0:攻撃、1:魔法）
+		int targetIdx;			//攻撃対象が誰か
+		std::string skillName;  //使った技を記憶しておく
+		MAGIC_TYPE magicType;		//魔法の効果の種類を記憶しておく
 	};
 
 	//経験値（仮）
@@ -77,14 +91,14 @@ private:
 	GameScene& gameScene_;		//親の情報を渡す
 	InputManager& ins_ = InputManager::GetInstance();//inputManagerのインスタンスを取得
 
-	//プレイヤーの選択したコマンドを管理する変数
-	COMMAND command_; 
-	
 	//難易度を管理する変数
 	DIFFICULTY difficulty_ = DIFFICULTY::EASY;
 
 	//現在のバトルステップを管理する変数
 	BATTLE_STEP battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+
+	//プレイヤーの選択したコマンドを管理する変数
+	COMMAND command_; 
 
 	//魔法攻撃のインターバル(1ターン)
 	bool wasMagicUsedLastTurn_ = false; //前のターンに魔法を使ったか

@@ -74,6 +74,8 @@ void QuestPhase::Draw(void)
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
 	{
+		DrawFormatString(0, 40, 0xFFFFFFF, "%d", subMenuCursor_);
+
 		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
 		Utility::DrawCommandMenu(0, 200, subActionMessages_, subMenuCursor_);
 		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
@@ -150,7 +152,34 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.clear();
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
-	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0 });
+	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0});
+	if (command_ == COMMAND::ATTACK)
+	{
+		if (subMenuCursor_ == 0) {
+			actionOrder_.back().skillName = "単体攻撃";
+		}
+		else {
+			actionOrder_.back().skillName = "全体攻撃";
+		}
+	}
+	// 魔法攻撃（1）の場合
+	else if (command_ == COMMAND::MAGIC)
+	{
+		// サブメニューの選択肢に応じて魔法の性質を分ける！
+		if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::MAGIC_ATTACK)) {
+			actionOrder_.back().magicType = MAGIC_TYPE::MAGIC_ATTACK; //攻撃魔法
+		}
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::HEAL)) {
+			actionOrder_.back().magicType = MAGIC_TYPE::HEAL;         //回復魔法
+		}
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::BUFF)) {
+			actionOrder_.back().magicType = MAGIC_TYPE::BUFF;         //強化魔法
+		}
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::DEBUFF)) {
+			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF;         //弱化魔法
+		}
+		// 将来のバフ・デバフ魔法もここに条件を足すだけ！
+	}
 
 	//敵の追加（DecideActionでランダムに行動を決定）
 	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
@@ -193,13 +222,27 @@ void QuestPhase::ProcessActionLoop(void)
 			}
 			else if (command_ == COMMAND::MAGIC) 
 			{
-				battleMessage_ = unit.name + " の魔法攻撃！";
-				activeEnemy_->TakeDamage(playerStatus_->MagicAttack());
-			}
-			else if (command_ == COMMAND::ITEM) 
-			{
-				battleMessage_ = unit.name + " がアイテム使用！";
-				playerStatus_->hp_ += 20;
+				switch (unit.magicType)
+				{
+				case MAGIC_TYPE::MAGIC_ATTACK:
+					battleMessage_ = unit.name + " の魔法攻撃！";
+					activeEnemy_->TakeDamage(playerStatus_->MagicAttack());
+					break;
+				case MAGIC_TYPE::HEAL:
+					battleMessage_ = unit.name + " の回復魔法！";
+					playerStatus_->Heal();
+					break;
+				case MAGIC_TYPE::BUFF:
+					battleMessage_ = unit.name + " の強化魔法！";
+					playerStatus_->Heal();
+					break;
+				case MAGIC_TYPE::DEBUFF:
+					battleMessage_ = unit.name + " の弱化魔法！";
+					playerStatus_->Heal();
+					break;
+				default:
+					break;
+				}
 			}
 		}
 		else
@@ -267,7 +310,7 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 
 		//倒した時の上書き
-		if (activeEnemy_->IsDead())
+		if (activeEnemy_->IsDead ())
 		{
 			battleMessage_ = activeEnemy_->GetName() + " を倒した！";
 		}
@@ -351,9 +394,6 @@ void QuestPhase::ProcessPlayerAction()
 		case QuestPhase::COMMAND::MAGIC:
 			subActionMessages_ = { "単体魔法","回復", "強化", "状態異常付与" };
 			break;
-		case QuestPhase::COMMAND::ITEM:
-			subActionMessages_ = { "回復", "状態異常回復" };
-			break;
 		case QuestPhase::COMMAND::MAX:
 			break;
 		default:
@@ -394,5 +434,5 @@ void QuestPhase::ProcessPlayerSubAction(void)
 
 void QuestPhase::DrawCommandSelection(void)
 {
-	Utility::DrawCommandMenu(0,200,{"攻撃","魔法","アイテム"},static_cast<int>(command_));
+	Utility::DrawCommandMenu(0,200,{"攻撃","魔法"},static_cast<int>(command_));
 }
