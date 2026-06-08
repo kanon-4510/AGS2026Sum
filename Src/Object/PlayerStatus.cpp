@@ -99,7 +99,8 @@ int PlayerStatus::MagicAttack()
 void PlayerStatus::Heal()
 {
 	hp_ += SkillBonus(BonusType::ItemBonus, heal_);
-	if (hp_ > GetMaxHp()) {
+	if (hp_ > GetMaxHp()) 
+	{
 		hp_ = GetMaxHp();
 	}
 }
@@ -109,7 +110,8 @@ void PlayerStatus::Damage(int damage)
 	int finalDamage = SkillBonus(BonusType::DefenseBonus, damage);
 
 	hp_ -= finalDamage;
-	if (hp_ <= 0) {
+	if (hp_ <= 0) 
+	{
 		hp_ = 0;
 		Death();
 	}
@@ -162,7 +164,8 @@ void PlayerStatus::GetExp(int exp)
 	int finalExp = SkillBonus(BonusType::ExpBonus, exp);
 
 	exp_ += finalExp;
-	while (exp_ >= NEED_EXP) {
+	while (exp_ >= NEED_EXP) 
+	{
 		exp_ -= NEED_EXP;
 		LevelUp();
 	}
@@ -178,22 +181,26 @@ void PlayerStatus::LevelUp()
 	//各ステータスの抽選処理
 
 	//60%の確率でPOWアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) 
+	{
 		power_ += 1;
 	}
 
 	//60%の確率でMAGICアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) 
+	{
 		magic_ += 1;
 	}
 
 	//60%の確率でSPEEDアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) 
+	{
 		speed_ += 1;
 	}
 
 	//60%の確率でLUCKアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) 
+	{
 		luck_ += 1;
 	}
 }
@@ -258,10 +265,35 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	JobBonus bonus;
 
 	//職業ごとのステータスボーナスを設定
-	if (this->job == "一般魔法使い") {
+	if (this->job == "一般魔法使い") 
+	{
 		bonus.hp = 10;
 		bonus.power = 10;
 		bonus.speed = 10;
+	}
+	if (this->job == "付加術師") 
+	{
+		bonus.power = 10;
+	}
+	if (this->job == "魔剣士") 
+	{
+		bonus.power = 10;
+	}
+	if (this->job == "魔導師") 
+	{
+		bonus.power = 10;
+	}
+	if (this->job == "聖職者") 
+	{
+		bonus.power = 10;
+	}
+	if (this->job == "呪術師") 
+	{
+		bonus.power = 10;
+	}
+	if (this->job == "占い師") 
+	{
+		bonus.power = 10;
 	}
 
 	return bonus;
