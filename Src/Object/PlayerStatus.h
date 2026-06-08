@@ -23,7 +23,6 @@ public:
 	int power_ = 10;
 	int magic_ = 10;
 	int speed_ = 10;
-	int luck_ = 10;
 
 	int heal_ = 2;	//‰ñ•œ—Ê
 
