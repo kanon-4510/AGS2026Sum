@@ -14,7 +14,6 @@ void PlayerStatus::Draw()
 	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Physical: %d", power_);
 	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magical: %d", magic_);
 	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
-	DrawFormatString(STATUS_X, 110,STATUS_COLOR, "Luck: %d", luck_);
 
 	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
 	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "薬: %d", pharmacy_);
@@ -118,25 +117,10 @@ void PlayerStatus::LevelUp()
 
 	//各ステータスの抽選処理
 
-	//60%の確率でPOWアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
-		power_ += 1;
-	}
-
-	//60%の確率でMAGICアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
-		magic_ += 1;
-	}
-
-	//60%の確率でSPEEDアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
-		speed_ += 1;
-	}
-
-	//60%の確率でLUCKアップ
-	if ((rand() % RATE_BASE) < SKILL_UP_RATE) {
-		luck_ += 1;
-	}
+	//60%の確率でアップ
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) power_ += 1;
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) magic_ += 1;
+	if ((rand() % RATE_BASE) < SKILL_UP_RATE) speed_ += 1;
 }
 
 bool PlayerStatus::JobCheck(const JobData& job)
@@ -188,8 +172,8 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (archaeology_ / 10 * 2);
 
 	case BonusType::LuckBonus:
-		//占星術10につき、運のステータスを+1する
-		return baseValue + (astrology_ / 10);
+		//占星術10につき、回避率のステータスを+1する
+		return baseValue + (astrology_ / 5);
 	}
 	return baseValue;
 }
