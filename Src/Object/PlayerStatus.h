@@ -22,7 +22,7 @@ public:
 	int hp_ = maxHp_;
 	int power_ = 10;
 	int magic_ = 10;
-	int speed_ = 10;
+	int speed_ = 1;
 
 	int heal_ = 2;	//回復量
 
@@ -84,6 +84,8 @@ public:
 	//回復処理
 	void Heal();
 
+	void FullHeal();
+
 	//ダメージ処理
 	void Damage(int damage);
 
@@ -95,9 +97,6 @@ public:
 
 	//速度を外から参照できるようにする
 	int GetSpeed();
-
-	//運を外から参照できるようにする
-	int GetLuck();
 
 	//経験値処理
 	void GetExp(int exp);

@@ -20,6 +20,7 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene)
 	, currentWave_(1) //Waveの初期化
 {
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());//クエスト開始時に1戦目の敵を生成する
+	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
 }
 
 //デストラクタ
@@ -48,7 +49,7 @@ void QuestPhase::Draw(void)
 		&& battleStep_ != BATTLE_STEP::RESULT)
 	{
 		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
-		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
+		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->GetMaxHp());
 
 		//敵のHPを activeEnemy_ から直接もらう
 		if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
@@ -131,7 +132,7 @@ void QuestPhase::ManageTurn(void)
 		ProcessPlayerAction();
 		break;
 	case QuestPhase::BATTLE_STEP::COMMAND_SUB_SELECTION:
-		//プレイヤーの行動の処理などをここに書く
+		//DETERMINEに進むかCOMMAND_SELECTIONに戻るか
 		ProcessPlayerSubAction();
 		break;
 	case QuestPhase::BATTLE_STEP::DETERMINE:
@@ -141,6 +142,10 @@ void QuestPhase::ManageTurn(void)
 	case QuestPhase::BATTLE_STEP::ACTION_LOOP:
 		//行動の順番に従って処理を行う関数
 		ProcessActionLoop();
+		break;
+	case QuestPhase::BATTLE_STEP::STATUS_EFFECT:
+		//状態異常の処理を行う関数
+		ProcessStatusEffect();
 		break;
 	case QuestPhase::BATTLE_STEP::RESULT:
 		//結果表示の処理などをここに書く
@@ -204,9 +209,7 @@ void QuestPhase::ProcessActionLoop(void)
 	if (currentActionIdx_ >= actionOrder_.size())
 	{
 		//ターン終了時にフラグを更新
-		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
-
-		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+		battleStep_ = BATTLE_STEP::STATUS_EFFECT;
 		currentActionIdx_ = 0;
 		battleMessage_ = "";
 		return;
@@ -222,7 +225,7 @@ void QuestPhase::ProcessActionLoop(void)
 			if (command_ == COMMAND::ATTACK) 
 			{
 				battleMessage_ = unit.name + " の攻撃！";
-				activeEnemy_->TakeDamage(playerStatus_->Attack());
+				activeEnemy_->TakeDamage(2);
 			}
 			else if (command_ == COMMAND::MAGIC) 
 			{
@@ -242,7 +245,7 @@ void QuestPhase::ProcessActionLoop(void)
 					break;
 				case MAGIC_TYPE::DEBUFF:
 					battleMessage_ = unit.name + " の弱化魔法！";
-					playerStatus_->Heal();
+					statusEffect_ = STATUS_EFFECT::POISON;
 					break;
 				default:
 					break;
@@ -338,18 +341,14 @@ void QuestPhase::ProcessActionLoop(void)
 				currentWave_++; //次のWaveへ
 				activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); // 次の敵を生成
 
-				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
-				battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
-				currentActionIdx_ = 0;
-				battleMessage_ = "";
+				statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
 				return;
 			}
 			else
 			{
 				//全Waveクリア！
-				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 				battleStep_ = BATTLE_STEP::RESULT;
-				battleMessage_ = "";
+				statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
 				return;
 			}
 		}
@@ -360,6 +359,24 @@ void QuestPhase::ProcessActionLoop(void)
 	}
 }
 
+void QuestPhase::ProcessStatusEffect(void)
+{
+	if (statusEffect_ == STATUS_EFFECT::POISON)
+	{
+		battleMessage_ = actionOrder_[currentActionIdx_].name + " は毒ダメージを受けた！";
+
+		//敵も毒状態になっている場合は、ターンの最後にダメージを受ける（例：1ダメージ）
+		activeEnemy_->TakeDamage(1);
+	}
+
+	//ターン終了時にフラグを更新
+	wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+	currentActionIdx_ = 0;
+	battleMessage_ = "";
+
+	battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+}
+
 void QuestPhase::DisplayResult(void)
 {
 	//経験値獲得は ProcessActionLoop内で敵を倒すたびに行うように変更したため、ここは次へ進む処理のみ
@@ -367,7 +384,7 @@ void QuestPhase::DisplayResult(void)
 	{
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 		isFinished_ = true; //フェーズ終了
-		playerStatus_->hp_ = playerStatus_->maxHp_; //HPを全回復
+		playerStatus_->FullHeal(); //HPを全回復
 	}
 }
 
@@ -414,7 +431,7 @@ void QuestPhase::ProcessPlayerAction()
 
 void QuestPhase::ProcessPlayerSubAction(void)
 {
-	//// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
+	// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
 	int maxSubItems = static_cast<int>(subActionMessages_.size());
 	if (maxSubItems == 0) return; // 念のため
 

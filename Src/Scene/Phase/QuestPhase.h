@@ -30,6 +30,7 @@ public:
 		COMMAND_SUB_SELECTION,	//サブコマンド選択
 		DETERMINE,				//コマンド決定
 		ACTION_LOOP,			//行動ループ
+		STATUS_EFFECT,			//状態異常の処理
 		RESULT,					//結果表示
 		MAX
 	};
@@ -49,6 +50,15 @@ public:
 		HEAL,			//回復
 		BUFF,			//強化
 		DEBUFF,			//弱体化
+		MAX
+	};
+
+	//状態異常の種類
+	enum class STATUS_EFFECT
+	{
+		NONE,			//なし
+		POISON,			//毒
+		FREEZE,			//凍結
 		MAX
 	};
 
@@ -100,6 +110,9 @@ private:
 	//プレイヤーの選択したコマンドを管理する変数
 	COMMAND command_; 
 
+	//状態異常を管理する変数
+	STATUS_EFFECT statusEffect_;
+
 	//魔法攻撃のインターバル(1ターン)
 	bool wasMagicUsedLastTurn_ = false; //前のターンに魔法を使ったか
 	bool magicUsedThisTurn_ = false;    //今のターンに魔法を使ったか（更新用）
@@ -135,6 +148,9 @@ private:
 	//行動の順番に従って処理を行う関数
 	void ProcessActionLoop(void);
 	
+	//状態異常の処理を行う関数
+	void ProcessStatusEffect(void);
+
 	//結果を表示する関数
 	void DisplayResult(void);
 

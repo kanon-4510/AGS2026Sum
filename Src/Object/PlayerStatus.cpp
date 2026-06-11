@@ -10,9 +10,9 @@ void PlayerStatus::Draw()
 {
 	//ステータスの描画処理
 	DrawFormatString(STATUS_X, 10, STATUS_COLOR, "Level: %d", level_);
-	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, maxHp_);
-	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Physical: %d", power_);
-	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magical: %d", magic_);
+	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, GetMaxHp());
+	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Physical: %d", Attack());
+	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magical: %d", MagicAttack());
 	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
 
 	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
@@ -104,6 +104,11 @@ void PlayerStatus::Heal()
 	}
 }
 
+void PlayerStatus::FullHeal()
+{
+	hp_ = GetMaxHp();
+}
+
 void PlayerStatus::Damage(int damage)
 {
 	int finalDamage = SkillBonus(BonusType::DefenseBonus, damage);
@@ -145,18 +150,6 @@ int PlayerStatus::GetSpeed()
 	return speedWithJob;
 }
 
-int PlayerStatus::GetLuck()
-{
-	//初期速度
-	int base = this->luck_;
-
-	//職業ごとのプラス値を加える
-	int jobBonus = GetJobBonus().luck;
-	int luckWithJob = base + jobBonus;
-
-	return luckWithJob;
-}
-
 void PlayerStatus::GetExp(int exp)
 {
 	//経験値処理
@@ -174,7 +167,7 @@ void PlayerStatus::LevelUp()
 {
 	//レベルアップした時の処理
 	level_++;
-	maxHp_ += 5;
+	maxHp_++;
 	hp_ = GetMaxHp();
 
 	//各ステータスの抽選処理
