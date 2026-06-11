@@ -96,9 +96,6 @@ public:
 	//速度を外から参照できるようにする
 	int GetSpeed();
 
-	//運を外から参照できるようにする
-	int GetLuck();
-
 	//経験値処理
 	void GetExp(int exp);
 
@@ -120,5 +117,5 @@ public:
 	//職業名を書き換える
 	void SetJob(std::string newJobName) { job = newJobName; }
 
+	bool hasChallengedHellQuest_ = false; //激ムズクエストに挑戦したかどうかのフラグ
 };
-

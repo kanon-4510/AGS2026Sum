@@ -42,7 +42,7 @@ public:
 
 	//バトル用の関数
 	EnemyActionInfo DecideAction() const;
-	void TakeDamage(int damage);
+	void Damage(int damage);
 	void Heal(int amount); // 回復用の関数
 
 	//ゲッター
@@ -67,3 +67,4 @@ private:
 };
 
 Enemy* SpawnEnemyByTurn(int turn);
+Enemy* SpawnRushEnemy(int stage); //ラッシュ専用

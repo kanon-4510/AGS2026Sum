@@ -11,8 +11,6 @@ class Enemy;
 class QuestPhase : public PhaseBase
 {
 public:
-	
-
 	//難易度
 	enum class DIFFICULTY
 	{
@@ -74,7 +72,7 @@ public:
 	static constexpr float ENEMY_INCREASE = 0.7f;
 	static constexpr float HARD_INCREASE = 1.5f;
 
-	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene);		//デフォルトコンストラクタ
+	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest=false);		//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
 
 	void Update(void) override;		//更新処理
@@ -107,16 +105,19 @@ private:
 	Enemy* activeEnemy_ = nullptr; //現在戦っている敵のポインタ
 	int currentWave_ = 1;          //現在の連戦数（1戦目からスタート）
 	const int MAX_WAVES = 3;       //1回の遠征での最大連戦数（例：3連戦）
+
+	std::vector<std::string> difficultyMenu_; //表示する難易度のリスト
+	int difficultyCursor_ = 0;                //難易度選択用のカーソル
 	
 	//------フラグ---------
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
+	bool isHellQuest_ = false;//激ムズクエスト突入したか
 
 	//-------変数---------
 	int currentActionIdx_ = 0;	//行動リストの何番目かを指す
 	int subMenuCursor_ = 0;		// サブメニューのカーソル
 
 	//------関数---------
-	
 	//ターンを管理する関数
 	void ManageTurn(void);
 	

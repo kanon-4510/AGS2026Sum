@@ -30,7 +30,7 @@ void PlayerStatus::Draw()
 	if (itemBonus > 0) DrawFormatString(STATUS_BONUS_X, 150, GREEN, "(回復+%d)", itemBonus);
 
 	int atkBonus = SkillBonus(BonusType::AttackBonus, 0); //基準値0で呼ぶとボーナス量だけが返る
-	if (atkBonus > 0) DrawFormatString(STATUS_BONUS_X, 170, GREEN, "(攻撃+%d)", atkBonus);
+	if (atkBonus > 0) DrawFormatString(STATUS_BONUS_X, 170, GREEN, "(会心率+%d)", atkBonus);
 
 	int magBonus = SkillBonus(BonusType::MagicBonus, 0);
 	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 190, GREEN, "(魔法+%d)", magBonus);
@@ -39,10 +39,10 @@ void PlayerStatus::Draw()
 	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 210, GREEN, "(防御+%d)", defBonus);
 
 	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
-	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 230, GREEN, "(経験+%d)", expBonus);
+	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 230, GREEN, "(経験値+%d)", expBonus);
 
 	int luckBonus = SkillBonus(BonusType::LuckBonus, 0);
-	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(幸運+%d)", luckBonus);
+	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(回避率+%d)", luckBonus);
 
 	//職業ボーナスの描画
 	int jobHpBonus = GetJobBonus().hp; //職業ボーナスも表示
@@ -82,7 +82,7 @@ int PlayerStatus::Attack()
 	int powerWithJob = base + jobBonus;
 
 	//技能ステータスのボーナスを加える
-	return SkillBonus(BonusType::AttackBonus, powerWithJob);
+	return powerWithJob;
 }
 
 int PlayerStatus::MagicAttack()
@@ -145,18 +145,6 @@ int PlayerStatus::GetSpeed()
 	return speedWithJob;
 }
 
-int PlayerStatus::GetLuck()
-{
-	//初期速度
-	int base = this->luck_;
-
-	//職業ごとのプラス値を加える
-	int jobBonus = GetJobBonus().luck;
-	int luckWithJob = base + jobBonus;
-
-	return luckWithJob;
-}
-
 void PlayerStatus::GetExp(int exp)
 {
 	//経験値処理
@@ -174,12 +162,12 @@ void PlayerStatus::LevelUp()
 {
 	//レベルアップした時の処理
 	level_++;
-	maxHp_ += 5;
+	maxHp_ ++;
 	hp_ = GetMaxHp();
 
 	//各ステータスの抽選処理
 
-	//60%の確率でアップ
+	//70%の確率でアップ
 	if ((rand() % RATE_BASE) < SKILL_UP_RATE) power_ += 1;
 	if ((rand() % RATE_BASE) < SKILL_UP_RATE) magic_ += 1;
 	if ((rand() % RATE_BASE) < SKILL_UP_RATE) speed_ += 1;
@@ -212,8 +200,8 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (pharmacy_ / 10);
 
 	case BonusType::AttackBonus:
-		//武術10につき、物理攻撃のダメージを+1する
-		return baseValue + (martialArts_ / 10);
+		//武術5につき、会心率のダメージを+1する
+		return baseValue + (martialArts_ / 5);
 
 	case BonusType::MagicBonus:
 		//魔法知10につき、魔法威力を+1する
@@ -234,7 +222,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (archaeology_ / 10 * 2);
 
 	case BonusType::LuckBonus:
-		//占星術10につき、回避率のステータスを+1する
+		//占星術5につき、回避率のステータスを+1する
 		return baseValue + (astrology_ / 5);
 	}
 	return baseValue;

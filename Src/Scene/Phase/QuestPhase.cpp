@@ -10,16 +10,28 @@
 
 //外部にある敵生成関数（Enemy.cppなどに実装している想定）
 extern Enemy* SpawnEnemyByTurn(int currentTurn);
+extern Enemy* SpawnRushEnemy(int stage); //ラッシュ専用の敵生成関数
 
 //コンストラクタ
-QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene)
+QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool isHellQuest)
 	: gameScene_(gameScene)
 	, playerStatus_(playerStatus)
 	, command_(COMMAND::ATTACK)
 	, battleStep_(BATTLE_STEP::DIFFICULTY_SELECTION)
 	, currentWave_(1) //Waveの初期化
+	, isHellQuest_(false)
 {
-	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());//クエスト開始時に1戦目の敵を生成する
+	//クエスト開始時は一旦通常の敵を生成しておく
+	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
+
+	//ここで難易度メニューを動的に作成
+	difficultyMenu_ = { "優しい", "普通", "難しい" };
+
+	//13ターン目以降 かつ まだ一度も挑んでいないなら
+	if (gameScene_.GetTurn() >= 13 && !playerStatus_->hasChallengedHellQuest_)
+	{
+		difficultyMenu_.push_back("エクストラ");
+	}
 }
 
 //デストラクタ
@@ -47,6 +59,7 @@ void QuestPhase::Draw(void)
 	if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleStep_ != BATTLE_STEP::RESULT)
 	{
+		int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;
 		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
 		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->maxHp_);
 
@@ -60,7 +73,7 @@ void QuestPhase::Draw(void)
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
-		Utility::DrawCommandMenu(0, 40, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
+		Utility::DrawCommandMenu(0, 40, difficultyMenu_, difficultyCursor_);
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION) //難易度選択中はコマンドやHPを表示しない
 	{
@@ -103,19 +116,31 @@ bool QuestPhase::IsFinished() const
 
 void QuestPhase::ProcessDifficulty(void)
 {
-	//選択肢の数（今回は仮に3つ：「優しい」「普通」「難しい」）
-	int difficultyIndex = static_cast<int>(difficulty_); //enum class を int に変換して操作する
-	int maxDifficulty = static_cast<int>(DIFFICULTY::MAX);
-	//カーソル移動
-	Utility::ProcessCommandMenuSelection(difficultyIndex, maxDifficulty);
+	//選択肢の数を、配列のサイズから自動取得
+	int maxDifficulty = static_cast<int>(difficultyMenu_.size());
+	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
 
-	//更新された int の値を、安全に元の enum class 型に戻して代入する
-	difficulty_ = static_cast<DIFFICULTY>(difficultyIndex);
-	
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		battleStep_ = BATTLE_STEP::COMMAND_SELECTION; //次のステップへ
+		//選んだメニューの「文字列」で分岐させる
+		if (difficultyMenu_[difficultyCursor_] == "エクストラ")
+		{
+			isHellQuest_ = true;
+			playerStatus_->hasChallengedHellQuest_ = true;//二度と選べないようにフラグを回収
+
+			//通常敵のメモリを解放し、5連戦用の1体目とすげ替える！
+			delete activeEnemy_;
+			activeEnemy_ = SpawnRushEnemy(0);
+		}
+		else
+		{
+			isHellQuest_ = false;
+			//通常の難易度として enum に保存する（既存の処理を維持）
+			difficulty_ = static_cast<DIFFICULTY>(difficultyCursor_);
+		}
+
+		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
 }
 
@@ -159,10 +184,12 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0});
 	if (command_ == COMMAND::ATTACK)
 	{
-		if (subMenuCursor_ == 0) {
+		if (subMenuCursor_ == 0) 
+		{
 			actionOrder_.back().skillName = "単体攻撃";
 		}
-		else {
+		else 
+		{
 			actionOrder_.back().skillName = "全体攻撃";
 		}
 	}
@@ -170,17 +197,21 @@ void QuestPhase::DetermineActionOrder(void)
 	else if (command_ == COMMAND::MAGIC)
 	{
 		// サブメニューの選択肢に応じて魔法の性質を分ける！
-		if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::MAGIC_ATTACK)) {
+		if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::MAGIC_ATTACK))
+		{
 			actionOrder_.back().magicType = MAGIC_TYPE::MAGIC_ATTACK; //攻撃魔法
 		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::HEAL)) {
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::HEAL)) 
+		{
 			actionOrder_.back().magicType = MAGIC_TYPE::HEAL;         //回復魔法
 		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::BUFF)) {
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::BUFF)) 
+		{
 			actionOrder_.back().magicType = MAGIC_TYPE::BUFF;         //強化魔法
 		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::DEBUFF)) {
-			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF;         //弱化魔法
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::DEBUFF)) 
+		{
+			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF;       //弱化魔法
 		}
 		// 将来のバフ・デバフ魔法もここに条件を足すだけ！
 	}
@@ -222,7 +253,19 @@ void QuestPhase::ProcessActionLoop(void)
 			if (command_ == COMMAND::ATTACK) 
 			{
 				battleMessage_ = unit.name + " の攻撃！";
-				activeEnemy_->TakeDamage(playerStatus_->Attack());
+				//会心判定
+				//計算式：武術のステータス÷5
+				int criticalChance = playerStatus_->martialArts_ / 5;
+				int roll = GetRand(99);
+				if (roll < criticalChance)
+				{
+					battleMessage_ = "クリティカルヒット！";
+					activeEnemy_->Damage(playerStatus_->Attack()*2);
+				}
+				else
+				{
+					activeEnemy_->Damage(playerStatus_->Attack());
+				}
 			}
 			else if (command_ == COMMAND::MAGIC) 
 			{
@@ -230,7 +273,7 @@ void QuestPhase::ProcessActionLoop(void)
 				{
 				case MAGIC_TYPE::MAGIC_ATTACK:
 					battleMessage_ = unit.name + " の魔法攻撃！";
-					activeEnemy_->TakeDamage(playerStatus_->MagicAttack());
+					activeEnemy_->Damage(playerStatus_->MagicAttack());
 					break;
 				case MAGIC_TYPE::HEAL:
 					battleMessage_ = unit.name + " の回復魔法！";
@@ -292,7 +335,7 @@ void QuestPhase::ProcessActionLoop(void)
 				}
 
 				//回避判定
-				//計算式：基本回避率 運のステータス×2　　　※運の数値に合わせて調整
+				//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
 				int evasionChance = playerStatus_->astrology_ / 5;
 
 				//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
@@ -325,18 +368,22 @@ void QuestPhase::ProcessActionLoop(void)
 		//もし敵を倒していたら
 		if (activeEnemy_->IsDead())
 		{
-			//倒した敵から経験値を獲得
-			playerStatus_->GetExp(activeEnemy_->GetExp());
+			//倒した敵から経験値を獲得(ゲキムズ以外)
+			if (!isHellQuest_) playerStatus_->GetExp(activeEnemy_->GetExp());
 
 			//今の敵を消去
 			delete activeEnemy_;
 			activeEnemy_ = nullptr;
 
+			int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;//最大Wave数を動的に切り替え
+
 			//連戦チェック
-			if (currentWave_ < MAX_WAVES)
+			if (currentWave_ < maxWaves)
 			{
 				currentWave_++; //次のWaveへ
-				activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); // 次の敵を生成
+				//次の敵の呼び出し分け
+				if (isHellQuest_)activeEnemy_ = SpawnRushEnemy(currentWave_ - 1); //0スタートの配列に合わせる
+				else activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); // 次の敵を生成
 
 				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 				battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
@@ -347,6 +394,9 @@ void QuestPhase::ProcessActionLoop(void)
 			else
 			{
 				//全Waveクリア！
+
+				//激ムズクエストは莫大な経験値を付与
+				if (isHellQuest_)playerStatus_->GetExp(100);
 				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 				battleStep_ = BATTLE_STEP::RESULT;
 				battleMessage_ = "";
