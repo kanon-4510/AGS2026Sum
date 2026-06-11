@@ -32,7 +32,6 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	{
 		difficultyMenu_.push_back("エクストラ");
 	}
-}
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());//クエスト開始時に1戦目の敵を生成する
 	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
 }
@@ -419,7 +418,7 @@ void QuestPhase::ProcessStatusEffect(void)
 		battleMessage_ = actionOrder_[currentActionIdx_].name + " は毒ダメージを受けた！";
 
 		//敵も毒状態になっている場合は、ターンの最後にダメージを受ける（例：1ダメージ）
-		activeEnemy_->TakeDamage(1);
+		activeEnemy_->Damage(1);
 	}
 
 	//ターン終了時にフラグを更新
