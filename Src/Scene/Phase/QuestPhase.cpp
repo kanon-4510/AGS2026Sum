@@ -225,7 +225,7 @@ void QuestPhase::ProcessActionLoop(void)
 			if (command_ == COMMAND::ATTACK) 
 			{
 				battleMessage_ = unit.name + " ‚ÌUŒ‚I";
-				activeEnemy_->TakeDamage(2);
+				activeEnemy_->TakeDamage(playerStatus_->Attack());
 			}
 			else if (command_ == COMMAND::MAGIC) 
 			{
