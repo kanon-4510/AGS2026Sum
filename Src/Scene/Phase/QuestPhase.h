@@ -72,6 +72,37 @@ public:
 		MAGIC_TYPE magicType;		//魔法の効果の種類を記憶しておく
 	};
 
+	//------定数---------
+	//メッセージの表示位置
+
+	//難易度選択のメッセージの位置
+	static constexpr int DIFFICULTY_MSG_X = 0;
+	static constexpr int DIFFICULTY_MSG_Y = 40;
+
+	//現在のターンメッセージの位置
+	static constexpr int TURN_MSG_X = 0;
+	static constexpr int TURN_MSG_Y = 80;
+
+	//プレイヤーのHPメッセージの位置
+	static constexpr int PLAYER_HP_MSG_X = 0;
+	static constexpr int PLAYER_HP_MSG_Y = 120;
+
+	//エネミーのHPメッセージの位置
+	static constexpr int ENEMY_HP_MSG_X = 0;
+	static constexpr int ENEMY_HP_MSG_Y = 140;
+
+	//コマンドの位置
+	static constexpr int COMMAND_MSG_X = 0;
+	static constexpr int COMMAND_MSG_Y = 210;
+
+	//敵とプレイヤー行動を表示するメッセージの位置
+	static constexpr int BATTLE_MSG_X = 0;
+	static constexpr int BATTLE_MSG_Y = 170;
+
+	//次に進むメッセージの位置
+	static constexpr int NEXT_MSG_X = 0;
+	static constexpr int NEXT_MSG_Y = 190;
+
 	//経験値（仮）
 	static constexpr int EXP_GAIN = 10;
 
@@ -91,8 +122,9 @@ public:
 	//フェーズが終了したかどうかを親に伝える
 	virtual bool IsFinished() const override;
 private:
-	std::vector<ActionUnit> actionOrder_;//行動の順番を管理するためのリスト
-	std::string battleMessage_;			 //画面に表示する文字列
+	std::vector<ActionUnit> actionOrder_;	//行動の順番を管理するためのリスト
+	std::string tutorialMessage_;			//チュートリアル用のメッセージ
+	std::string battleMessage_;				//バトル用のメッセージ
 	std::vector<std::string> subActionMessages_; //サブアクションのメッセージを管理するリスト
 	
 	PlayerStatus* playerStatus_;//プレイヤーのステータスの情報を渡す
@@ -127,10 +159,15 @@ private:
 	bool isHellQuest_ = false;//激ムズクエスト突入したか
 
 	//-------変数---------
+	int battleTurn_ = 1;		//現在のバトルターン数
 	int currentActionIdx_ = 0;	//行動リストの何番目かを指す
 	int subMenuCursor_ = 0;		// サブメニューのカーソル
 
 	//------関数---------
+
+	//チュートリアル
+	void ProcessTutorial(void);
+	
 	//ターンを管理する関数
 	void ManageTurn(void);
 	
@@ -154,6 +191,8 @@ private:
 
 	//結果を表示する関数
 	void DisplayResult(void);
+
+	void DrawTutorial(void);	//チュートリアルの描画処理
 
 	//Draw関数内でコマンド選択の描画を行う関数
 	void DrawCommandSelection(void);

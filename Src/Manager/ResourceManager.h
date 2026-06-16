@@ -10,84 +10,16 @@ public:
 	// リソース名
 	enum class SRC
 	{
-		
-		//3Dモデル
-		PLAYER_SHADOW,
-		LIGHT,
-		MAIN_PLANET,
-		STAGE,
-		SKY_DOME,
-		PLAYER,
-		//エネミー
-		DOG,
-		SABO,
-		MIMIC,
-		MUSH,
-		ONION,
-		TOGE,
-		VIRUS,
-		SKELETON,
-		BOSS,
-		//エフェクト
-		FOOT_SMOKE,
-		EFF_DAMAGE,
-		EFF_SHOT,
-		TREE_RANGE,
-		EFF_POWER,
-		EFF_SPEED,
-		EFF_HEAL,
 		//タイトル
 		GAME_TITLE,
-		GAME_START,
-		GAME_LULE,
-		GAME_END,
-		YES,
-		NO,
-		//ゲームシーンUI
-		FRAME,
-		HP,
-		POWER,
-		SPEED,
-		INTIMACY,
-		POINT,
-		HP_UP,
-		POWER_UP,
-		SPEED_UP,
-		INTIMACY_UP,
-		BATTLE_IMG,
-		BATTLE_START_IMG,
+		//ゲームクリア
+		GAME_CLEAR,
 		//ゲームオーバー
-		GAMEOVER,
-
-		//キーボード
-		KEY_A,
-		KEY_D,
-		KEY_E,
-		KEY_S,
-		KEY_W,
-		KEY_TAB,
-		KEY_ENTER,
-		KEY_UP,
-		KEY_DOWN,
-		KEY_RIGHT,
-		KEY_LEFT,
-		//Xbox
-		XBOX_A,
-		XBOX_B,
-		XBOX_Y,
-		XBOX_X,
-		XBOX_LB,
-		XBOX_RB,
-		XBOX_UP,
-		XBOX_DOWN,
-		XBOX_RIGHT,
-		XBOX_LEFT,
-		//ゲームアイコン
-		ICON_ATTACK,
-		ICON_DEFENSE,
-		ICON_AVOID,
-		//カーソル
-		CURSOR
+		GAME_OVER,
+		//プレイヤー
+		PLAYER,
+		//ステージ
+		STAGE
 	};
 
 	// 明示的にインステンスを生成する

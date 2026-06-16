@@ -49,6 +49,8 @@ QuestPhase::~QuestPhase(void)
 //更新処理
 void QuestPhase::Update(void)
 {
+	//ProcessTutorial();
+
 	//ターン管理関数
 	ManageTurn();
 }
@@ -57,6 +59,8 @@ void QuestPhase::Update(void)
 void QuestPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
+
+	//DrawTutorial();
 
 	if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleStep_ != BATTLE_STEP::RESULT)
@@ -68,14 +72,14 @@ void QuestPhase::Draw(void)
 		//敵のHPを activeEnemy_ から直接もらう
 		if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
 		{
-			DrawFormatString(0, 120, 0xFFFFFF, "%sのHP %d", activeEnemy_->GetName().c_str(), activeEnemy_->GetCurrentHp());
+			DrawFormatString(ENEMY_HP_MSG_X, ENEMY_HP_MSG_Y, 0xFFFFFF, "%sのHP %d", activeEnemy_->GetName().c_str(), activeEnemy_->GetCurrentHp());
 			//画像を表示する場合はここに activeEnemy_->Draw(); を追加
 		}
 	}
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
-		Utility::DrawCommandMenu(0, 40, difficultyMenu_, difficultyCursor_);
+		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION) //難易度選択中はコマンドやHPを表示しない
 	{
@@ -83,23 +87,22 @@ void QuestPhase::Draw(void)
 
 		if (battleMessage_ != "")
 		{
-			DrawFormatString(0, 150, 0xFF0000, battleMessage_.c_str());
-			DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
+			DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
+			DrawString(NEXT_MSG_X, NEXT_MSG_Y, "Enterキーで次へ", 0xFF0000);
 		}
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
 	{
-		DrawFormatString(0, 40, 0xFFFFFFF, "%d", subMenuCursor_);
+		//DrawFormatString(0, 40, 0xFFFFFFF, "%d", subMenuCursor_);
 
 		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
-		Utility::DrawCommandMenu(0, 200, subActionMessages_, subMenuCursor_);
-		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
+		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, subActionMessages_, subMenuCursor_);
 	}
 	
 	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
 	{
-		DrawFormatString(0, 150, 0xFF0000, battleMessage_.c_str());
-		DrawString(0, 170, "Enterキーで次へ", 0xFF0000);
+		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
+		DrawString(NEXT_MSG_X, NEXT_MSG_Y, "Enterキーで次へ", 0xFF0000);
 	}
 
 	if (battleStep_ == BATTLE_STEP::RESULT)
@@ -242,6 +245,10 @@ void QuestPhase::ProcessActionLoop(void)
 	{
 		//ターン終了時にフラグを更新
 		battleStep_ = BATTLE_STEP::STATUS_EFFECT;
+		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+
+		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+		battleTurn_++;
 		currentActionIdx_ = 0;
 		battleMessage_ = "";
 		return;
@@ -509,5 +516,70 @@ void QuestPhase::ProcessPlayerSubAction(void)
 
 void QuestPhase::DrawCommandSelection(void)
 {
-	Utility::DrawCommandMenu(0,200,{"攻撃","魔法","アイテム"},static_cast<int>(command_));
+	Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y,{"攻撃","魔法"},static_cast<int>(command_));
+}
+
+void QuestPhase::ProcessTutorial(void)
+{
+	//チュートリアルの内容をここに書く
+	if(gameScene_.GetTurn() == 1)
+	{
+		// 最初のクエスト（turn == 0）以外は通常の自由戦闘なので何もしない
+		if (gameScene_.GetTurn() != 1) return;
+
+		// 【バトル内の、最初のコマンド入力フェーズのとき】
+		// ※仮にコマンド選択中のステップ名を BATTLE_STEP::COMMAND_SELECTION とします
+		if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION
+			&& battleTurn_ == 1)
+		{
+			// メインコマンドは「攻撃（0）」に強制固定
+			command_ = COMMAND::ATTACK;
+
+			// もし攻撃のサブメニュー（単体・全体）まで開いているなら、
+			// 最初の選択肢「単体攻撃（0）」にカーソルを強制ロック！
+			if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
+			{
+				subMenuCursor_ = 0;
+				// このあとの通常のカーソル移動キーの入力を無視するフラグ（returnなど）に繋げます
+			}
+		}
+		
+	}
+}
+void QuestPhase::DrawTutorial(void)
+{
+	tutorialMessage_ = "";
+
+	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
+	{
+		tutorialMessage_ = "チュートリアル\nここでは難易度を選択できます\n最初は優しいを選んで下さい\nEnterキーを押してみましょう！";
+	}
+	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+		&&battleTurn_ == 1)
+	{
+		tutorialMessage_ = "チュートリアル\n最初のターンは攻撃コマンドしか選べません！\n攻撃を選んでEnterキーを押してみましょう！";
+	}
+	else if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+		&& battleTurn_ == 2)
+	{
+		tutorialMessage_ = "チュートリアル\n次は魔法で攻撃をしましょう\n魔法を選んでEnterキーを押してみましょう！";
+	}
+	else if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+		&& battleTurn_ == 3)
+	{
+		tutorialMessage_ = "チュートリアル\n魔法を使うと１ターンの休憩が必要です\n攻撃を選んでEnterキーを押してみましょう！";
+	}
+	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+		&& battleTurn_ == 4)
+	{
+		tutorialMessage_ = "チュートリアル\nあとは好きなように戦いましょう";
+	}
+
+
+	//チュートリアルの内容をここに書く
+	//例：最初のターンだけ特別な説明を表示するなど
+	if(gameScene_.GetTurn() == 1)
+	{
+		DrawFormatString(0, 900, 0xFFFFFF, tutorialMessage_.c_str());
+	}
 }
