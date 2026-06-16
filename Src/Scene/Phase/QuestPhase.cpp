@@ -245,10 +245,6 @@ void QuestPhase::ProcessActionLoop(void)
 	{
 		//ターン終了時にフラグを更新
 		battleStep_ = BATTLE_STEP::STATUS_EFFECT;
-		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
-
-		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
-		battleTurn_++;
 		currentActionIdx_ = 0;
 		battleMessage_ = "";
 		return;
