@@ -145,18 +145,6 @@ int PlayerStatus::GetSpeed()
 	return speedWithJob;
 }
 
-int PlayerStatus::GetLuck()
-{
-	//初期速度
-	int base = this->luck_;
-
-	//職業ごとのプラス値を加える
-	int jobBonus = GetJobBonus().luck;
-	int luckWithJob = base + jobBonus;
-
-	return luckWithJob;
-}
-
 void PlayerStatus::GetExp(int exp)
 {
 	//経験値処理

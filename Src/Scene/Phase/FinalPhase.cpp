@@ -201,9 +201,8 @@ void FinalPhase::ProcessActionLoop(void)
 		{
 			battleMessage_ = unit.name + " の攻撃！";
 			//回避判定
-				//計算式：基本回避率 運のステータス×2
-				//※運の数値に合わせて「/ 2」の部分は調整
-			int evasionChance = playerStatus_->luck_ / 2;
+				//計算式：基本回避率 運のステータス×2　　　※運の数値に合わせて調整
+			int evasionChance = playerStatus_->astrology_ / 5;
 
 			//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
 			if (evasionChance > 90) evasionChance = 90;
