@@ -106,7 +106,7 @@ void GameScene::Draw(void)
 
 		Utility::DrawCommandMenu(100, 100,{"クエスト", "授業", "資格試験"}, (phase_));
 
-		//DrawGraph(1000, 200, playerImg_, TRUE);
+		DrawGraph(1000, 200, playerImg_, TRUE);
 
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();

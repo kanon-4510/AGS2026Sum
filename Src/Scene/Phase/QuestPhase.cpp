@@ -66,8 +66,9 @@ void QuestPhase::Draw(void)
 		&& battleStep_ != BATTLE_STEP::RESULT)
 	{
 		int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;
-		DrawFormatString(0, 80, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, MAX_WAVES);//連戦（Wave）の表示
-		DrawFormatString(0, 100, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->GetMaxHp());
+		DrawFormatString(0, 80, 0xFFFF00, "現在のターン %d", battleTurn_);//連戦（Wave）の表示
+		DrawFormatString(0, 100, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, maxWaves);//連戦（Wave）の表示
+		DrawFormatString(PLAYER_HP_MSG_X, PLAYER_HP_MSG_Y, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->GetMaxHp());
 
 		//敵のHPを activeEnemy_ から直接もらう
 		if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
@@ -85,6 +86,7 @@ void QuestPhase::Draw(void)
 	{
 		DrawCommandSelection();
 
+		//行動の結果メッセージがあれば表示
 		if (battleMessage_ != "")
 		{
 			DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
@@ -252,6 +254,13 @@ void QuestPhase::ProcessActionLoop(void)
 
 	auto& unit = actionOrder_[currentActionIdx_];
 
+	//敵が死んでいる場合はスキップ（プレイヤーの行動は常に処理する）
+	if (!unit.isPlayer && (activeEnemy_ == nullptr || activeEnemy_->IsDead()))
+	{
+		currentActionIdx_++;
+		return;
+	}
+
 	//①ダメージとメッセージの処理
 	if (battleMessage_ == "")
 	{
@@ -354,7 +363,7 @@ void QuestPhase::ProcessActionLoop(void)
 					//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
 					battleMessage_ = "攻撃を回避！";
 				}
-				else
+				else if(!activeEnemy_->IsDead())
 				{
 					//回避失敗 通常通りダメージを受ける
 					playerStatus_->Damage(damage);
@@ -372,6 +381,9 @@ void QuestPhase::ProcessActionLoop(void)
 	//②Enterキー待ちと、連戦(Wave)の処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
+
+		battleMessage_ = "";
+
 		//もし敵を倒していたら
 		if (activeEnemy_->IsDead())
 		{
@@ -391,8 +403,11 @@ void QuestPhase::ProcessActionLoop(void)
 				//次の敵の呼び出し分け
 				if (isHellQuest_)activeEnemy_ = SpawnRushEnemy(currentWave_ - 1); //0スタートの配列に合わせる
 				else activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); // 次の敵を生成
-
+				
+				actionOrder_.clear(); // 行動リストを綺麗に掃除
+				currentActionIdx_ = 0; // インデックスも0に戻す
 				statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
+				battleMessage_ = ""; // メッセージをリセットして次のターンへ！
 				return;
 			}
 			else
@@ -409,7 +424,6 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 
 		//敵がまだ生きていれば、次のキャラの行動へ
-		battleMessage_ = "";
 		currentActionIdx_++;
 	}
 }
@@ -427,7 +441,6 @@ void QuestPhase::ProcessStatusEffect(void)
 	//ターン終了時にフラグを更新
 	wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 	currentActionIdx_ = 0;
-	battleMessage_ = "";
 
 	battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 }
@@ -486,7 +499,7 @@ void QuestPhase::ProcessPlayerAction()
 
 void QuestPhase::ProcessPlayerSubAction(void)
 {
-	// 選択肢の数を、埋め込まれた配列のサイズから自動取得！
+	//選択肢の数を、埋め込まれた配列のサイズから自動取得！
 	int maxSubItems = static_cast<int>(subActionMessages_.size());
 	if (maxSubItems == 0) return; // 念のため
 
