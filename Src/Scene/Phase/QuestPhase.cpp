@@ -79,7 +79,7 @@ void QuestPhase::Draw(void)
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
-		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, { "優しい", "普通", "難しい" }, static_cast<int>(difficulty_));
+		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y,difficultyMenu_, difficultyCursor_);
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION) //難易度選択中はコマンドやHPを表示しない
 	{
