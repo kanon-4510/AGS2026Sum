@@ -65,6 +65,8 @@ void QuestPhase::Draw(void)
 	if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleStep_ != BATTLE_STEP::RESULT)
 	{
+		activeEnemy_->Draw(); //敵の描画
+
 		int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;
 		DrawFormatString(0, 80, 0xFFFF00, "現在のターン %d", battleTurn_);//連戦（Wave）の表示
 		DrawFormatString(0, 100, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, maxWaves);//連戦（Wave）の表示
