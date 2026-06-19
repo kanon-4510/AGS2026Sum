@@ -119,5 +119,8 @@ public:
 	//職業名を書き換える
 	void SetJob(std::string newJobName) { job = newJobName; }
 
+	//現在の職業名を外から参照できるようにする
+	std::string GetJobName() const { return job; }
+
 	bool hasChallengedHellQuest_ = false; //激ムズクエストに挑戦したかどうかのフラグ
 };
