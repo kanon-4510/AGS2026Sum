@@ -67,7 +67,8 @@ void Enemy::Draw() const
     DrawFormatString(x_, y_ - 20, white, "HP: %d / %d", currentHp_, maxHp_);
 
     //3.【応用】簡易的なHPバー（緑色の矩形）を描画するなら
-    if (maxHp_ > 0) {
+    if (maxHp_ > 0) 
+    {
         int barWidth = 100; //バーの最大幅
         int currentBarWidth = barWidth * currentHp_ / maxHp_;
         //赤い背景
@@ -142,14 +143,14 @@ Enemy* SpawnEnemyByTurn(int turn)
         switch (enemyType)
         {
         case 0: return new Enemy("スライム",    19,1, 7,5,"こうげき","こうげき","たいあたり","",spawnX,spawnY);
-        case 1: return new Enemy("オオカミ男",  24,2,12,8,"こうげき","こうげき","ひっかく",  "",spawnX,spawnY);
-        case 2: return new Enemy("弓スケルトン",26,3, 9,7,"こうげき","こうげき","どくのや",  "",spawnX,spawnY);
-        case 3: return new Enemy("ゾンビ",      21,2, 9,6,"こうげき","こうげき","こうげき",  "",spawnX,spawnY);
+        case 1: return new Enemy("オオカミ男",  24,1,12,8,"こうげき","こうげき","ひっかく",  "",spawnX,spawnY);
+        case 2: return new Enemy("弓スケルトン",26,2, 9,7,"こうげき","こうげき","どくのや",  "",spawnX,spawnY);
+        case 3: return new Enemy("ゾンビ",      21,1, 9,6,"こうげき","こうげき","こうげき",  "",spawnX,spawnY);
         }
     }
     //万一バグでここまで来た場合、強制的にスライム
     //(NAME,HP,POW,SPD,EXP,ACT1,ACT2,ACT3,)
-    return new Enemy("スライム",1,1,1,1,"こうげき","こうげき","こうげき","media/slime.png",spawnX,spawnY);
+    return new Enemy("スライム",1,1,1,1,"こうげき","こうげき","こうげき","",spawnX,spawnY);
 }
 
 Enemy* SpawnRushEnemy(int stage)

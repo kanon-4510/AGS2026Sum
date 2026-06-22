@@ -64,12 +64,21 @@ void PlayerStatus::InitJob()
 	//–¼‘O, LV, POW, MAG, –òŠw, •p, –‚–@’m, M‹Â, lŒÃ, è¯
 	jobList.push_back(JobData("ˆê”Ê–‚–@g‚¢",2,0,0, 0,0,10,0,0,0));
 
-	jobList.push_back(JobData("•t‰Ápt",3,0,0,100,  0,  0,  0,  0,  0));
-	jobList.push_back(JobData("–‚Œ•m"	,3,0,0,  0,100,  0,  0,  0,  0));
-	jobList.push_back(JobData("–‚“±t"	,3,0,0,  0,  0,130,  0,  0,  0));
-	jobList.push_back(JobData("¹EÒ"	,3,0,0,  0,  0,  0,100,  0,  0));
-	jobList.push_back(JobData("ôpt"	,3,0,0,  0,  0,  0,  0,100,  0));
-	jobList.push_back(JobData("è‚¢t"	,3,0,0,  0,  0,  0,  0,  0,100));
+	jobList.push_back(JobData("•t‰Ápt",5,0,0,100,  0,  0,  0,  0,  0));
+	jobList.push_back(JobData("–‚Œ•m"	,5,0,0,  0,100,  0,  0,  0,  0));
+	jobList.push_back(JobData("–‚“±t"	,5,0,0,  0,  0,130,  0,  0,  0));
+	jobList.push_back(JobData("¹EÒ"	,5,0,0,  0,  0,  0,100,  0,  0));
+	jobList.push_back(JobData("ôpt"	,5,0,0,  0,  0,  0,  0,100,  0));
+	jobList.push_back(JobData("è‚¢t"	,5,0,0,  0,  0,  0,  0,  0,100));
+
+	jobList.push_back(JobData("˜B‹àpt",15,0,0,500,  0,  0,  0,  0,  0));
+	jobList.push_back(JobData("¹‹Rm"	,15,0,0,  0,500,  0,  0,  0,  0));
+	jobList.push_back(JobData("Œ«Ò"	,15,0,0,  0,  0,500,  0,  0,  0));
+	jobList.push_back(JobData("ˆ«–‚âP‚¢",15,0,0,  0,  0,  0,500,  0,  0));
+	jobList.push_back(JobData("€—ìpt",15,0,0,  0,  0,  0,  0,500,  0));
+	jobList.push_back(JobData("—\Œ¾Ò"	,15,0,0,  0,  0,  0,  0,  0,500));
+
+	jobList.push_back(JobData("‘å–‚–@g‚¢",30,0,0,300,300,300,300,300,300));
 }
 
 int PlayerStatus::Attack()
@@ -205,7 +214,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (pharmacy_ / 10);
 
 	case BonusType::AttackBonus:
-		//•p5‚É‚Â‚«A‰ïS—¦‚Ìƒ_ƒ[ƒW‚ğ+1‚·‚é
+		//•p5‚É‚Â‚«A‰ïS—¦‚ğ+1‚·‚é
 		return baseValue + (martialArts_ / 5);
 
 	case BonusType::MagicBonus:

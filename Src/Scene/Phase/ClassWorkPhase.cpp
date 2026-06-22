@@ -64,7 +64,7 @@ void ClassWorkPhase::ProcessClassworkDecision()
 	//‹Z”\’l‚Ìã¸
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
-		int rand = GetRand(35)-15;	//—”‚Ìæ“¾
+		int rand = GetRand(30)-15;	//—”‚Ìæ“¾
 		int skill = SKILL_UP + rand;//ã¸•‚ÌŠm’è
 
 		switch (select_) 
