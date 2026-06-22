@@ -51,8 +51,11 @@ void PlayerStatus::Draw()
 	int jobAtkBonus = GetJobBonus().power; //職業ボーナスも表示
 	if (jobAtkBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 50, GREEN, "(職業ボーナス+%d)", jobAtkBonus);
 
-	int jpbSpeedBonus = GetJobBonus().speed;
-	if (jpbSpeedBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 90, GREEN, "(職業ボーナス+%d)", jpbSpeedBonus);
+	int jobMagBonus = GetJobBonus().magic;
+	if (jobMagBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 70, GREEN, "(職業ボーナス+%d)", jobMagBonus);
+
+	int jobSpeedBonus = GetJobBonus().speed;
+	if (jobSpeedBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 90, GREEN, "(職業ボーナス+%d)", jobSpeedBonus);
 }
 
 void PlayerStatus::InitJob()
@@ -249,13 +252,11 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	//職業ごとのステータスボーナスを設定
 	if (this->job == "一般魔法使い") 
 	{
-		bonus.hp = 10;
-		bonus.power = 10;
-		bonus.speed = 10;
+		bonus.magic = 5;
 	}
 	if (this->job == "付加術師") 
 	{
-		bonus.power = 10;
+		bonus.hp = 10;
 	}
 	if (this->job == "魔剣士") 
 	{
@@ -263,11 +264,11 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	}
 	if (this->job == "魔導師") 
 	{
-		bonus.power = 10;
+		bonus.magic = 10;
 	}
 	if (this->job == "聖職者") 
 	{
-		bonus.power = 10;
+		bonus.hp = 10;
 	}
 	if (this->job == "呪術師") 
 	{
@@ -275,7 +276,7 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	}
 	if (this->job == "占い師") 
 	{
-		bonus.power = 10;
+		bonus.speed = 10;
 	}
 
 	return bonus;

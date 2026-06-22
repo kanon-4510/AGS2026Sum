@@ -41,8 +41,15 @@ private:
 	QUEST_PHASE phase_;	//クエストのフェーズ
 	int turn_;		//現在のターン数
 
+	int playerImg_; //プレイヤーの画像ハンドル
+	int stageImg_; //ステージの画像ハンドル
+
 	//メンバー変数の宣言
 	bool isInputBlocked_ = false; //入力ブロックフラグ
+
+	//チュートリアル
+	void ProcessTutorial(void);	//チュートリアルの処理
+	void DrawTutorial(void);	//チュートリアルの描画処理
 
 	//メンバー関数
 	void ProcessPhaseSelection(void);	//フェーズ選択の処理

@@ -5,53 +5,53 @@
 
 void UIPanel::Init(void)
 {
-    //トレーニング画面用の画像
-    imageHandles_[STATUS_TYPE::HP] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::HP_UP).handleId_;
+ //   //トレーニング画面用の画像
+ //   imageHandles_[STATUS_TYPE::HP] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::HP_UP).handleId_;
 
-    imageHandles_[STATUS_TYPE::POW] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::POWER_UP).handleId_;
+ //   imageHandles_[STATUS_TYPE::POW] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::POWER_UP).handleId_;
 
-    imageHandles_[STATUS_TYPE::SPEED] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::SPEED_UP).handleId_;
+ //   imageHandles_[STATUS_TYPE::SPEED] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::SPEED_UP).handleId_;
 
-    imageHandles_[STATUS_TYPE::INTIMACY] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::INTIMACY_UP).handleId_;
-   
-	//ステータス名画像
-    statusName_[static_cast<int>(STATUS_TYPE::HP)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::HP).handleId_;
-    
-    statusName_[static_cast<int>(STATUS_TYPE::POW)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::POWER).handleId_;
-    
-    statusName_[static_cast<int>(STATUS_TYPE::SPEED)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::SPEED).handleId_;
-    
-    statusName_[static_cast<int>(STATUS_TYPE::INTIMACY)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::INTIMACY).handleId_;
-    
-    statusName_[static_cast<int>(STATUS_TYPE::POINT)] = 
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::POINT).handleId_;
-    
-	//バトル画面に進む用画像
-    battleImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BATTLE_IMG).handleId_;
-    
-	//操作説明用の画像
-    enterImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::KEY_ENTER).handleId_;
-    xboxAImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::XBOX_A).handleId_;
-    xboxXImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::XBOX_X).handleId_;
-    xboxYImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::XBOX_Y).handleId_;
+ //   imageHandles_[STATUS_TYPE::INTIMACY] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::INTIMACY_UP).handleId_;
+ //  
+	////ステータス名画像
+ //   statusName_[static_cast<int>(STATUS_TYPE::HP)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::HP).handleId_;
+ //   
+ //   statusName_[static_cast<int>(STATUS_TYPE::POW)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::POWER).handleId_;
+ //   
+ //   statusName_[static_cast<int>(STATUS_TYPE::SPEED)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::SPEED).handleId_;
+ //   
+ //   statusName_[static_cast<int>(STATUS_TYPE::INTIMACY)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::INTIMACY).handleId_;
+ //   
+ //   statusName_[static_cast<int>(STATUS_TYPE::POINT)] = 
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::POINT).handleId_;
+ //   
+	////バトル画面に進む用画像
+ //   battleImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BATTLE_IMG).handleId_;
+ //   
+	////操作説明用の画像
+ //   enterImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::KEY_ENTER).handleId_;
+ //   xboxAImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::XBOX_A).handleId_;
+ //   xboxXImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::XBOX_X).handleId_;
+ //   xboxYImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::XBOX_Y).handleId_;
 
-    //バトル画面用の画像
-    actionName_[static_cast<int>(ACTION_TYPE::ATTAC)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::ICON_ATTACK).handleId_;
+ //   //バトル画面用の画像
+ //   actionName_[static_cast<int>(ACTION_TYPE::ATTAC)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::ICON_ATTACK).handleId_;
 
-    actionName_[static_cast<int>(ACTION_TYPE::DEFENSE)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::ICON_DEFENSE).handleId_;
+ //   actionName_[static_cast<int>(ACTION_TYPE::DEFENSE)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::ICON_DEFENSE).handleId_;
 
-    actionName_[static_cast<int>(ACTION_TYPE::AVOID)] =
-        ResourceManager::GetInstance().Load(ResourceManager::SRC::ICON_AVOID).handleId_;
+ //   actionName_[static_cast<int>(ACTION_TYPE::AVOID)] =
+ //       ResourceManager::GetInstance().Load(ResourceManager::SRC::ICON_AVOID).handleId_;
 }
 
 void UIPanel::SetType(int type)

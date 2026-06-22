@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include "../../Application.h"
+#include "../../Common/Color.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "JobChangePhase.h"
@@ -12,12 +13,6 @@ JobChangePhase::JobChangePhase(PlayerStatus* playerStatus) :playerStatus_(player
 void JobChangePhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
-	timer_++; // フェーズの経過時間を増加させる
-
-	if (timer_ > COUNT_MAX) // 例えば、300フレーム経過したらフェーズを終了する
-	{
-		//isFinished_ = true;
-	}
 
 	/*if (ins.IsTrgDown(KEY_INPUT_SPACE))
 	{
@@ -39,8 +34,15 @@ void JobChangePhase::Update(void)
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN)) {
         const auto& selectedJob = jobList[selectedIndex_];
 
+        //現在の職業名を取得
+        std::string Job = playerStatus_->GetJobName();
+
+        if (selectedJob.status.name == Job) {
+            //現在の職業と同じなら転職できない
+			timer_ = 0; //メッセージ表示のカウントをリセット
+        }
         //PlayerStatusのJobCheckを呼び出して判定
-        if (playerStatus_->JobCheck(selectedJob)) {
+        else if (playerStatus_->JobCheck(selectedJob)) {
             //条件クリア！職業を変更する
             playerStatus_->SetJob(selectedJob.status.name);
 			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
@@ -61,26 +63,90 @@ void JobChangePhase::Update(void)
 void JobChangePhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Job Change", 0xFFFFFF);
-	DrawFormatString(0, 20, 0xFFFFFF, "カウント %d", timer_);
 
     auto& jobList = playerStatus_->GetJobList();
 
-    DrawString(100, 50, "【資格試験 - 職業選択】", GetColor(255, 255, 255));
+    //現在の職業名を取得
+    std::string Job = playerStatus_->GetJobName();
+
+    DrawString(100, 50, "【資格試験 - 職業選択】", Color::WHITE);
+
+    if(timer_ < COUNT_MAX)
+    {
+        DrawString(100, 80, "現在の職業と同じ職業は選択できません！", Color::WHITE);
+        timer_++; //メッセージ表示のカウントを増やす
+	}
 
     for (int i = 0; i < jobList.size(); i++) {
-        int color = GetColor(100, 100, 100); //デフォルトはグレー（なれない）
+        int color = Color::GRAY; //デフォルトはグレー（なれない）
 
         //条件チェック
         if (playerStatus_->JobCheck(jobList[i])) {
-            color = GetColor(255, 255, 255); //なれる職業は白
+            color = Color::WHITE; //なれる職業は白
         }
 
-        //選択中の職業は黄色
+        //もしループ中の職業が「現在の職業」なら色を緑色にする
+        bool isCurrent = (jobList[i].status.name == Job);
+        if (isCurrent) {
+            color = Color::GREEN; //現在の職業は緑
+        }
+
+        //選択中の職業
         if (i == selectedIndex_) {
             DrawString(80, 100 + i * 25, "→", color);
         }
 
         DrawFormatString(100, 100 + i * 25, color, "%s", jobList[i].status.name.c_str());
+    }
+
+    DrawJobBonus(jobList[selectedIndex_]);
+}
+
+void JobChangePhase::DrawJobBonus(const JobData& job)
+{
+    auto& jobList = playerStatus_->GetJobList();
+
+    if (!jobList.empty() && selectedIndex_ < jobList.size()) {
+
+        //後で元に戻せるように、現在の本当の職業名を退避させておく
+        std::string trueJob = playerStatus_->GetJobName();
+
+        //カーソルが合っている職業名を取得
+        std::string selectedJobName = jobList[selectedIndex_].status.name;
+
+        //一時的にプレイヤーの職業を「カーソルが合っている職」に変更する
+        playerStatus_->SetJob(selectedJobName);
+
+        //GetJobBonus()を呼び出してカーソルが合っている職業のボーナスを取得
+        auto bonus = playerStatus_->GetJobBonus();
+
+        //用が済んだので、即座に本当の職業名に戻す
+        playerStatus_->SetJob(trueJob);
+
+        //ボーナスの描画処理
+        DrawString(bonusX, bonusY, "【職業ボーナス】", Color::YELLOW);
+
+        int offset = 1;
+        if (bonus.hp > 0) {
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "HP    : +%d", bonus.hp);
+            offset++;
+        }
+        if (bonus.power > 0) {
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "POW   : +%d", bonus.power);
+            offset++;
+        }
+        if (bonus.magic > 0) {
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "MAG   : +%d", bonus.magic);
+            offset++;
+        }
+        if (bonus.speed > 0) {
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "SPD   : +%d", bonus.speed);
+            offset++;
+        }
+
+        if (offset == 1) {
+            DrawString(bonusX, bonusY + 25, "ボーナスなし", GetColor(150, 150, 150));
+        }
     }
 }
 
