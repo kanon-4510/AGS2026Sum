@@ -443,6 +443,7 @@ void QuestPhase::ProcessStatusEffect(void)
 	//ターン終了時にフラグを更新
 	wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 	currentActionIdx_ = 0;
+	battleMessage_ = "";
 
 	battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 }

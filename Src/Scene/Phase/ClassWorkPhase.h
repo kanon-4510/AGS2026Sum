@@ -5,6 +5,9 @@
 class ClassWorkPhase : public PhaseBase
 {
 public:
+	static constexpr int bonusX = 400;	//技能ボーナスの描画位置X
+	static constexpr int bonusY = 140;	//技能ボーナスの描画位置Y
+
 	enum CLASSWORK_SELECT
 	{
 		PHARMACY,       //薬学
@@ -23,6 +26,8 @@ public:
 
 	void Update(void) override;		//更新処理
 	void Draw(void) override;		//描画処理
+
+	void DrawSkillBonus(void);	//技能ボーナスの描画処理
 
 	// フェーズが終了したかどうかを親に伝える
 	virtual bool IsFinished() const override;
