@@ -128,19 +128,19 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
 
         int offset = 1;
         if (bonus.hp > 0) {
-            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "HP    : +%d", bonus.hp);
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::WHITE, "HP    : +%d", bonus.hp);
             offset++;
         }
         if (bonus.power > 0) {
-            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "POW   : +%d", bonus.power);
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::WHITE, "POW   : +%d", bonus.power);
             offset++;
         }
         if (bonus.magic > 0) {
-            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "MAG   : +%d", bonus.magic);
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::WHITE, "MAG   : +%d", bonus.magic);
             offset++;
         }
         if (bonus.speed > 0) {
-            DrawFormatString(bonusX, bonusY + offset * 25, Color::SKY_BLUE, "SPD   : +%d", bonus.speed);
+            DrawFormatString(bonusX, bonusY + offset * 25, Color::WHITE, "SPD   : +%d", bonus.speed);
             offset++;
         }
 

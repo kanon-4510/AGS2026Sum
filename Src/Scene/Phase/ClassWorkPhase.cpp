@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include "../../Application.h"
+#include "../../Common/Color.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "ClassWorkPhase.h"
@@ -25,15 +26,64 @@ void ClassWorkPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
 
-	int color = GetColor(255, 255, 255);
-	int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
+	DrawFormatString(100, 100, (select_ == CLASSWORK_SELECT::PHARMACY ? Color::YELLOW : Color::WHITE), "薬学調合");
+	DrawFormatString(100, 140, (select_ == CLASSWORK_SELECT::MARTIALARTS ? Color::YELLOW : Color::WHITE), "武術訓練");
+	DrawFormatString(100, 180, (select_ == CLASSWORK_SELECT::MAGICKNOWLEDGE ? Color::YELLOW : Color::WHITE), "魔法知識");
+	DrawFormatString(100, 220, (select_ == CLASSWORK_SELECT::FAITH ? Color::YELLOW : Color::WHITE), "信仰");
+	DrawFormatString(100, 260, (select_ == CLASSWORK_SELECT::ARCHAEOLOGY ? Color::YELLOW : Color::WHITE), "考古学");
+	DrawFormatString(100, 300, (select_ == CLASSWORK_SELECT::ASTROLOGY ? Color::YELLOW : Color::WHITE), "占星術");
 
-	DrawFormatString(100, 100, (select_ == CLASSWORK_SELECT::PHARMACY ? selectColor : color), "薬学調合");
-	DrawFormatString(100, 140, (select_ == CLASSWORK_SELECT::MARTIALARTS ? selectColor : color), "武術訓練");
-	DrawFormatString(100, 180, (select_ == CLASSWORK_SELECT::MAGICKNOWLEDGE ? selectColor : color), "魔法知識");
-	DrawFormatString(100, 220, (select_ == CLASSWORK_SELECT::FAITH ? selectColor : color), "信仰");
-	DrawFormatString(100, 260, (select_ == CLASSWORK_SELECT::ARCHAEOLOGY ? selectColor : color), "考古学");
-	DrawFormatString(100, 300, (select_ == CLASSWORK_SELECT::ASTROLOGY ? selectColor : color), "占星術");
+	DrawSkillBonus();
+}
+
+void ClassWorkPhase::DrawSkillBonus(void)
+{
+
+	DrawString(bonusX, bonusY, "【技能効果ボーナス】", Color::YELLOW);
+
+	//現在のボーナス値と、授業を受けた後のボーナス値を比較するための変数
+	std::string effectName = "";
+	int reqInterval = 0;	//次のレベルまでの必要値（例：薬学なら次の回復量アップまでの必要値）
+
+	//選択されている項目に応じて、一瞬だけステータスを上げて効果の変化を測定する
+	switch (select_)
+	{
+	case CLASSWORK_SELECT::PHARMACY:
+		effectName = "アイテム回復量";
+		reqInterval = 10; // 10ごとにアップ
+		break;
+
+	case CLASSWORK_SELECT::MARTIALARTS:
+		effectName = "会心率";
+		reqInterval = 5; // 5ごとにアップ
+		break;
+
+	case CLASSWORK_SELECT::MAGICKNOWLEDGE:
+		effectName = "魔法威力";
+		reqInterval = 10; // 10ごとにアップ
+		break;
+
+	case CLASSWORK_SELECT::FAITH:
+		effectName = "被ダメージ軽減";
+		reqInterval = 10; // 10ごとにアップ
+		break;
+
+	case CLASSWORK_SELECT::ARCHAEOLOGY:
+		effectName = "獲得経験値";
+		reqInterval = 10; // 10ごとにアップ
+		break;
+
+	case CLASSWORK_SELECT::ASTROLOGY:
+		effectName = "回避率";
+		reqInterval = 5; // 5ごとにアップ
+		break;
+	}
+
+	//画面に効果の仕様を出力
+	DrawFormatString(bonusX, bonusY + 30, Color::WHITE, "効果内容: %s", effectName.c_str());
+
+	//「〇〇ごとに効果アップ！」と表示する
+	DrawFormatString(bonusX, bonusY + 55, Color::GREEN, "能力値 %d ごとに効果アップ！", reqInterval);
 }
 
 bool ClassWorkPhase::IsFinished() const
