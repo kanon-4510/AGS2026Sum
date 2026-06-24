@@ -37,7 +37,7 @@ public:
 	enum class COMMAND
 	{
 		ATTACK,	//物理攻撃
-		MAGIC,	//魔法攻撃
+		MAGIC,	//魔法
 		MAX
 	};
 
@@ -47,16 +47,19 @@ public:
 		MAGIC_ATTACK,	//魔法攻撃
 		HEAL,			//回復
 		BUFF,			//強化
-		DEBUFF,			//弱体化
+		DEBUFF,			//弱化
 		MAX
 	};
 
 	//状態異常の種類
 	enum class STATUS_EFFECT
 	{
-		NONE,			//なし
-		POISON,			//毒
-		FREEZE,			//凍結
+		NONE,	//なし
+		POISON,	//毒　(紫)
+		FREEZE,	//凍結(青)
+		FLASH,	//閃光(黄)
+		CURSE,	//呪い(赤)
+		SILENCE,//沈黙(緑)
 		MAX
 	};
 
@@ -69,7 +72,7 @@ public:
 		int command;			//選択した行動（0:攻撃、1:魔法）
 		int targetIdx;			//攻撃対象が誰か
 		std::string skillName;  //使った技を記憶しておく
-		MAGIC_TYPE magicType;		//魔法の効果の種類を記憶しておく
+		MAGIC_TYPE magicType;	//魔法の効果の種類を記憶しておく
 	};
 
 	//------定数---------
@@ -140,14 +143,15 @@ private:
 	//プレイヤーの選択したコマンドを管理する変数
 	COMMAND command_; 
 
-	//状態異常を管理する変数
-	STATUS_EFFECT statusEffect_;
+	STATUS_EFFECT statusEffect_;//状態異常を管理する変数
+	int statusTurns_ = 4;		//状態異常の残りターン数
 
 	//魔法攻撃のインターバル(1ターン)
 	bool wasMagicUsedLastTurn_ = false; //前のターンに魔法を使ったか
 	bool magicUsedThisTurn_ = false;    //今のターンに魔法を使ったか（更新用）
 
 	Enemy* activeEnemy_ = nullptr; //現在戦っている敵のポインタ
+	int battleTurn_ = 1;		   //現在のバトルターン数
 	int currentWave_ = 1;          //現在の連戦数（1戦目からスタート）
 	const int MAX_WAVES = 3;       //1回の遠征での最大連戦数（例：3連戦）
 
@@ -159,12 +163,10 @@ private:
 	bool isHellQuest_ = false;//激ムズクエスト突入したか
 
 	//-------変数---------
-	int battleTurn_ = 1;		//現在のバトルターン数
 	int currentActionIdx_ = 0;	//行動リストの何番目かを指す
-	int subMenuCursor_ = 0;		// サブメニューのカーソル
+	int subMenuCursor_ = 0;		//サブメニューのカーソル
 
 	//------関数---------
-
 	//チュートリアル
 	void ProcessTutorial(void);
 	
