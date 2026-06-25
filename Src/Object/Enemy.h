@@ -30,7 +30,7 @@ class Enemy
 {
 public:
 	//コンストラクタ（画像ファイルのパスや、画面のどこに描画するかの座標も受け取るように拡張）
-	Enemy(std::string name, int hp, int power, int speed, int exp,
+	Enemy(std::string name, int hp, int power1, int power2, int power3, int speed, int exp,
 		std::string skill1, std::string skill2, std::string skill3,
 		const char* imagePath, int x, int y);
 
@@ -48,7 +48,9 @@ public:
 	//ゲッター
 	std::string GetName() const { return name_; }
 	int GetCurrentHp() const { return currentHp_; }
-	int GetPower() const { return power_; }
+	int GetPower1() const { return power1_; }
+	int GetPower2() const { return power2_; }
+	int GetPower3() const { return power3_; }
 	int GetSpeed() const { return speed_; }
 	int GetExp() const { return exp_; }
 	bool IsDead() const { return currentHp_ <= 0; }
@@ -56,7 +58,9 @@ private:
 	std::string name_;
 	int maxHp_;
 	int currentHp_;
-	int power_;
+	int power1_;
+	int power2_;
+	int power3_;
 	int speed_;
 	int exp_;
 	std::string skills_[3];

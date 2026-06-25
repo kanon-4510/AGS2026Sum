@@ -325,7 +325,7 @@ void QuestPhase::ProcessActionLoop(void)
 						break;
 					case MAGIC_TYPE::DEBUFF:
 						battleMessage_ += unit.name + " の弱化魔法！";
-						statusEffect_ = STATUS_EFFECT::SILENCE;
+						enemyStatusEffect_ = STATUS_EFFECT::SILENCE;
 						break;
 					default:
 						break;
@@ -349,20 +349,19 @@ void QuestPhase::ProcessActionLoop(void)
 			{
 				//--- それ以外は通常の攻撃技として処理 ---
 				//unit.command (0:通常行動, 1:中技, 2:大技) で威力を変える
-				int basePower = activeEnemy_->GetPower();
 				int damage = 0;
 
 				if (unit.command == 0) 
 				{
-					damage = basePower;
+					damage = activeEnemy_->GetPower1();
 				}
 				else if (unit.command == 1)
 				{
-					damage = basePower;
+					damage = activeEnemy_->GetPower2();
 				}
 				else if (unit.command == 2) 
 				{
-					damage = basePower;
+					damage = activeEnemy_->GetPower3();
 				}
 
 				//回避判定
@@ -422,7 +421,7 @@ void QuestPhase::ProcessActionLoop(void)
 				actionOrder_.clear(); //行動リストを綺麗に掃除
 				currentActionIdx_ = 0;//インデックスも0に戻す
 				battleMessage_ = "";  //メッセージをリセットして次のターンへ！
-				statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
+				enemyStatusEffect_ = STATUS_EFFECT::NONE;
 				return;
 			}
 			else
@@ -432,6 +431,7 @@ void QuestPhase::ProcessActionLoop(void)
 				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 				battleStep_ = BATTLE_STEP::RESULT;
 				statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
+				enemyStatusEffect_ = STATUS_EFFECT::NONE;
 				return;
 			}
 		}
