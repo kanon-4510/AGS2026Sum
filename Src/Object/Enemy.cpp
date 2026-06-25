@@ -53,6 +53,13 @@ void Enemy::Heal(int amount)
     }
 }
 
+std::string Enemy::GetSkill(int index) const
+{
+    //配列の範囲外(0から2以外)を指定された場合は空の文字列を返す
+    if (index < 0 || index >= 3) return "";
+    return skills_[index];
+}
+
 //DxLibの描画処理（メインループ内で毎フレーム呼び出す）
 void Enemy::Draw() const 
 {
@@ -129,7 +136,7 @@ Enemy* SpawnEnemyByTurn(int turn)
         int enemyType = GetRand(4);
         switch (enemyType)
         {
-        case 0: return new Enemy("毒スライム",    50,10,10,0,"こうげき","こうげき",  "たいあたり","",spawnX,spawnY);
+        case 0: return new Enemy("毒スライム",    50,10,10,0,"こうげき","こうげき",  "毒たいあたり","",spawnX,spawnY);
         case 1: return new Enemy("ホワイトウルフ",50,10,10,0,"こうげき","ひっかく",  "きりさく",  "",spawnX,spawnY);
         case 2: return new Enemy("ブラックウルフ",50,10,10,0,"こうげき","ひっかく",  "きりさく",  "",spawnX,spawnY);
         case 3: return new Enemy("天狗",          50,10,10,0,"こうげき","ふきつな風","いあいぎり","",spawnX,spawnY);

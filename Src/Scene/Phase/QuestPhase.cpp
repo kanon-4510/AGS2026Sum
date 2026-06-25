@@ -189,6 +189,10 @@ void QuestPhase::DetermineActionOrder(void)
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
 	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0});
+	if (command_ == COMMAND::ATTACK)
+	{
+		actionOrder_.back().skillName = "単体攻撃";
+	}
 	// 魔法攻撃（1）の場合
 	if (command_ == COMMAND::MAGIC)
 	{
@@ -335,15 +339,58 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 		else
 		{
+			//0から2の乱数を生成して、敵のスキルを1つ決定する
+			int randomIndex = rand() % 3;
+			std::string chosenSkill = activeEnemy_->GetSkill(randomIndex);
+
+			//決定したスキル名を代入する
+			unit.skillName = chosenSkill;
+
 			//敵の行動分岐
 			battleMessage_ = unit.name + " の " + unit.skillName + "！";
 
-			//技の名前によって効果を発動させる
-			if (unit.skillName == "かいふく" || unit.skillName == "めいそう")
+			//技の名前によって特別な効果を発動させる
+			if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ" 
+				|| unit.skillName == "自己再生")
 			{
-				int healAmount = 50; //回復量（必要に応じて調整してください）
+				int healAmount = activeEnemy_->GetCurrentHp()/2; //最大HPの半分回復
 				activeEnemy_->Heal(healAmount);
-				battleMessage_ = unit.name + " のHPが " + std::to_string(healAmount) + " 回復した！";
+				battleMessage_ += unit.name + " のHPが " + std::to_string(healAmount) + " 回復した！";
+			}
+			else if (unit.skillName == "まもる" || unit.skillName == "かまえる" || unit.skillName == "すいへき")
+			{
+				//防御力アップやダメージ軽減
+				battleMessage_ = unit.name + " は身構えている！";
+			}
+			else if (unit.skillName == "へびにらみ" || unit.skillName == "石化の魔眼" 
+				|| unit.skillName == "金縛り" || unit.skillName == "発狂")
+			{
+				//プレイヤーを凍結状態にする
+				battleMessage_ = "プレイヤーは 凍って動けない！";
+			}
+			else if(unit.skillName == "どくのや" || unit.skillName == "毒の粉" 
+				|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒たいあたり")
+			{
+				//プレイヤーを毒状態にする
+				battleMessage_ = "プレイヤーは 毒状態になった！";
+			}
+			else if (unit.skillName == "のろい" || unit.skillName == "呪われた包丁" 
+				|| unit.skillName == "血槍" || unit.skillName == "鬼火")
+			{
+				//プレイヤーを呪い状態にする
+				battleMessage_ = "プレイヤーは 呪われた！";
+			}
+			else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬" 
+				|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム")
+			{
+				//プレイヤーを閃光状態にする
+				battleMessage_ = "プレイヤーは 目がくらんだ！";
+			}
+			else if (unit.skillName == "放熱" || unit.skillName == "ちんもく" 
+				|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
+			{
+				//プレイヤーを沈黙状態にする
+				battleMessage_ = "プレイヤーは 沈黙状態になった！";
 			}
 			else
 			{
@@ -550,8 +597,8 @@ void QuestPhase::ProcessPlayerAction()
 		switch (command_)
 		{
 		case QuestPhase::COMMAND::ATTACK:
-			subActionMessages_ = { "単体攻撃", "全体攻撃" };
-			break;
+			battleStep_ = BATTLE_STEP::DETERMINE;
+			return;
 		case QuestPhase::COMMAND::MAGIC:
 			subActionMessages_ = { "攻撃","回復","強化","状態異常付与" };
 			break;

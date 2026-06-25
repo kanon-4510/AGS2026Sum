@@ -52,6 +52,7 @@ public:
 	int GetSpeed() const { return speed_; }
 	int GetExp() const { return exp_; }
 	bool IsDead() const { return currentHp_ <= 0; }
+	std::string GetSkill(int index) const;
 private:
 	std::string name_;
 	int maxHp_;
