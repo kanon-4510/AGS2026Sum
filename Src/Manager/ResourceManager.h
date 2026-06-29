@@ -14,6 +14,8 @@ public:
 		GAME_TITLE,
 		//ゲームクリア
 		GAME_CLEAR,
+		//ゲームシーン
+		GAME_SCENE,
 		//ゲームオーバー
 		GAME_OVER,
 		//プレイヤー
