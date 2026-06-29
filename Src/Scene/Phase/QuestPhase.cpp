@@ -254,12 +254,11 @@ void QuestPhase::ProcessActionLoop(void)
 			//---状態異常の行動前チェック---
 			bool skipAction = false;
 			bool isMiss = false;
-			std::string extraMsg = ""; //凍結解除のメッセージを足すための変数
 
 			//凍結(行動不可)
 			if (statusEffect_ == STATUS_EFFECT::FREEZE)
 			{
-				if (GetRand(99) < 50) //50%で凍ったまま行動不可
+				if (GetRand(99) < 60) //60%で凍ったまま行動不可
 				{
 					battleMessage_ = "体が凍りついて動けない";
 					skipAction = true;
@@ -320,12 +319,13 @@ void QuestPhase::ProcessActionLoop(void)
 						playerStatus_->Heal();
 						break;
 					case MAGIC_TYPE::BUFF:
-						battleMessage_ += unit.name + " の強化魔法！";
-						playerStatus_->Heal();
+						battleMessage_ += unit.name + " の状態回復魔法！";
+						statusEffect_ = STATUS_EFFECT::NONE;
+						statusTurns_ = 4;
 						break;
 					case MAGIC_TYPE::DEBUFF:
 						battleMessage_ += unit.name + " の弱化魔法！";
-						enemyStatusEffect_ = STATUS_EFFECT::SILENCE;
+						statusEffect_ = STATUS_EFFECT::FREEZE;
 						break;
 					default:
 						break;
@@ -335,52 +335,87 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 		else
 		{
-			//敵の行動分岐
-			battleMessage_ = unit.name + " の " + unit.skillName + "！";
+			//---状態異常の行動前チェック---
+			bool skipAction = false;
+			bool isMiss = false;
 
-			//技の名前によって効果を発動させる
-			if (unit.skillName == "かいふく" || unit.skillName == "めいそう")
+			//凍結(行動不可)
+			if (enemyStatusEffect_ == STATUS_EFFECT::FREEZE)
 			{
-				int healAmount = 50; //回復量（必要に応じて調整してください）
-				activeEnemy_->Heal(healAmount);
-				battleMessage_ = unit.name + " のHPが " + std::to_string(healAmount) + " 回復した！";
+				if (GetRand(99) < 60) //60%で凍ったまま行動不可
+				{
+					battleMessage_ += unit.name + "は凍りついて動けない";
+					skipAction = true;
+				}
+				else //確率を乗り越えたら解除してそのまま行動
+				{
+					battleMessage_ += unit.name + "は氷が溶けてうごけるようになった";
+					enemyStatusEffect_ = STATUS_EFFECT::NONE;
+				}
+			}
+			//閃光(命中低下)
+			if (!skipAction && enemyStatusEffect_ == STATUS_EFFECT::FLASH)
+			{
+				if (GetRand(99) < 50) isMiss = true; //50%で外れる
+			}
+			//実際の行動処理
+			if (skipAction)
+			{
+				//メッセージは設定済みなので何もしない
+			}
+			else if (isMiss)
+			{
+				battleMessage_ += unit.name + "は目が眩んで攻撃が外れた";
 			}
 			else
 			{
-				//--- それ以外は通常の攻撃技として処理 ---
-				//unit.command (0:通常行動, 1:中技, 2:大技) で威力を変える
-				int damage = 0;
+				//敵の行動分岐
+				battleMessage_ += unit.name + " の " + unit.skillName + "！";
 
-				if (unit.command == 0) 
+				//技の名前によって効果を発動させる
+				if (unit.skillName == "かいふく" || unit.skillName == "めいそう")
 				{
-					damage = activeEnemy_->GetPower1();
+					int healAmount = 50; //回復量（必要に応じて調整してください）
+					activeEnemy_->Heal(healAmount);
+					battleMessage_ = unit.name + " のHPが " + std::to_string(healAmount) + " 回復した！";
 				}
-				else if (unit.command == 1)
+				else
 				{
-					damage = activeEnemy_->GetPower2();
-				}
-				else if (unit.command == 2) 
-				{
-					damage = activeEnemy_->GetPower3();
-				}
+					//--- それ以外は通常の攻撃技として処理 ---
+					//unit.command (0:通常行動, 1:中技, 2:大技) で威力を変える
+					int damage = 0;
 
-				//回避判定
-				//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
-				int evasionChance = playerStatus_->astrology_ / 5;
+					if (unit.command == 0)
+					{
+						damage = activeEnemy_->GetPower1();
+					}
+					else if (unit.command == 1)
+					{
+						damage = activeEnemy_->GetPower2();
+					}
+					else if (unit.command == 2)
+					{
+						damage = activeEnemy_->GetPower3();
+					}
 
-				//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
-				if (evasionChance > 90) evasionChance = 90;
-				int roll = GetRand(99);
+					//回避判定
+					//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
+					int evasionChance = playerStatus_->astrology_ / 5;
 
-				if (roll < evasionChance)
-				{
-					//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
-					battleMessage_ = "攻撃を回避！";
-				}
-				else if(!activeEnemy_->IsDead())
-				{
-					//回避失敗 通常通りダメージを受ける
-					playerStatus_->Damage(damage);
+					//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
+					if (evasionChance > 90) evasionChance = 90;
+					int roll = GetRand(99);
+
+					if (roll < evasionChance)
+					{
+						//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
+						battleMessage_ = "攻撃を回避！";
+					}
+					else if (!activeEnemy_->IsDead())
+					{
+						//回避失敗 通常通りダメージを受ける
+						playerStatus_->Damage(damage);
+					}
 				}
 			}
 		}
@@ -449,12 +484,20 @@ void QuestPhase::ProcessStatusEffect(void)
 		bool hasEffectMessage = false; //メッセージを出すべき効果があったか
 
 		//定数ダメージ(poison)
+		if (enemyStatusEffect_ == STATUS_EFFECT::POISON)
+		{
+			//ターンの最後にダメージを受ける（例：1ダメージ）
+			battleMessage_ = activeEnemy_->GetName() + "は毒のダメージを受けた";
+			activeEnemy_->Damage(1);
+			hasEffectMessage = true;
+		}
+		//定数ダメージ(poison)
 		if (statusEffect_ == STATUS_EFFECT::POISON)
 		{
-			//プレイヤーのHPを直接減らす
-			//敵も毒状態になっている場合は、ターンの最後にダメージを受ける（例：1ダメージ）
-			battleMessage_ = actionOrder_[currentActionIdx_].name + "は毒のダメージを受けた";
-			activeEnemy_->Damage(1);
+			//ターンの最後にダメージを受ける（例：1ダメージ）
+			if (enemyStatusEffect_ == STATUS_EFFECT::POISON)battleMessage_ = "お互いに毒のダメージを受けた";
+			else battleMessage_ = "プレイヤーは毒のダメージを受けた";
+			playerStatus_->Damage(1);
 			hasEffectMessage = true;
 		}
 		//ターン経過で即死(curse)
@@ -465,8 +508,6 @@ void QuestPhase::ProcessStatusEffect(void)
 			{
 				battleMessage_ = "呪いが発動した……";
 				playerStatus_->hp_ = 1; //HPを1にする
-				statusEffect_ = STATUS_EFFECT::NONE; //状態異常を解除
-				statusTurns_ = 4;
 			}
 			else
 			{
@@ -482,7 +523,6 @@ void QuestPhase::ProcessStatusEffect(void)
 			{
 				battleMessage_ = "沈黙が解けた ";
 				statusEffect_ = STATUS_EFFECT::NONE; //状態異常を解除
-				statusTurns_ = 4;
 				hasEffectMessage = true;
 			}
 		}
@@ -545,7 +585,7 @@ void QuestPhase::ProcessPlayerAction()
 		else magicUsedThisTurn_ = false;
 
 		subActionMessages_.clear(); //一度リセット
-		subMenuCursor_ = 0;    //カーソルを先頭に
+		subMenuCursor_ = 0;			//カーソルを先頭に
 
 		switch (command_)
 		{
@@ -569,7 +609,7 @@ void QuestPhase::ProcessPlayerAction()
 
 void QuestPhase::ProcessPlayerSubAction(void)
 {
-	//選択肢の数を、埋め込まれた配列のサイズから自動取得！
+	//選択肢の数を、埋め込まれた配列のサイズから自動取
 	int maxSubItems = static_cast<int>(subActionMessages_.size());
 	if (maxSubItems == 0) return; // 念のため
 
@@ -579,9 +619,9 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	//--- 決定処理 ---
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく！
+		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく
 		//例：chosenSubMenuIdx_ = subMenuCursor_; 
-		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡します。
+		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡します
 
 		//行動決定へ進む
 		battleStep_ = BATTLE_STEP::DETERMINE;

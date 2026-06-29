@@ -31,12 +31,12 @@ Enemy::~Enemy()
     DeleteGraph(gh_);
 }
 
-/*//技のランダム決定
+//技のランダム決定
 EnemyActionInfo Enemy::DecideAction()const
 {
     int chosenSkill = rand() % 3;
     return { name_, speed_, chosenSkill, skills_[chosenSkill] };
-}*/
+}
 
 //ダメージ処理
 void Enemy::Damage(int damage) 
