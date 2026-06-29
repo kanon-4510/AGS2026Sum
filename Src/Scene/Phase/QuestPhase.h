@@ -143,7 +143,9 @@ private:
 	//プレイヤーの選択したコマンドを管理する変数
 	COMMAND command_; 
 
+	//状態異常系
 	STATUS_EFFECT statusEffect_;//状態異常を管理する変数
+	STATUS_EFFECT enemyStatusEffect_ = STATUS_EFFECT::NONE;	//敵の状態異常を管理する変数
 	int statusTurns_ = 4;		//状態異常の残りターン数
 
 	//魔法攻撃のインターバル(1ターン)
