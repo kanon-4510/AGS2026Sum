@@ -31,7 +31,7 @@ void GameScene::Init(void)
 	turn_ = 1;
 	phase_ = QUEST_PHASE::PHASE_QUEST;
 	playerImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER).handleId_;
-	stageImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::STAGE).handleId_;
+	stageImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
 }
 
 //更新処理
@@ -104,9 +104,9 @@ void GameScene::Draw(void)
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
 
-		Utility::DrawCommandMenu(100, 100,{"クエスト", "授業", "資格試験"}, (phase_));
+		Utility::DrawCommandMenu(200, 200,{"クエスト", "授業", "資格試験"}, (phase_));
 
-		DrawGraph(1000, 200, playerImg_, TRUE);
+		DrawGraph(1100, 520, playerImg_, TRUE);
 
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();

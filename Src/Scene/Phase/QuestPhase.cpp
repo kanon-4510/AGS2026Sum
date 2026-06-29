@@ -151,6 +151,11 @@ void QuestPhase::ProcessDifficulty(void)
 
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
+	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB)) {
+		//キャンセルキーが押されたらフェーズを終了する
+		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
+		isFinished_ = true;
+	}
 }
 
 void QuestPhase::ManageTurn(void)
