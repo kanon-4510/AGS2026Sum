@@ -53,6 +53,11 @@ void QuestPhase::Update(void)
 
 	//ƒ^[ƒ“ŠÇ—ŠÖ”
 	ManageTurn();
+
+	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
+	{
+		activeEnemy_->Update(); //“G‚ÌXVˆ—
+	}
 }
 
 //•`‰æˆ—
@@ -428,7 +433,6 @@ void QuestPhase::ProcessActionLoop(void)
 			{
 				//--- ‚»‚êˆÈŠO‚Í’Êí‚ÌUŒ‚‹Z‚Æ‚µ‚Äˆ— ---
 				//unit.command (0:’Êís“®, 1:’†‹Z, 2:‘å‹Z) ‚ÅˆÐ—Í‚ð•Ï‚¦‚é
-				int basePower = activeEnemy_->GetPower();
 				int damage = 0;
 
 					if (unit.command == 0)
