@@ -57,7 +57,13 @@ EnemyActionInfo Enemy::DecideAction()const
 //ダメージ処理
 void Enemy::Damage(int damage) 
 {
-    currentHp_ -= damage;
+    // 軽減値の分だけダメージを減らす
+    int Damage = damage - guard_;
+
+    //ダメージがマイナスにならないようにする
+    if (Damage < 0)Damage = 0;
+
+    currentHp_ -= Damage;
     if (currentHp_ < 0) currentHp_ = 0;
 }
 

@@ -68,8 +68,12 @@ public:
 	//バトル用の関数
 	void ChangeAnim(ENEMY_ANIM nextAnim);
 	EnemyActionInfo DecideAction() const;
-	void Damage(int damage);
-	void Heal(int amount); // 回復用の関数
+	void Damage(int damage);//負傷用の関数
+	void Heal(int amount);	//回復用の関数
+	
+	//防御系
+	void SetGuard(int power){guard_ = power;};//ダメージ軽減数値を設定
+	void ResetGuard(){guard_ = 0;}
 
 	//ゲッター
 	std::string GetName() const { return name_; }
@@ -100,6 +104,8 @@ private:
 	int speed_;
 	int exp_;
 	std::string skills_[3];
+
+	int guard_ = 0; //軽減ダメージ量
 
 	//DxLib用の画像ハンドルと座標
 	int gh_;
