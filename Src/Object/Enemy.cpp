@@ -41,7 +41,13 @@ EnemyActionInfo Enemy::DecideAction()const
 //ダメージ処理
 void Enemy::Damage(int damage) 
 {
-    currentHp_ -= damage;
+    // 軽減値の分だけダメージを減らす
+    int Damage = damage - guard_;
+
+    //ダメージがマイナスにならないようにする
+    if (Damage < 0)Damage = 0;
+
+    currentHp_ -= Damage;
     if (currentHp_ < 0) currentHp_ = 0;
 }
 
@@ -138,11 +144,11 @@ Enemy* SpawnEnemyByTurn(int turn)
         int enemyType = GetRand(4);
         switch (enemyType)
         {
-        case 0: return new Enemy("毒スライム",    50,10,10,0,"こうげき","こうげき",  "毒たいあたり","",spawnX,spawnY);
-        case 1: return new Enemy("ホワイトウルフ",50,10,10,0,"こうげき","ひっかく",  "きりさく",  "",spawnX,spawnY);
-        case 2: return new Enemy("ブラックウルフ",50,10,10,0,"こうげき","ひっかく",  "きりさく",  "",spawnX,spawnY);
-        case 3: return new Enemy("天狗",          50,10,10,0,"こうげき","ふきつな風","いあいぎり","",spawnX,spawnY);
-        case 4: return new Enemy("剣スケルトン",  50,10,10,0,"こうげき","ざんげき",  "まもる",    "",spawnX,spawnY);
+        case 0: return new Enemy("毒スライム",    50,10,10,10,10,0,"こうげき","こうげき",  "毒たいあたり","",spawnX,spawnY);
+        case 1: return new Enemy("ホワイトウルフ",50,10,10,10,10,0,"こうげき","ひっかく",  "きりさく",  "",spawnX,spawnY);
+        case 2: return new Enemy("ブラックウルフ",50,10,10,10,10,0,"こうげき","ひっかく",  "きりさく",  "",spawnX,spawnY);
+        case 3: return new Enemy("天狗",          50,10,10,10,10,0,"こうげき","ちんもく",  "いあいぎり","",spawnX,spawnY);
+        case 4: return new Enemy("剣スケルトン",  50,10,10,10,10,0,"こうげき","ざんげき",  "まもる",    "",spawnX,spawnY);
         }
     }
     //1〜3ターン目
@@ -151,10 +157,10 @@ Enemy* SpawnEnemyByTurn(int turn)
         int enemyType = GetRand(3);
         switch (enemyType)
         {
-        case 0: return new Enemy("スライム",    19,1,1,1, 7,5,"こうげき","こうげき","たいあたり","",spawnX,spawnY);
-        case 1: return new Enemy("オオカミ男",  24,1,1,1,12,8,"こうげき","こうげき","ひっかく",  "",spawnX,spawnY);
-        case 2: return new Enemy("弓スケルトン",26,2,2,2, 9,7,"こうげき","こうげき","どくのや",  "",spawnX,spawnY);
-        case 3: return new Enemy("ゾンビ",      21,1,1,1, 9,6,"こうげき","こうげき","こうげき",  "",spawnX,spawnY);
+        case 0: return new Enemy("スライム",    26,1,1,1, 7,5,"こうげき","こうげき","たいあたり","",spawnX,spawnY);
+        case 1: return new Enemy("オオカミ男",  21,1,1,1,12,8,"こうげき","こうげき","ひっかく",  "",spawnX,spawnY);
+        case 2: return new Enemy("弓スケルトン",21,1,1,1, 9,7,"こうげき","こうげき","どくのや",  "",spawnX,spawnY);
+        case 3: return new Enemy("ゾンビ",      21,2,2,2, 9,6,"こうげき","こうげき","こうげき",  "",spawnX,spawnY);
         }
     }
     //万一バグでここまで来た場合、強制的にスライム

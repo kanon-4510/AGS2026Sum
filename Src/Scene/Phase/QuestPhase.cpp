@@ -344,9 +344,10 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 		else
 		{
-			//---状態異常の行動前チェック---
+			//行動前チェック
 			bool skipAction = false;
 			bool isMiss = false;
+			activeEnemy_->ResetGuard();
 
 			//凍結(行動不可)
 			if (enemyStatusEffect_ == STATUS_EFFECT::FREEZE)
@@ -378,6 +379,9 @@ void QuestPhase::ProcessActionLoop(void)
 			}
 			else
 			{
+				EnemyActionInfo eAction = activeEnemy_->DecideAction();
+				unit.skillName = eAction.skillName;
+
 				//敵の行動分岐
 				battleMessage_ += unit.name + " の " + unit.skillName + "！";
 
@@ -385,50 +389,67 @@ void QuestPhase::ProcessActionLoop(void)
 			if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ" 
 				|| unit.skillName == "自己再生")
 			{
-				int healAmount = activeEnemy_->GetCurrentHp()/2; //最大HPの半分回復
+				//Power分回復
+				int healAmount = activeEnemy_->GetPower3(); 
 				activeEnemy_->Heal(healAmount);
-				battleMessage_ += unit.name + " のHPが " + std::to_string(healAmount) + " 回復した！";
+				battleMessage_ += unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
 			}
-			else if (unit.skillName == "まもる" || unit.skillName == "かまえる" || unit.skillName == "すいへき")
+			else if (unit.skillName == "まもる" || unit.skillName == "守る"
+				|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
 			{
-				//防御力アップやダメージ軽減
-				battleMessage_ = unit.name + " は身構えている！";
+				//Power分ダメージ軽減
+				activeEnemy_->SetGuard(activeEnemy_->GetPower3());
+				battleMessage_ += unit.name + "は身構えている";
 			}
 			else if (unit.skillName == "へびにらみ" || unit.skillName == "石化の魔眼" 
 				|| unit.skillName == "金縛り" || unit.skillName == "発狂")
 			{
 				//プレイヤーを凍結状態にする
-				battleMessage_ = "プレイヤーは 凍って動けない！";
-			}
-			else if(unit.skillName == "どくのや" || unit.skillName == "毒の粉" 
-				|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒たいあたり")
-			{
-				//プレイヤーを毒状態にする
-				battleMessage_ = "プレイヤーは 毒状態になった！";
-			}
-			else if (unit.skillName == "のろい" || unit.skillName == "呪われた包丁" 
-				|| unit.skillName == "血槍" || unit.skillName == "鬼火")
-			{
-				//プレイヤーを呪い状態にする
-				battleMessage_ = "プレイヤーは 呪われた！";
-			}
-			else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬" 
-				|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム")
-			{
-				//プレイヤーを閃光状態にする
-				battleMessage_ = "プレイヤーは 目がくらんだ！";
+				statusEffect_ = STATUS_EFFECT::FREEZE;
+				int damage = activeEnemy_->GetPower3();
+				playerStatus_->Damage(damage);
+				battleMessage_ += "プレイヤーは凍りついた";
 			}
 			else if (unit.skillName == "放熱" || unit.skillName == "ちんもく" 
 				|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
 			{
 				//プレイヤーを沈黙状態にする
-				battleMessage_ = "プレイヤーは 沈黙状態になった！";
+				statusEffect_ = STATUS_EFFECT::SILENCE;
+				int damage = activeEnemy_->GetPower3();
+				playerStatus_->Damage(damage);
+				battleMessage_ += "プレイヤーは沈黙になった";
+			}
+			else if(unit.skillName == "どくのや" || unit.skillName == "毒の粉" 
+				|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒たいあたり")
+			{
+				//プレイヤーを毒状態にする
+				statusEffect_ = STATUS_EFFECT::POISON;
+				int damage = activeEnemy_->GetPower2();
+				playerStatus_->Damage(damage);
+				battleMessage_ += "プレイヤーは毒状態になった";
+			}
+			else if (unit.skillName == "のろい" || unit.skillName == "呪われた包丁" 
+				|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
+			{
+				//プレイヤーを呪い状態にする
+				statusEffect_ = STATUS_EFFECT::CURSE;
+				int damage = activeEnemy_->GetPower2();
+				playerStatus_->Damage(damage);
+				battleMessage_ += "プレイヤーは呪われた";
+			}
+			else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬" 
+				|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃")
+			{
+				//プレイヤーを閃光状態にする
+				statusEffect_ = STATUS_EFFECT::FLASH;
+				int damage = activeEnemy_->GetPower2();
+				playerStatus_->Damage(damage);
+				battleMessage_ += "プレイヤーは目がくらんだ";
 			}
 			else
 			{
-				//--- それ以外は通常の攻撃技として処理 ---
-				//unit.command (0:通常行動, 1:中技, 2:大技) で威力を変える
-				int basePower = activeEnemy_->GetPower();
+				//---それ以外は通常の攻撃技として処理---
+				//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
 				int damage = 0;
 
 					if (unit.command == 0)
