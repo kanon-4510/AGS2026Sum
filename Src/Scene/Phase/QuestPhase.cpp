@@ -231,6 +231,8 @@ void QuestPhase::DetermineActionOrder(void)
 	{
 		EnemyActionInfo eAction = activeEnemy_->DecideAction();
 		actionOrder_.push_back({ eAction.name, eAction.speed, false, 0, eAction.actionType, 0 });
+
+		actionOrder_.back().skillName = eAction.skillName;
 	}
 
 	//ソート（スピード順）
@@ -460,14 +462,18 @@ void QuestPhase::ProcessActionLoop(void)
 					if (unit.command == 0)
 					{
 						damage = activeEnemy_->GetPower1();
+
+						activeEnemy_->ChangeAnim(unit.command);
 					}
 					else if (unit.command == 1)
 					{
 						damage = activeEnemy_->GetPower2();
+						activeEnemy_->ChangeAnim(unit.command);
 					}
 					else if (unit.command == 2)
 					{
 						damage = activeEnemy_->GetPower3();
+						activeEnemy_->ChangeAnim(unit.command);
 					}
 
 					//回避判定
@@ -635,6 +641,7 @@ void QuestPhase::ProcessPlayerAction()
 {
 	int commandIndex = static_cast<int>(command_); //enum class を int に変換して操作する
 	int maxItems = static_cast<int>(COMMAND::MAX);
+
 	
 	//カーソル移動
 	Utility::ProcessCommandMenuSelection(commandIndex, maxItems);
@@ -734,7 +741,6 @@ void QuestPhase::ProcessTutorial(void)
 				// このあとの通常のカーソル移動キーの入力を無視するフラグ（returnなど）に繋げます
 			}
 		}
-		
 	}
 }
 void QuestPhase::DrawTutorial(void)
@@ -765,8 +771,6 @@ void QuestPhase::DrawTutorial(void)
 	{
 		tutorialMessage_ = "チュートリアル\nあとは好きなように戦いましょう";
 	}
-
-
 	//チュートリアルの内容をここに書く
 	//例：最初のターンだけ特別な説明を表示するなど
 	if(gameScene_.GetTurn() == 1)

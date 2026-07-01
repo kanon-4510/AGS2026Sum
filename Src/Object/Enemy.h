@@ -66,7 +66,7 @@ public:
 	void Draw() const;
 
 	//バトル用の関数
-	void ChangeAnim(ENEMY_ANIM nextAnim);
+	void ChangeAnim(int command);
 	EnemyActionInfo DecideAction() const;
 	void Damage(int damage);//負傷用の関数
 	void Heal(int amount);	//回復用の関数
