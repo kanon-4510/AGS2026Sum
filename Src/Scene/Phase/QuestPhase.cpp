@@ -341,7 +341,7 @@ void QuestPhase::ProcessActionLoop(void)
 						break;
 					case MAGIC_TYPE::DEBUFF:
 						battleMessage_ += unit.name + " ÇÃé„âªñÇñ@ÅI";
-						statusEffect_ = STATUS_EFFECT::FREEZE;
+						enemyStatusEffect_ = STATUS_EFFECT::FREEZE;
 						break;
 					default:
 						break;
