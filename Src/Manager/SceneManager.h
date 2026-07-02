@@ -43,6 +43,10 @@ public:
 	// デルタタイムの取得
 	float GetDeltaTime(void) const;
 
+	// ?? チュートリアルのON/OFFを切り替える関数を追加
+	bool IsTutorialEnabled() const { return isTutorial_; }
+	void ToggleTutorial() { isTutorial_ = !isTutorial_; }
+
 private:
 
 	// 静的インスタンス
@@ -62,6 +66,9 @@ private:
 
 	bool isLoading_ = false;
 	int loadingTimer_ = 0;
+
+	//チュートリアルのフラグ
+	bool isTutorial_ = true;
 
 	// デルタタイム
 	std::chrono::system_clock::time_point preTime_;

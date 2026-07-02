@@ -38,12 +38,14 @@ void GameScene::Init(void)
 void GameScene::Update(void)
 {
 	//３ターン目までチュートリアルの処理
-	if (turn_ <= 3)
+	if (SceneManager::GetInstance().IsTutorialEnabled())
 	{
-		ProcessTutorial();
+		if (turn_ <= 3)
+		{
+			ProcessTutorial();
+		}
 	}
 	
-
 	//まず現在のフェーズのUpdateを回す
 	if (currentPhase_) {
 		currentPhase_->Update();
@@ -83,7 +85,7 @@ void GameScene::Update(void)
 void GameScene::Draw(void)
 {
 	if (currentPhase_) {
-		//ここが呼ばれていないと、どれだけ切り替わっても画面は変わりません
+		//ここが呼ばれていないと、どれだけ切り替わっても画面は変変わらない
 		currentPhase_->Draw();
 	}
 	else if(turn_ >= MAX_TURN){
@@ -100,7 +102,11 @@ void GameScene::Draw(void)
 		DrawGraph(0, 0, stageImg_, TRUE);
 		//メニュー画面の描画処理
 		DrawFormatString(0, 0, 0xFFFFFF, "Scene : Game 現在のターン %d", turn_);
-
+		if (SceneManager::GetInstance().IsTutorialEnabled())
+		{
+			DrawTutorial();
+		}
+		
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
 
@@ -111,7 +117,7 @@ void GameScene::Draw(void)
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();
 	}
-	//DrawTutorial();
+	
 }
 
 //解放処理
@@ -121,7 +127,19 @@ void GameScene::Release(void)
 
 void GameScene::ProcessTutorial(void)
 {
-	
+	//チュートリアルの処理
+	if (turn_ == 1)
+	{
+		phase_ = QUEST_PHASE::PHASE_QUEST;
+	}
+	else if (turn_ == 2)
+	{
+		phase_ = QUEST_PHASE::PHASE_CLASSWORK;
+	}
+	else if (turn_ == 3)
+	{
+		phase_ = QUEST_PHASE::PHASE_JOB_CHANGE;
+	}
 }
 
 void GameScene::DrawTutorial(void)
@@ -129,15 +147,15 @@ void GameScene::DrawTutorial(void)
 	//チュートリアルの処理
 	if (turn_ == 1)
 	{
-		DrawFormatString(0, 1000, 0xFFFFFF, "チュートリアル：クエストフェーズの説明");
+		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：クエストフェーズの説明");
 	}
 	else if (turn_ == 2)
 	{
-		DrawFormatString(0, 1000, 0xFFFFFF, "チュートリアル：授業フェーズの説明");
+		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：授業フェーズの説明");
 	}
 	else if (turn_ == 3)
 	{
-		DrawFormatString(0, 1000, 0xFFFFFF, "チュートリアル：資格試験フェーズの説明");
+		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：資格試験フェーズの説明");
 	}
 }
 
