@@ -66,14 +66,16 @@ void GameScene::Update(void)
 	}
 
 	//入力ブロック中なら解除して飛ばす
-	if (isInputBlocked_) {
+	if (isInputBlocked_) 
+	{
 		isInputBlocked_ = false;
 		return;
 	}
 
 	//フェーズが実行中でない場合（メニュー選択）
 	//上のif文の中でreturnしていれば、最終ターン終了時はここは実行されない
-	if (!currentPhase_) {
+	if (!currentPhase_) 
+	{
 		ProcessPhaseSelection();
 		ProcessPhaseDecision();
 	}

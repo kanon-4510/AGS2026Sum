@@ -419,8 +419,7 @@ Enemy* SpawnEnemyByTurn(int turn)
         int enemyType = GetRand(3);
         switch (enemyType)
         {
-        case 0:
-        {
+        case 0:{
             std::vector<MotionConfig> slimeAnims = {
                 { "Data/Image/Enemy/Slime/Blue/Idle.png",          8, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Blue/Attack_1.png",      10, 1, 128, 128 },
@@ -466,9 +465,6 @@ Enemy* SpawnEnemyByTurn(int turn)
         }
         }
     }
-    //万一バグでここまで来た場合、強制的にスライム
-    //(NAME,HP,POW,SPD,EXP,ACT1,ACT2,ACT3,)
-    //return new Enemy("スライム", 1, 1, 1, 1, "こうげき", "こうげき", "こうげき", "media/slime.png", spawnX, spawnY);
 }
 
 Enemy* SpawnRushEnemy(int stage)
@@ -478,7 +474,8 @@ Enemy* SpawnRushEnemy(int stage)
 
     switch (stage)
     {
-    case 0: {
+    case 0:
+    {
         std::vector<MotionConfig> minotaurAnims = {
                 { "Data/Image/Enemy/Minotaur/Ark/Idle.png",         10, 1, 128, 128 },
                 { "Data/Image/Enemy/Minotaur/Ark/Attack.png",        5, 1, 128, 128 },

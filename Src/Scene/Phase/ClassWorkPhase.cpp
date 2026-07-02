@@ -70,7 +70,7 @@ void ClassWorkPhase::DrawSkillBonus(void)
 
 	case CLASSWORK_SELECT::ARCHAEOLOGY:
 		effectName = "獲得経験値";
-		reqInterval = 10; // 10ごとにアップ
+		reqInterval = 5; // 5ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ASTROLOGY:

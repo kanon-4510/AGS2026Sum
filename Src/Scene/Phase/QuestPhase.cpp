@@ -13,32 +13,32 @@ extern Enemy* SpawnEnemyByTurn(int currentTurn);
 extern Enemy* SpawnRushEnemy(int stage); //ラッシュ専用の敵生成関数
 
 //コンストラクタ
-QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool isHellQuest)
+QuestPhase::QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest)
 	: gameScene_(gameScene)
 	, playerStatus_(playerStatus)
-	, command_(COMMAND::ATTACK)
-	, battleStep_(BATTLE_STEP::DIFFICULTY_SELECTION)
-	, currentWave_(1) //Waveの初期化
-	, isHellQuest_(false)
+	, isHellQuest_(isHellQuest)
+	, bgImageHandle_(-1)
 {
 	//クエスト開始時は一旦通常の敵を生成しておく
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
-
-	//ここで難易度メニューを動的に作成
-	difficultyMenu_ = {"普通","普通","普通"};
+	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
+	battleStep_ = BATTLE_STEP::DIFFICULTY_SELECTION;
+	locationMenu_ = {"平原","魔法の森","岩山の道場","魔大陸","壊れた聖堂","古代遺跡","星の丘"};	//ここで難易度メニューを動的に作成
+	selectableLocations_ = {QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL};
 
 	//13ターン目以降 かつ まだ一度も挑んでいないなら
 	if (gameScene_.GetTurn() >= 13 && !playerStatus_->hasChallengedHellQuest_)
 	{
-		difficultyMenu_.push_back("エクストラ");
+		locationMenu_.push_back("エクストラ");
+		selectableLocations_.push_back(QUEST_LOCATION::CONTINENT);
 	}
-	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());//クエスト開始時に1戦目の敵を生成する
-	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
 }
 
 //デストラクタ
 QuestPhase::~QuestPhase(void)
 {
+	if (bgImageHandle_ != -1)DeleteGraph(bgImageHandle_);
+
 	if (activeEnemy_ != nullptr)
 	{
 		delete activeEnemy_;
@@ -63,6 +63,8 @@ void QuestPhase::Update(void)
 //描画処理
 void QuestPhase::Draw(void)
 {
+	if (bgImageHandle_ != -1)DrawGraph(0, 0, bgImageHandle_, TRUE);//背景を描画する
+
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
 	//DrawTutorial();
 
@@ -84,7 +86,8 @@ void QuestPhase::Draw(void)
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)//難易度選択中はコマンドやHPを表示しない
 	{
-		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y,difficultyMenu_, difficultyCursor_);
+		DrawString(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y - 30, "どこに行く？", 0xFFFFFF);
+		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y,locationMenu_, difficultyCursor_);
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
 	{
@@ -106,8 +109,9 @@ void QuestPhase::Draw(void)
 	{
 		DrawString(0, 150, "遠征クリア！ 経験値を獲得した！", 0xFFFFFF);
 		DrawString(0, 170, "レベルが上がった！", 0xFFFFFF);
-		DrawString(0, 190, "基礎ステータスが上がった！", 0xFFFFFF);
-		DrawString(0, 210, "Enterキーで次へ", 0xFFFFFF);
+		DrawString(0, 190, locationRewardMsg_.c_str(), 0xFFFF00);
+		DrawString(0, 210, "基礎ステータスが上がった！", 0xFFFFFF);
+		DrawString(0, 230, "Enterキーで次へ", 0xFFFFFF);
 	}
 	
 	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
@@ -125,17 +129,18 @@ bool QuestPhase::IsFinished() const
 void QuestPhase::ProcessDifficulty(void)
 {
 	//選択肢の数を、配列のサイズから自動取得
-	int maxDifficulty = static_cast<int>(difficultyMenu_.size());
+	int maxDifficulty = static_cast<int>(locationMenu_.size());
 	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
 
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
 		//選んだメニューの「文字列」で分岐させる
-		if (difficultyMenu_[difficultyCursor_] == "エクストラ")
+		if (locationMenu_[difficultyCursor_] == "エクストラ")
 		{
 			isHellQuest_ = true;
-			playerStatus_->hasChallengedHellQuest_ = true;//二度と選べないようにフラグを回収
+			playerStatus_->hasChallengedHellQuest_ = true;	//二度と選べないようにフラグを回収
+			location_ = QUEST_LOCATION::CONTINENT;			//場所を魔大陸に設定
 
 			//通常敵のメモリを解放し5連戦用の1体目とすげ替える
 			delete activeEnemy_;
@@ -145,7 +150,17 @@ void QuestPhase::ProcessDifficulty(void)
 		{
 			isHellQuest_ = false;
 			//通常の難易度としてenumに保存する
-			difficulty_ = static_cast<DIFFICULTY>(difficultyCursor_);
+			location_ = selectableLocations_[difficultyCursor_];
+		}
+		switch (location_)
+		{
+		case QUEST_LOCATION::PLAINS: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_1.png"); break;
+		case QUEST_LOCATION::FOREST: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_2.png"); break;
+		case QUEST_LOCATION::SHRINE: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_3.png"); break;
+		case QUEST_LOCATION::CONTINENT: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_4.png"); break;
+		case QUEST_LOCATION::CATHEDRAL: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_5.png"); break;
+		case QUEST_LOCATION::RUINS: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_6.png"); break;
+		case QUEST_LOCATION::HILL: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_7.png"); break;
 		}
 
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
@@ -390,7 +405,7 @@ void QuestPhase::ProcessActionLoop(void)
 				unit.skillName = eAction.skillName;
 
 				//敵の行動分岐
-				battleMessage_ += unit.name + " の " + unit.skillName + "！";
+				battleMessage_ += unit.name + "の" + unit.skillName + "！";
 
 			//技の名前によって特別な効果を発動させる
 			if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ" 
@@ -539,6 +554,42 @@ void QuestPhase::ProcessActionLoop(void)
 			}
 			else
 			{
+				//全Waveクリア 経験値と場所ボーナスを付与
+				int rand = GetRand(20) - 10;	//乱数の取得
+				int statusBonus = 15+rand;
+
+				switch (location_)
+				{
+				case QUEST_LOCATION::PLAINS:
+					playerStatus_->GetExp(statusBonus);
+					locationRewardMsg_ = "追加で経験値を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				case QUEST_LOCATION::FOREST:
+					playerStatus_->pharmacy_ += statusBonus;
+					locationRewardMsg_ = "追加で薬学を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				case QUEST_LOCATION::SHRINE:
+					playerStatus_->martialArts_ += statusBonus;
+					locationRewardMsg_ = "追加で武術を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				case QUEST_LOCATION::CONTINENT:
+					playerStatus_->magicKnowledge_+=statusBonus;
+					locationRewardMsg_ = "追加で魔法知識を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				case QUEST_LOCATION::CATHEDRAL:
+					playerStatus_->faith_ += statusBonus;
+					locationRewardMsg_ = "追加で信仰を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				case QUEST_LOCATION::RUINS:
+					playerStatus_->archaeology_ += statusBonus;
+					locationRewardMsg_ = "追加で考古学を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				case QUEST_LOCATION::HILL:
+					playerStatus_->astrology_ += statusBonus;
+					locationRewardMsg_ = "追加で占星術を" + std::to_string(statusBonus) + "獲得した";
+					break;
+				}
+
 				if (isHellQuest_)playerStatus_->GetExp(100);//激ムズクエストは莫大な経験値を付与
 
 				wasMagicUsedLastTurn_ = magicUsedThisTurn_;

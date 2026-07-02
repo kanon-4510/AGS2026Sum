@@ -38,7 +38,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::GAME_TITLE, std::move(res));
 	//ゲームシーン用画像
 	//----------------------------------------------
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Stage_0.png");
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Stage/Stage_0.png");
 	resourcesMap_.emplace(SRC::GAME_SCENE, std::move(res));
 	//GameOverScene
 	//-------------------------------------
