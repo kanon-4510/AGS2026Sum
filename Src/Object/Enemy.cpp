@@ -168,59 +168,49 @@ Enemy* SpawnEnemyByTurn(int turn)
         {
         case 0: {
             std::vector<MotionConfig> bulletMachinaAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("バレットマキナ", 150, 10, 10, 10, 10, 0, "こうげき", "砲撃", "電力チャージ", bulletMachinaAnims, spawnX, spawnY);
-            // new Enemy("バレットマキナ", 150, 10, 10, 0, "こうげき", "砲撃", "電力チャージ", "", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("バレットマキナ",150,10,10,10,10,0,"こうげき","砲撃","電力チャージ",bulletMachinaAnims, spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> wraithAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("レイス", 150, 10, 10, 10, 10, 0, "こうげき", "金縛り", "呪われた包丁", wraithAnims, spawnX, spawnY);
-            //return; new Enemy("レイス", 150, 10, 10, 0, "こうげき", "金縛り", "呪われた包丁", "", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("レイス", 150, 10, 10, 10, 10, 0, "こうげき", "呪われた包丁", "金縛り", wraithAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> evilLightningWizardAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("悪の雷魔術師", 150, 10, 10, 10, 10, 0, "こうげき", "電光斬", "エレキビーム", evilLightningWizardAnims, spawnX, spawnY);
-            //return; new Enemy("悪の雷魔術師", 150, 10, 10, 0, "こうげき", "電光斬", "エレキビーム", "", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("悪の雷魔術師", 150, 10, 10, 10, 10, 0, "こうげき", "電撃斬", "エレキビーム", evilLightningWizardAnims, spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> nightKnightAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("夜の騎士", 150, 10, 10, 10, 10, 0, "こうげき", "切断", "守りの構え", nightKnightAnims, spawnX, spawnY);
-            //return; new Enemy("夜の騎士", 150, 10, 10, 0, "こうげき", "切断", "守りの構え", "", spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> darkGorgonAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("ダークゴルゴン", 150, 10, 10, 10, 10, 0, "こうげき", "薙ぎ払い", "蛇にらみ", darkGorgonAnims, spawnX, spawnY);
-            //return; new Enemy("ダークゴルゴン", 150, 10, 10, 0, "こうげき", "薙ぎ払い", "蛇にらみ", "", spawnX, spawnY);
         }
         }
     }
@@ -232,59 +222,49 @@ Enemy* SpawnEnemyByTurn(int turn)
         {
         case 0: {
             std::vector<MotionConfig> lesserTaurosAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("下級タウロス", 100, 10, 10, 10, 10, 0, "こうげき", "こうげき", "自己再生", lesserTaurosAnims, spawnX, spawnY);
-            //return; new Enemy("下級タウロス", 100, 10, 10, 0, "こうげき", "こうげき", "自己再生", "", spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> vampireAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("ヴァンパイア", 100, 10, 10, 10, 10, 0, "こうげき", "血槍", "沈黙の呪い", vampireAnims, spawnX, spawnY);
-            //return;// new Enemy("ヴァンパイア", 100, 10, 10, 0, "こうげき", "血槍", "沈黙の呪い", "", spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> crowTenguAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("カラス天狗", 100, 10, 10, 10, 10, 0, "こうげき", "居合切り", "破魔空間", crowTenguAnims, spawnX, spawnY);
-            //return;// new Enemy("カラス天狗", 100, 10, 10, 0, "こうげき", "居合切り", "破魔空間", "", spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> fireWizardAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("悪の炎魔術師", 100, 10, 10, 10, 10, 0, "こうげき", "ひのたま", "火炎放射", fireWizardAnims, spawnX, spawnY);
-            //return;// new Enemy("悪の炎魔術師", 100, 10, 10, 0, "こうげき", "ひのたま", "火炎放射", "", spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> gorgonAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("ゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "薙ぎ払い", "かみつく", gorgonAnims, spawnX, spawnY);
-            //return;// new Enemy("ゴルゴン", 100, 10, 10, 0, "こうげき", "薙ぎ払い", "かみつく", "", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("ゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "かみつく", "薙ぎ払い", gorgonAnims, spawnX, spawnY);
         }
         }
     }
@@ -296,59 +276,49 @@ Enemy* SpawnEnemyByTurn(int turn)
         {
         case 0: {
             std::vector<MotionConfig> lavaSlimeAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("溶岩スライム", 80, 10, 10, 10, 10, 0, "こうげき", "たいあたり", "たいあたり", lavaSlimeAnims, spawnX, spawnY);
-            //return;new Enemy("溶岩スライム", 80, 10, 10, 0, "こうげき", "たいあたり", "たいあたり", "", spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> ghostAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("ゴースト", 80, 10, 10, 10, 10, 0, "こうげき", "のろい", "絶叫", ghostAnims, spawnX, spawnY);
-            //return;// new Enemy("ゴースト", 80, 10, 10, 0, "こうげき", "のろい", "絶叫", "", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("ゴースト", 80, 10, 10, 10, 10, 0, "こうげき", "呪い", "発狂", ghostAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> morningKnightAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("朝の騎士", 80, 10, 10, 10, 10, 0, "こうげき", "斬撃", "守る", morningKnightAnims, spawnX, spawnY);
-            //return;// new Enemy("朝の騎士", 80, 10, 10, 0, "こうげき", "斬撃", "守る", "", spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> magicBombAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("マジックボム", 80, 10, 10, 10, 10, 0, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
-            //return;// new Enemy("マジックボム", 80, 10, 10, 0, "こうげき", "ばくはつ", "放熱", "", spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> trentAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("トレント", 80, 10, 10, 10, 10, 0, "こうげき", "毒の粉", "大地の恵み", trentAnims, spawnX, spawnY);
-            //return;// new Enemy("トレント", 80, 10, 10, 0, "こうげき", "毒の粉", "大地の恵み", "", spawnX, spawnY);
         }
         }
     }
@@ -360,59 +330,49 @@ Enemy* SpawnEnemyByTurn(int turn)
         {
         case 0: {
             std::vector<MotionConfig> poisonSlimeAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("毒スライム", 50, 10, 10, 10, 10, 0, "こうげき", "こうげき", "毒たいあたり", poisonSlimeAnims, spawnX, spawnY);
-            //return;// new Enemy("毒スライム", 50, 10, 10, 0, "こうげき", "こうげき", "たいあたり", "", spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> whiteWolfAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("ホワイトウルフ", 50, 10, 10, 10, 10, 0, "こうげき", "ひっかく", "きりさく", whiteWolfAnims, spawnX, spawnY);
-            //return;// new Enemy("ホワイトウルフ", 50, 10, 10, 0, "こうげき", "ひっかく", "きりさく", "", spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> blackWolfAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("ブラックウルフ", 50, 10, 10, 10, 10, 0, "こうげき", "ひっかく", "きりさく", blackWolfAnims, spawnX, spawnY);
-            //return;// new Enemy("ブラックウルフ", 50, 10, 10, 0, "こうげき", "ひっかく", "きりさく", "", spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> tengAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("天狗", 50, 10, 10, 10, 10, 0, "こうげき", "ふきつな風", "いあいぎり", tengAnims, spawnX, spawnY);
-            //return;// new Enemy("天狗", 50, 10, 10, 0, "こうげき", "ふきつな風", "いあいぎり", "", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("天狗", 50, 10, 10, 10, 10, 0, "こうげき", "いあいぎり", "ちんもく", tengAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> skeletonSaberAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
             return new Enemy("剣スケルトン", 50, 10, 10, 10, 10, 0, "こうげき", "ざんげき", "まもる", skeletonSaberAnims, spawnX, spawnY);
-            //return;// new Enemy("剣スケルトン", 50, 10, 10, 0, "こうげき", "ざんげき", "まもる", "", spawnX, spawnY);
         }
         }
     }
@@ -422,60 +382,45 @@ Enemy* SpawnEnemyByTurn(int turn)
         int enemyType = GetRand(3);
         switch (enemyType)
         {
-        case 0:
-        {
+        case 0:{
             std::vector<MotionConfig> slimeAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("スライム", 19, 1, 1, 1, 7, 5, "こうげき", "こうげき", "たいあたり", slimeAnims, spawnX, spawnY);
-            //return new Enemy("スライム",    19,1, 7,5,"こうげき","こうげき","たいあたり","Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",spawnX,spawnY);
-        }
-        case 1: {
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("スライム", 26,1,1,1,7,5, "こうげき", "こうげき", "たいあたり", slimeAnims, spawnX, spawnY);
+        }case 1:{
             std::vector<MotionConfig> WerewolfAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("オオカミ男", 24, 1, 1, 1, 12, 8, "こうげき", "こうげき", "ひっかく", WerewolfAnims, spawnX, spawnY);
-            //return new Enemy("オオカミ男", 24, 2, 12, 8, "こうげき", "こうげき", "ひっかく", "Data/Image/Enemy/slime/Blue_Slime/Dead.png", spawnX, spawnY);
-        }
-        case 2: {
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("オオカミ男",21,1,1,1,12,8, "こうげき", "こうげき", "ひっかく", WerewolfAnims, spawnX, spawnY);
+        }case 2:{
             std::vector<MotionConfig> skeletonArcherAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("弓スケルトン", 26, 2, 2, 2, 9, 7, "こうげき", "こうげき", "どくのや", skeletonArcherAnims, spawnX, spawnY);
-            //return new Enemy("弓スケルトン", 26, 3, 9, 7, "こうげき", "こうげき", "どくのや", "Data/Image/Enemy/slime/Blue_Slime/Hurt.png", spawnX, spawnY);
-        }
-        case 3: {
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("弓スケルトン",21,1,1,1,9,7, "こうげき", "どくのや", "こうげき", skeletonArcherAnims, spawnX, spawnY);
+        }case 3: {
             std::vector<MotionConfig> zombieAnims = {
-                { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
-            };
-            return new Enemy("ゾンビ", 21, 1, 1, 1, 9, 6, "こうげき", "こうげき", "こうげき", zombieAnims, spawnX, spawnY);
-            //return new Enemy("ゾンビ", 21, 2, 9, 6, "こうげき", "こうげき", "こうげき", "Data/Image/Enemy/slime/Blue_Slime/Idle.png", spawnX, spawnY);
+                {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+                {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}};
+            return new Enemy("ゾンビ", 21,2,2,2,9,6, "こうげき", "こうげき", "こうげき", zombieAnims, spawnX, spawnY);
         }
         }
     }
-    //万一バグでここまで来た場合、強制的にスライム
-    //(NAME,HP,POW,SPD,EXP,ACT1,ACT2,ACT3,)
-    //return new Enemy("スライム", 1, 1, 1, 1, "こうげき", "こうげき", "こうげき", "media/slime.png", spawnX, spawnY);
 }
 
 Enemy* SpawnRushEnemy(int stage)
@@ -485,61 +430,65 @@ Enemy* SpawnRushEnemy(int stage)
 
     switch (stage)
     {
-    case 0: {
+    case 0:
+    {
         std::vector<MotionConfig> minotaurAnims = {
-               { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
+               {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}
         };
         return new Enemy("ミノタウロス", 100, 10, 10, 10, 10, 0, "こうげき", "こうげき", "自己再生", minotaurAnims, spawnX, spawnY);
-        // return;// new Enemy("ミノタウロス",  100,10,10,0,"こうげき","こうげき","自己再生",    "",spawnX,spawnY);
-    }case 1: {
+    }
+    case 1:
+    {
         std::vector<MotionConfig> swordMachinaAnims = {
-               { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
+               {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}
         };
         return new Enemy("ソードマキナ", 100, 10, 10, 10, 10, 0, "こうげき", "雷連撃", "電力チャージ", swordMachinaAnims, spawnX, spawnY);
-        //return;// new Enemy("ソードマキナ",  100,10,10,0,"こうげき","雷連撃",  "電力チャージ","",spawnX,spawnY);
-    }   case 2: {
+    }
+    case 2:
+    {
         std::vector<MotionConfig> demonFoxAnims = {
-               { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
+               {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}
         };
         return new Enemy("妖狐", 100, 10, 10, 10, 10, 0, "こうげき", "鬼火", "蒼炎", demonFoxAnims, spawnX, spawnY);
-        //return;// new Enemy("妖狐",          100,10,10,0,"こうげき","鬼火",    "蒼炎",        "",spawnX,spawnY);
-    }case 3: {
+    }
+    case 3:
+    {
         std::vector<MotionConfig> fallenWarriorAnims = {
-               { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
+               {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}
         };
         return new Enemy("落武者", 100, 10, 10, 10, 10, 0, "こうげき", "切り裂く", "受流しの構え", fallenWarriorAnims, spawnX, spawnY);
-        //return;// new Enemy("落武者",        100,10,10,0,"こうげき","切り裂く","受流しの構え","",spawnX,spawnY);
-    }case 4: {
+    }
+    case 4:
+    {
         std::vector<MotionConfig> evilGorgonAnims = {
-               { "Data/Image/Enemy/slime/Blue_Slime/Idle.png",          8, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/slime/Blue_Slime/Dead.png",          3, 1, 128, 128 }
+               {"Data/Image/Enemy/slime/Blue_Slime/Idle.png",    8,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_1.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_2.png",4,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Attack_3.png",5,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Hurt.png",    6,1,128,128},
+               {"Data/Image/Enemy/slime/Blue_Slime/Dead.png",    3,1,128,128}
         };
         return new Enemy("イビルゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "毒牙", "石化の魔眼", evilGorgonAnims, spawnX, spawnY);
-        //return;// new Enemy("イビルゴルゴン",100,10,10,0,"こうげき","毒牙",    "石化の魔眼",  "",spawnX,spawnY);
     }
     }
     return nullptr;

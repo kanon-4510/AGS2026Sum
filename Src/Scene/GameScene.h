@@ -3,6 +3,7 @@
 #include "../Manager/InputManager.h"
 #include "Phase/PhaseBase.h"
 #include "SceneBase.h"
+#include "../Scene/Phase/QuestPhase.h"
 #include "../Object/PlayerStatus.h"
 
 class GameScene : public SceneBase
@@ -39,10 +40,10 @@ private:
 	std::unique_ptr<PhaseBase> currentPhase_;
 
 	QUEST_PHASE phase_;	//クエストのフェーズ
-	int turn_;		//現在のターン数
+	int turn_;			//現在のターン数
 
 	int playerImg_; //プレイヤーの画像ハンドル
-	int stageImg_; //ステージの画像ハンドル
+	int stageImg_;  //ステージの画像ハンドル
 
 	//メンバー変数の宣言
 	bool isInputBlocked_ = false; //入力ブロックフラグ

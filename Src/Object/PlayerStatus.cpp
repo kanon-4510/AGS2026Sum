@@ -35,7 +35,7 @@ void PlayerStatus::Draw()
 	int magBonus = SkillBonus(BonusType::MagicBonus, 0);
 	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 190, GREEN, "(魔法+%d)", magBonus);
 
-	int defBonus = (faith_ / 5); //軽減するダメージ量
+	int defBonus = (faith_ / 10); //軽減するダメージ量
 	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 210, GREEN, "(防御+%d)", defBonus);
 
 	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
@@ -221,7 +221,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (martialArts_ / 5);
 
 	case BonusType::MagicBonus:
-		//魔法知10につき、魔法威力を+1する
+		//魔法知10につき、魔法を+1する
 		return baseValue + (magicKnowledge_ / 10);
 
 	case BonusType::DefenseBonus:
@@ -235,8 +235,8 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 
 	case BonusType::ExpBonus:
 		//考古学10につき、獲得経験値を+2する（固定値追加）
-		//例：基本経験値10、考古学10 → 10 + (10 / 10 * 2) = 12
-		return baseValue + (archaeology_ / 10 * 2);
+		//例：基本経験値10、考古学10 → 10 + (10 / 5) = 12
+		return baseValue + (archaeology_ / 5);
 
 	case BonusType::LuckBonus:
 		//占星術5につき、回避率のステータスを+1する

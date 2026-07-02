@@ -6,6 +6,18 @@
 #include <vector>
 #include <string>
 
+// クエストの場所を定義
+enum class QUEST_LOCATION
+{
+	PLAINS,		//平原
+	FOREST,		//魔法の森
+	SHRINE,		//岩山の道場
+	CONTINENT,	//魔大陸
+	CATHEDRAL,	//壊れた聖堂
+	RUINS,		//古代遺跡
+	HILL		//星の丘
+};
+
 class GameScene;
 class Enemy;
 class QuestPhase : public PhaseBase
@@ -116,7 +128,7 @@ public:
 	static constexpr float ENEMY_INCREASE = 0.7f;
 	static constexpr float HARD_INCREASE = 1.5f;
 
-	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest=false);		//デフォルトコンストラクタ
+	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest = false);//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
 
 	void Update(void) override;		//更新処理
@@ -148,6 +160,14 @@ private:
 	STATUS_EFFECT enemyStatusEffect_ = STATUS_EFFECT::NONE;	//敵の状態異常を管理する変数
 	int statusTurns_ = 4;		//状態異常の残りターン数
 
+	//クエスト場所系
+	QUEST_LOCATION location_;		//配列
+	std::string locationRewardMsg_;	//メッセージ用
+	int bgImageHandle_;				//背景画像
+	std::vector<std::string> locationMenu_;
+	std::vector<QUEST_LOCATION> selectableLocations_; //メニューに対応するenumを記憶する用
+	int difficultyCursor_ = 0;                //難易度選択用のカーソル
+
 	//魔法攻撃のインターバル(1ターン)
 	bool wasMagicUsedLastTurn_ = false; //前のターンに魔法を使ったか
 	bool magicUsedThisTurn_ = false;    //今のターンに魔法を使ったか（更新用）
@@ -157,9 +177,6 @@ private:
 	int currentWave_ = 1;          //現在の連戦数（1戦目からスタート）
 	const int MAX_WAVES = 3;       //1回の遠征での最大連戦数（例：3連戦）
 
-	std::vector<std::string> difficultyMenu_; //表示する難易度のリスト
-	int difficultyCursor_ = 0;                //難易度選択用のカーソル
-	
 	//------フラグ---------
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 	bool isHellQuest_ = false;//激ムズクエスト突入したか
