@@ -221,7 +221,10 @@ private:
 	//結果を表示する関数
 	void DisplayResult(void);
 
-	void DrawTutorial(void);	//チュートリアルの描画処理
+	//Draw
+	//--------------
+	//チュートリアルの描画処理
+	void DrawTutorial(void);
 
 	//Draw関数内でコマンド選択の描画を行う関数
 	void DrawCommandSelection(void);

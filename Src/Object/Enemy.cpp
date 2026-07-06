@@ -323,12 +323,12 @@ Enemy* SpawnEnemyByTurn(int turn)
             return new Enemy("ゴースト", 80, 10, 10, 10, 10, 0, "こうげき", "のろい", "絶叫", ghostAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> morningKnightAnims = {
-                { "Data/Image/Knight/Morning/Blue_Slime/Idle.png",          4, 1, 128, 128 },
-                { "Data/Image/Knight/Morning/Blue_Slime/Attack_1.png",      5, 1, 128, 128 },
-                { "Data/Image/Knight/Morning/Blue_Slime/Attack_2.png",      6, 1, 128, 128 },
-                { "Data/Image/Knight/Morning/Blue_Slime/Attack_3.png",      5, 1, 128, 128 },
-                { "Data/Image/Knight/Morning/Blue_Slime/Hurt.png",          2, 1, 128, 128 },
-                { "Data/Image/Knight/Morning/Blue_Slime/Dead.png",          6, 1, 128, 128 }
+                { "Data/Image/Enemy/Knight/Morning/Idle.png",          4, 1, 128, 128 },
+                { "Data/Image/Enemy/Knight/Morning/Attack_1.png",      5, 1, 128, 128 },
+                { "Data/Image/Enemy/Knight/Morning/Attack_2.png",      6, 1, 128, 128 },
+                { "Data/Image/Enemy/Knight/Morning/Attack_3.png",      5, 1, 128, 128 },
+                { "Data/Image/Enemy/Knight/Morning/Hurt.png",          2, 1, 128, 128 },
+                { "Data/Image/Enemy/Knight/Morning/Dead.png",          6, 1, 128, 128 }
             };
             return new Enemy("朝の騎士", 80, 10, 10, 10, 10, 0, "こうげき", "斬撃", "守る", morningKnightAnims, spawnX, spawnY);
         }case 3: {
