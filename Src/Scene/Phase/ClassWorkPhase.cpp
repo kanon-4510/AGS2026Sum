@@ -49,7 +49,7 @@ void ClassWorkPhase::DrawSkillBonus(void)
 	switch (select_)
 	{
 	case CLASSWORK_SELECT::PHARMACY:
-		effectName = "アイテム回復量";
+		effectName = "回復量";
 		reqInterval = 10; // 10ごとにアップ
 		break;
 

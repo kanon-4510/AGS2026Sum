@@ -38,6 +38,7 @@ public:
 		DIFFICULTY_SELECTION,	//難易度選択
 		COMMAND_SELECTION,		//コマンド選択
 		COMMAND_SUB_SELECTION,	//サブコマンド選択
+		MAGIC_SELECTION,		//魔法選択
 		DETERMINE,				//コマンド決定
 		ACTION_LOOP,			//行動ループ
 		STATUS_EFFECT,			//状態異常の処理
@@ -141,6 +142,7 @@ private:
 	std::string tutorialMessage_;			//チュートリアル用のメッセージ
 	std::string battleMessage_;				//バトル用のメッセージ
 	std::vector<std::string> subActionMessages_; //サブアクションのメッセージを管理するリスト
+	std::vector<std::string> magicTypeMessages_; //魔法の種類のメッセージを管理するリスト
 	
 	PlayerStatus* playerStatus_;//プレイヤーのステータスの情報を渡す
 	GameScene& gameScene_;		//親の情報を渡す
@@ -185,6 +187,9 @@ private:
 	int currentActionIdx_ = 0;	//行動リストの何番目かを指す
 	int subMenuCursor_ = 0;		//サブメニューのカーソル
 
+	int magicMenuCursor_ = 0;		//魔法メニューのカーソル
+	int chosenMagicIdx_ = 0;		//選択した魔法の種類のインデックス
+
 	//------関数---------
 	//チュートリアル
 	void ProcessTutorial(void);
@@ -201,6 +206,9 @@ private:
 	//プレイヤーの行動の処理などをここに書く
 	void ProcessPlayerSubAction(void);
 	
+	//魔法選択の処理
+	void MagicSelection();
+
 	//行動の順番を決定する関数
 	void DetermineActionOrder(void);
 	

@@ -105,6 +105,11 @@ void QuestPhase::Draw(void)
 		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
 		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, subActionMessages_, subMenuCursor_);
 	}
+	else if(battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
+	{
+		//魔法の種類の描画
+		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, magicTypeMessages_, magicMenuCursor_);
+	}
 	else if (battleStep_ == BATTLE_STEP::RESULT)
 	{
 		DrawString(0, 150, "遠征クリア！ 経験値を獲得した！", 0xFFFFFF);
@@ -186,6 +191,10 @@ void QuestPhase::ManageTurn(void)
 	case QuestPhase::BATTLE_STEP::COMMAND_SUB_SELECTION:
 		//DETERMINEに進むかCOMMAND_SELECTIONに戻るか
 		ProcessPlayerSubAction();
+		break;
+	case QuestPhase::BATTLE_STEP::MAGIC_SELECTION:
+		//DETERMINEに進むかCOMMAND_SUB_SELECTIONに戻るか
+		MagicSelection();
 		break;
 	case QuestPhase::BATTLE_STEP::DETERMINE:
 		//行動の順番を決定する関数
@@ -355,8 +364,31 @@ void QuestPhase::ProcessActionLoop(void)
 						statusTurns_ = 4;
 						break;
 					case MAGIC_TYPE::DEBUFF:
-						battleMessage_ += unit.name + " の弱化魔法！";
-						enemyStatusEffect_ = STATUS_EFFECT::FREEZE;
+						if (chosenMagicIdx_ == 0)
+						{
+							battleMessage_ += unit.name + " の毒魔法！";
+							enemyStatusEffect_ = STATUS_EFFECT::POISON;
+						}
+						else if (chosenMagicIdx_ == 1)
+						{
+							battleMessage_ += unit.name + " の凍結魔法！";
+							enemyStatusEffect_ = STATUS_EFFECT::FREEZE;
+						}
+						else if (chosenMagicIdx_ == 2)
+						{
+							battleMessage_ += unit.name + " の閃光！";
+							enemyStatusEffect_ = STATUS_EFFECT::FLASH;
+						}
+						else if (chosenMagicIdx_ == 3)
+						{
+							battleMessage_ += unit.name + " の呪い！";
+							enemyStatusEffect_ = STATUS_EFFECT::CURSE;
+						}
+						else if (chosenMagicIdx_ == 4)
+						{
+							battleMessage_ += unit.name + " の沈黙魔法！";
+							enemyStatusEffect_ = STATUS_EFFECT::SILENCE;
+						}
 						break;
 					default:
 						break;
@@ -742,7 +774,7 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	//選択肢の数を、埋め込まれた配列のサイズから自動取
 	int maxSubItems = static_cast<int>(subActionMessages_.size());
 	if (maxSubItems == 0) return; // 念のため
-
+	
 	//カーソル移動処理
 	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
@@ -753,13 +785,89 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		//例：chosenSubMenuIdx_ = subMenuCursor_; 
 		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡します
 
-		//行動決定へ進む
-		battleStep_ = BATTLE_STEP::DETERMINE;
-	}
+		magicMenuCursor_ = 0;
 
+		//一度リストを空にする
+		magicTypeMessages_.clear();
+
+		//行動決定へ進む
+		switch (subMenuCursor_)
+		{
+		case 0:
+			//攻撃
+			magicTypeMessages_.push_back("魔法1");
+
+			//レベルに応じて追加
+			if (playerStatus_->magicKnowledge_ >= 70)
+			{
+				magicTypeMessages_.push_back("魔法2");
+			}
+			if (playerStatus_->magicKnowledge_ >= 140)
+			{
+				magicTypeMessages_.push_back("魔法3");
+			}
+			break;
+		case 1:
+			//回復
+			magicTypeMessages_.push_back("ヒール1");
+			if (playerStatus_->pharmacy_ >= 70)
+			{
+				magicTypeMessages_.push_back("ヒール2");
+			}
+			if (playerStatus_->pharmacy_ >= 140)
+			{
+				magicTypeMessages_.push_back("ヒール3");
+			}
+			break;
+		case 2:
+			//強化
+			magicTypeMessages_ = { "状態異常回復" };
+			break;
+		case 3:
+			//状態異常付与
+			magicTypeMessages_.push_back("毒");
+
+			if (playerStatus_->archaeology_ >= 70)
+			{
+				magicTypeMessages_.push_back("凍結");
+			}
+			if (playerStatus_->archaeology_ >= 140)
+			{
+				magicTypeMessages_.push_back("閃光");
+			}
+			break;
+		default:
+			break;
+		}
+
+		battleStep_ = BATTLE_STEP::MAGIC_SELECTION;
+	}
 	if (ins_.IsTrgDown(KEY_INPUT_TAB))
 	{
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+	}
+}
+
+void QuestPhase::MagicSelection()
+{
+	//選択肢の数を、埋め込まれた配列のサイズから自動取
+	int maxMagItems = static_cast<int>(magicTypeMessages_.size());
+	if (maxMagItems == 0) return;
+
+	//カーソル移動処理
+	Utility::ProcessCommandMenuSelection(magicMenuCursor_, maxMagItems);
+
+	//決定処理
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	{
+		//ここで最終的に何番目の魔法・状態異常を選んだかを記憶する
+		chosenMagicIdx_ = magicMenuCursor_;
+
+		battleStep_ = BATTLE_STEP::DETERMINE;
+	}
+	if (ins_.IsTrgDown(KEY_INPUT_TAB))
+	{
+		battleStep_ = BATTLE_STEP::COMMAND_SUB_SELECTION;
 	}
 }
 
