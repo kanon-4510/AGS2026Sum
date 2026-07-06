@@ -15,7 +15,8 @@ enum class QUEST_LOCATION
 	CONTINENT,	//魔大陸
 	CATHEDRAL,	//壊れた聖堂
 	RUINS,		//古代遺跡
-	HILL		//星の丘
+	HILL,		//星の丘
+	EXTRA
 };
 
 class GameScene;
@@ -215,8 +216,7 @@ private:
 	//行動の順番に従って処理を行う関数
 	void ProcessActionLoop(void);
 	
-	//状態異常の処理を行う関数
-	void ProcessStatusEffect(void);
+	void ProcessStatusEffect(void);//状態異常
 
 	//結果を表示する関数
 	void DisplayResult(void);

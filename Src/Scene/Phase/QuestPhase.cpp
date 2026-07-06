@@ -30,7 +30,7 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHe
 	if (gameScene_.GetTurn() >= 13 && !playerStatus_->hasChallengedHellQuest_)
 	{
 		locationMenu_.push_back("エクストラ");
-		selectableLocations_.push_back(QUEST_LOCATION::CONTINENT);
+		selectableLocations_.push_back(QUEST_LOCATION::EXTRA);
 	}
 }
 
@@ -145,7 +145,7 @@ void QuestPhase::ProcessDifficulty(void)
 		{
 			isHellQuest_ = true;
 			playerStatus_->hasChallengedHellQuest_ = true;	//二度と選べないようにフラグを回収
-			location_ = QUEST_LOCATION::CONTINENT;			//場所を魔大陸に設定
+			location_ = QUEST_LOCATION::EXTRA;			//場所を魔大陸に設定
 
 			//通常敵のメモリを解放し5連戦用の1体目とすげ替える
 			delete activeEnemy_;
@@ -166,6 +166,7 @@ void QuestPhase::ProcessDifficulty(void)
 		case QUEST_LOCATION::CATHEDRAL: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_5.png"); break;
 		case QUEST_LOCATION::RUINS: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_6.png"); break;
 		case QUEST_LOCATION::HILL: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_7.png"); break;
+		case QUEST_LOCATION::EXTRA: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_8.png"); break;
 		}
 
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
@@ -440,72 +441,92 @@ void QuestPhase::ProcessActionLoop(void)
 				//敵の行動分岐
 				battleMessage_ += unit.name + "の" + unit.skillName + "！";
 
-			//技の名前によって特別な効果を発動させる
-			if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ" 
-				|| unit.skillName == "自己再生")
-			{
-				//Power分回復
-				int healAmount = activeEnemy_->GetPower3(); 
-				activeEnemy_->Heal(healAmount);
-				battleMessage_ += unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
-			}
-			else if (unit.skillName == "まもる" || unit.skillName == "守る"
-				|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
-			{
-				//Power分ダメージ軽減
-				activeEnemy_->SetGuard(activeEnemy_->GetPower3());
-				battleMessage_ += unit.name + "は身構えている";
-			}
-			else if (unit.skillName == "へびにらみ" || unit.skillName == "石化の魔眼" 
-				|| unit.skillName == "金縛り" || unit.skillName == "発狂")
-			{
-				//プレイヤーを凍結状態にする
-				statusEffect_ = STATUS_EFFECT::FREEZE;
-				int damage = activeEnemy_->GetPower3();
-				playerStatus_->Damage(damage);
-				battleMessage_ += "プレイヤーは凍りついた";
-			}
-			else if (unit.skillName == "放熱" || unit.skillName == "ちんもく" 
-				|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
-			{
-				//プレイヤーを沈黙状態にする
-				statusEffect_ = STATUS_EFFECT::SILENCE;
-				int damage = activeEnemy_->GetPower3();
-				playerStatus_->Damage(damage);
-				battleMessage_ += "プレイヤーは沈黙になった";
-			}
-			else if(unit.skillName == "どくのや" || unit.skillName == "毒の粉" 
-				|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒たいあたり")
-			{
-				//プレイヤーを毒状態にする
-				statusEffect_ = STATUS_EFFECT::POISON;
-				int damage = activeEnemy_->GetPower2();
-				playerStatus_->Damage(damage);
-				battleMessage_ += "プレイヤーは毒状態になった";
-			}
-			else if (unit.skillName == "のろい" || unit.skillName == "呪われた包丁" 
-				|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
-			{
-				//プレイヤーを呪い状態にする
-				statusEffect_ = STATUS_EFFECT::CURSE;
-				int damage = activeEnemy_->GetPower2();
-				playerStatus_->Damage(damage);
-				battleMessage_ += "プレイヤーは呪われた";
-			}
-			else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬" 
-				|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃")
-			{
-				//プレイヤーを閃光状態にする
-				statusEffect_ = STATUS_EFFECT::FLASH;
-				int damage = activeEnemy_->GetPower2();
-				playerStatus_->Damage(damage);
-				battleMessage_ += "プレイヤーは目がくらんだ";
-			}
-			else
-			{
-				//---それ以外は通常の攻撃技として処理---
-				//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
-				int damage = 0;
+				//技の名前によって特別な効果を発動させる
+				if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
+					|| unit.skillName == "自己再生")
+				{
+					//Power分回復
+					int healAmount = activeEnemy_->GetPower3();
+					activeEnemy_->Heal(healAmount);
+					battleMessage_ += unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
+				}
+				else if (unit.skillName == "まもる" || unit.skillName == "守る"
+					|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
+				{
+					//Power分ダメージ軽減
+					activeEnemy_->SetGuard(activeEnemy_->GetPower3());
+					battleMessage_ += unit.name + "は身構えている";
+				}
+				else if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
+					|| unit.skillName == "金縛り" || unit.skillName == "発狂")
+				{
+					//プレイヤーを凍結状態にする
+					int damage = activeEnemy_->GetPower3();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::FREEZE;
+						battleMessage_ += "プレイヤーは凍りついた";
+					}
+					else battleMessage_ += "しかしうまく決まらなかった";
+				}
+				else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
+					|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
+				{
+					//プレイヤーを沈黙状態にする
+					int damage = activeEnemy_->GetPower3();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::SILENCE;
+						battleMessage_ += "プレイヤーは沈黙になった";
+					}
+					else battleMessage_ += "しかしうまく決まらなかった";
+				}
+				else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
+					|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
+				{
+					//プレイヤーを毒状態にする
+					int damage = activeEnemy_->GetPower2();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::POISON;
+						battleMessage_ += "プレイヤーは毒状態になった";
+					}
+					else battleMessage_ += "しかしうまく決まらなかった";
+				}
+				else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
+					|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
+				{
+					//プレイヤーを呪い状態にする
+					int damage = activeEnemy_->GetPower2();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::CURSE;
+						battleMessage_ += "プレイヤーは呪われた";
+					}
+					else battleMessage_ += "しかしうまく決まらなかった";
+				}
+				else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
+					|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃")
+				{
+					//プレイヤーを閃光状態にする
+					int damage = activeEnemy_->GetPower2();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::FLASH;
+						battleMessage_ += "プレイヤーは目がくらんだ";
+					}
+					else battleMessage_ += "しかしうまく決まらなかった";
+				}
+				else
+				{
+					//---それ以外は通常の攻撃技として処理---
+					//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
+					int damage = 0;
 
 					if (unit.command == 0)
 					{
@@ -535,7 +556,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (roll < evasionChance)
 					{
 						//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
-						battleMessage_ = "攻撃を回避！";
+						battleMessage_ = "攻撃を回避した！";
 					}
 					else if (!activeEnemy_->IsDead())
 					{
@@ -556,7 +577,6 @@ void QuestPhase::ProcessActionLoop(void)
 	//②Enterキー待ちと、連戦(Wave)の処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
 	{
-
 		battleMessage_ = "";
 
 		//もし敵を倒していたら
@@ -684,6 +704,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			if (statusTurns_ <= 0)
 			{
 				battleMessage_ = "沈黙が解けた ";
+				statusTurns_ = 4;
 				statusEffect_ = STATUS_EFFECT::NONE; //状態異常を解除
 				hasEffectMessage = true;
 			}
