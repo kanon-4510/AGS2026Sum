@@ -49,7 +49,7 @@ QuestPhase::~QuestPhase(void)
 //更新処理
 void QuestPhase::Update(void)
 {
-	//ProcessTutorial();
+	ProcessTutorial();
 
 	//ターン管理関数
 	ManageTurn();
@@ -66,7 +66,7 @@ void QuestPhase::Draw(void)
 	if (bgImageHandle_ != -1)DrawGraph(0, 0, bgImageHandle_, TRUE);//背景を描画する
 
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
-	//DrawTutorial();
+	DrawTutorial();
 
 	if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
 	{
@@ -263,6 +263,7 @@ void QuestPhase::ProcessActionLoop(void)
 	{
 		//ターン終了時にフラグを更新
 		battleStep_ = BATTLE_STEP::STATUS_EFFECT;
+		battleTurn_++;
 		currentActionIdx_ = 0;
 		battleMessage_ = "";
 		return;
@@ -770,6 +771,8 @@ void QuestPhase::DrawCommandSelection(void)
 
 void QuestPhase::ProcessTutorial(void)
 {
+	if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
+	
 	//チュートリアルの内容をここに書く
 	if(gameScene_.GetTurn() == 1)
 	{
@@ -784,28 +787,36 @@ void QuestPhase::ProcessTutorial(void)
 			// メインコマンドは「攻撃（0）」に強制固定
 			command_ = COMMAND::ATTACK;
 
-			// もし攻撃のサブメニュー（単体・全体）まで開いているなら、
-			// 最初の選択肢「単体攻撃（0）」にカーソルを強制ロック！
+			//もし攻撃のサブメニュー（単体・全体）まで開いているなら、
+			//最初の選択肢「単体攻撃（0）」にカーソルを強制ロック！
 			if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
 			{
 				subMenuCursor_ = 0;
 				// このあとの通常のカーソル移動キーの入力を無視するフラグ（returnなど）に繋げます
 			}
 		}
+		else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION
+			&& battleTurn_ == 2)
+		{
+			// メインコマンドは「攻撃（0）」に強制固定
+			command_ = COMMAND::MAGIC;
+		}
 	}
 }
 void QuestPhase::DrawTutorial(void)
 {
+	if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
+
 	tutorialMessage_ = "";
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
-		tutorialMessage_ = "チュートリアル\nここでは難易度を選択できます\n最初は優しいを選んで下さい\nEnterキーを押してみましょう";
+		tutorialMessage_ = "チュートリアル\nここではステージを選択できます\n好きなステージを選んで下さい\nEnterキーを押してみましょう";
 	}
 	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&&battleTurn_ == 1)
 	{
-		tutorialMessage_ = "チュートリアル\n最初のターンは攻撃コマンドしか選べません！\n攻撃を選んでEnterキーを押してみましょう";
+		tutorialMessage_ = "チュートリアル\n攻撃を選びましょう！\n攻撃を選んでEnterキーを押してみましょう";
 	}
 	else if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 2)
@@ -826,6 +837,6 @@ void QuestPhase::DrawTutorial(void)
 	//例：最初のターンだけ特別な説明を表示するなど
 	if(gameScene_.GetTurn() == 1)
 	{
-		DrawFormatString(0, 900, 0xFFFFFF, tutorialMessage_.c_str());
+		DrawFormatString(0, 500, 0xFFFFFF, tutorialMessage_.c_str());
 	}
 }

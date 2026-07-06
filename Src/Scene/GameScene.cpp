@@ -149,15 +149,15 @@ void GameScene::DrawTutorial(void)
 	//チュートリアルの処理
 	if (turn_ == 1)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：クエストフェーズの説明");
+		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：クエストフェーズの説明\nここでは敵と戦って経験値を獲得します");
 	}
 	else if (turn_ == 2)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：授業フェーズの説明");
+		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：授業フェーズの説明\nここではスキルを学びます");
 	}
 	else if (turn_ == 3)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：資格試験フェーズの説明");
+		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：資格試験フェーズの説明\nここでは職業を選択できます");
 	}
 }
 
