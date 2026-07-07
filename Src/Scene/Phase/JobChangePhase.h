@@ -26,6 +26,7 @@ public:
 
 private:
 	PlayerStatus* playerStatus_; // プレイヤーのステータスへのポインタ
+	InputManager& ins_ = InputManager::GetInstance();
 	int selectedIndex_ = 0; // 現在選択されている職業のインデックス
 
 	int timer_ = 200; //メッセージ表示のカウントを管理する変数

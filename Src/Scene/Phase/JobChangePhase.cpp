@@ -14,24 +14,22 @@ void JobChangePhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
 
-	/*if (ins.IsTrgDown(KEY_INPUT_SPACE))
-	{
-		isFinished_ = true;
-	}*/
-
     //プレイヤーが持っている全職業リストを取得
     auto& jobList = playerStatus_->GetJobList();
 
     //上下キーで選択中の職業（selectedIndex）を動かす処理
-    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_UP)) {
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_UP) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP)) {
         selectedIndex_ = (selectedIndex_ - 1 + jobList.size()) % jobList.size();
     }
-    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_DOWN)) {
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_DOWN) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN)) {
         selectedIndex_ = (selectedIndex_ + 1) % jobList.size();
     }
 
     //決定キーが押されたら
-    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN)) {
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
         const auto& selectedJob = jobList[selectedIndex_];
 
         //現在の職業名を取得
@@ -53,7 +51,8 @@ void JobChangePhase::Update(void)
             //条件を満たしていない
         }
     }
-    else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB)) {
+    else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
         //キャンセルキーが押されたらフェーズを終了する
         PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
         isFinished_ = true;

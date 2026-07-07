@@ -138,7 +138,8 @@ void QuestPhase::ProcessDifficulty(void)
 	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
 
 	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//選んだメニューの「文字列」で分岐させる
 		if (locationMenu_[difficultyCursor_] == "エクストラ")
@@ -170,7 +171,8 @@ void QuestPhase::ProcessDifficulty(void)
 
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
-	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB)) {
+	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
 		//キャンセルキーが押されたらフェーズを終了する
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
 		isFinished_ = true;
@@ -553,7 +555,8 @@ void QuestPhase::ProcessActionLoop(void)
 	}
 
 	//②Enterキー待ちと、連戦(Wave)の処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 
 		battleMessage_ = "";
@@ -700,7 +703,8 @@ void QuestPhase::ProcessStatusEffect(void)
 
 	//ここに来るのは、battleMessage_ に何かしらの文章が入っている場合
 	//Enterキー待ちをしてから次のターン（またはゲームオーバー）へ進む
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		battleMessage_ = ""; //メッセージをリセット
 		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
@@ -712,7 +716,8 @@ void QuestPhase::ProcessStatusEffect(void)
 void QuestPhase::DisplayResult(void)
 {
 	//経験値獲得は ProcessActionLoop内で敵を倒すたびに行うように変更したため、ここは次へ進む処理のみ
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 		isFinished_ = true; //フェーズ終了
@@ -732,7 +737,8 @@ void QuestPhase::ProcessPlayerAction()
 	command_ = static_cast<COMMAND>(commandIndex);
 
 	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//沈黙状態の時は、魔法を選ぼうとしても決定できない
 		if (command_ == COMMAND::MAGIC && statusEffect_ == STATUS_EFFECT::SILENCE)
@@ -779,7 +785,8 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
 	//--- 決定処理 ---
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく
 		//例：chosenSubMenuIdx_ = subMenuCursor_; 
@@ -842,7 +849,8 @@ void QuestPhase::ProcessPlayerSubAction(void)
 
 		battleStep_ = BATTLE_STEP::MAGIC_SELECTION;
 	}
-	if (ins_.IsTrgDown(KEY_INPUT_TAB))
+	if (ins_.IsTrgDown(KEY_INPUT_TAB) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
@@ -858,14 +866,16 @@ void QuestPhase::MagicSelection()
 	Utility::ProcessCommandMenuSelection(magicMenuCursor_, maxMagItems);
 
 	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//ここで最終的に何番目の魔法・状態異常を選んだかを記憶する
 		chosenMagicIdx_ = magicMenuCursor_;
 
 		battleStep_ = BATTLE_STEP::DETERMINE;
 	}
-	if (ins_.IsTrgDown(KEY_INPUT_TAB))
+	if (ins_.IsTrgDown(KEY_INPUT_TAB) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		battleStep_ = BATTLE_STEP::COMMAND_SUB_SELECTION;
 	}

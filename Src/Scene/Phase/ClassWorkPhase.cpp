@@ -112,7 +112,8 @@ void ClassWorkPhase::ProcessClassworkSelection(void)
 void ClassWorkPhase::ProcessClassworkDecision()
 {
 	//ãZî\ílÇÃè„è∏
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		int rand = GetRand(30)-15;	//óêêîÇÃéÊìæ
 		int skill = SKILL_UP + rand;//è„è∏ïùÇÃämíË
@@ -151,7 +152,8 @@ void ClassWorkPhase::ProcessClassworkDecision()
 			break;
 		}
 	}
-	if (ins_.IsTrgDown(KEY_INPUT_TAB) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	if (ins_.IsTrgDown(KEY_INPUT_TAB) || 
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL;
 		isFinished_ = true;
