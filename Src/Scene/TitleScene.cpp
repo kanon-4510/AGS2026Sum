@@ -82,7 +82,7 @@ void TitleScene::ProcessTitleSelection(void)
 void TitleScene::ProcessTitleDecision(void)
 {
 	if(ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		switch (titleSelection_)
 		{

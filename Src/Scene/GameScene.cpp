@@ -183,7 +183,8 @@ void GameScene::ProcessPhaseSelection(void)
 
 void GameScene::ProcessPhaseDecision()
 {
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		switch (phase_) 
 		{
