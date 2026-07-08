@@ -28,6 +28,7 @@
     <ClCompile Include="Src\Scene\TitleScene.cpp" />
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
     <ClCompile Include="Src\Object\Enemy.cpp" />
+    <ClCompile Include="Src\Scene\Phase\EventPhase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Object\JobData.h" />
@@ -58,5 +59,6 @@
     <ClInclude Include="Src\Scene\TitleScene.h" />
     <ClInclude Include="Src\Utility\AsoUtility.h" />
     <ClInclude Include="Src\Object\Enemy.h" />
+    <ClInclude Include="Src\Scene\Phase\EventPhase.h" />
   </ItemGroup>
 </Project>

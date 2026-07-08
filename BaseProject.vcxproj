@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Scene\Phase\EventPhase.cpp" />
     <ClCompile Include="Src\Object\Enemy.cpp" />
     <ClCompile Include="Src\Object\JobData.cpp" />
     <ClCompile Include="Src\Object\PlayerStatus.cpp" />
@@ -48,6 +49,7 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Scene\Phase\EventPhase.h" />
     <ClInclude Include="Src\Object\Enemy.h" />
     <ClInclude Include="Src\Object\JobData.h" />
     <ClInclude Include="Src\Object\PlayerStatus.h" />

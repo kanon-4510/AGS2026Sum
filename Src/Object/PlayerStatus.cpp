@@ -281,3 +281,41 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 
 	return bonus;
 }
+
+int PlayerStatus::AddSkillPoint(SkillType type, int baseAmount)
+{
+	float multiplier = 1.0f; // 基本は等倍（1.0倍）
+
+	// 選んだルートと、上がる技能の組み合わせでボーナス（1.5倍など）をかける
+	switch (currentRoute_)
+	{
+	case PLAYER_ROUTE::BREAKTHROUGH: //打破：武術と考古学
+		if (type == SkillType::MartialArts || type == SkillType::Archaeology) multiplier = 1.5f;
+		break;
+	case PLAYER_ROUTE::SALVATION:    //救世：信仰と薬学
+		if (type == SkillType::Faith || type == SkillType::Pharmacy) multiplier = 1.5f;
+		break;
+	case PLAYER_ROUTE::TRUTH:        //真理：魔法知識と占星術
+		if (type == SkillType::MagicKnowledge || type == SkillType::Astrology) multiplier = 1.5f;
+		break;
+	case PLAYER_ROUTE::SELFLESS:     //無欲：すべてに少しボーナス
+		multiplier = 1.3f;
+		break;
+	}
+
+	// 実際の獲得量を計算（端数切り捨て）
+	int finalAmount = static_cast<int>(baseAmount * multiplier);
+
+	// 該当する技能に加算
+	switch (type)
+	{
+	case SkillType::MartialArts   : martialArts_ += finalAmount; break;
+	case SkillType::Archaeology	  : archaeology_ += finalAmount; break;
+	case SkillType::Faith		  : faith_ += finalAmount; break;
+	case SkillType::Pharmacy	  : pharmacy_ += finalAmount; break;
+	case SkillType::MagicKnowledge: magicKnowledge_ += finalAmount; break;
+	case SkillType::Astrology	  : astrology_ += finalAmount; break;
+	}
+
+	return finalAmount;
+}

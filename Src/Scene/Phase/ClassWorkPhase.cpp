@@ -55,32 +55,32 @@ void ClassWorkPhase::DrawSkillBonus(void)
 	{
 	case CLASSWORK_SELECT::PHARMACY:
 		effectName = "回復量";
-		reqInterval = 10; // 10ごとにアップ
+		reqInterval = 10; //10ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::MARTIALARTS:
 		effectName = "会心率";
-		reqInterval = 5; // 5ごとにアップ
+		reqInterval = 5; //5ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::MAGICKNOWLEDGE:
-		effectName = "魔法威力";
-		reqInterval = 10; // 10ごとにアップ
+		effectName = "使える魔法の種類";
+		reqInterval = 50; //50ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::FAITH:
 		effectName = "被ダメージ軽減";
-		reqInterval = 10; // 10ごとにアップ
+		reqInterval = 10; //10ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ARCHAEOLOGY:
 		effectName = "獲得経験値";
-		reqInterval = 5; // 5ごとにアップ
+		reqInterval = 5; //5ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ASTROLOGY:
 		effectName = "回避率";
-		reqInterval = 5; // 5ごとにアップ
+		reqInterval = 5; //5ごとにアップ
 		break;
 	}
 
@@ -123,39 +123,32 @@ void ClassWorkPhase::ProcessClassworkDecision()
 		int rand = GetRand(30)-15;	//乱数の取得
 		int skill = SKILL_UP + rand;//上昇幅の確定
 
-		switch (select_) 
+		switch (select_)
 		{
 		case CLASSWORK_SELECT::PHARMACY:
-			playerStatus_->pharmacy_ += skill;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
-			isFinished_ = true;
+			//ボーナス計算をする関数に渡す
+			playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Pharmacy, skill);
 			break;
 		case CLASSWORK_SELECT::MARTIALARTS:
-			playerStatus_->martialArts_ += skill;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
-			isFinished_ = true;
+			playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MartialArts, skill);
 			break;
 		case CLASSWORK_SELECT::MAGICKNOWLEDGE:
-			playerStatus_->magicKnowledge_ += skill;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
-			isFinished_ = true;
+			playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MagicKnowledge, skill);
 			break;
 		case CLASSWORK_SELECT::FAITH:
-			playerStatus_->faith_ += skill;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
-			isFinished_ = true;
+			playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Faith, skill);
 			break;
 		case CLASSWORK_SELECT::ARCHAEOLOGY:
-			playerStatus_->archaeology_ += skill;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
-			isFinished_ = true;
+			playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Archaeology, skill);
 			break;
 		case CLASSWORK_SELECT::ASTROLOGY:
-			playerStatus_->astrology_ += skill;
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
-			isFinished_ = true;
+			playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Astrology, skill);
 			break;
 		}
+
+		// どの授業を選んでも最終的にターンを進めるので、外にまとめる！
+		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
+		isFinished_ = true;
 	}
 	if (ins_.IsTrgDown(KEY_INPUT_TAB) || 
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))

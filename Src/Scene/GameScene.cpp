@@ -7,6 +7,7 @@
 #include "Phase/QuestPhase.h"
 #include "Phase/ClassWorkPhase.h"
 #include "Phase/JobChangePhase.h"
+#include "Phase/EventPhase.h"
 #include "GameScene.h"
 
 //デフォルトコンストラクタ
@@ -51,23 +52,33 @@ void GameScene::Update(void)
 	}
 	
 	//まず現在のフェーズのUpdateを回す
-	if (currentPhase_) {
+	if (currentPhase_) 
+	{
 		currentPhase_->Update();
 
 		//フェーズが終わった瞬間の処理
-		if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::NEXT_TURN
-			&& currentPhase_->IsFinished()) {
-			currentPhase_.reset(); // クエスト終了！
-			turn_++; //ターンを進める
-			isInputBlocked_ = true; // ←ここで「次のフレームは入力を受け付けない」フラグを立てる
-			return;
-		}
-		else if (currentPhase_->phaseResult_ == PhaseBase::PHASE_RESULT::CANCEL
-			&& currentPhase_->IsFinished())
+		if (currentPhase_->IsFinished())
 		{
-			currentPhase_.reset(); // クエスト終了！
-			isInputBlocked_ = true;
-			return; //コマンド選択をやり直す
+			//フェーズの終了結果を一時保存してからリセットする
+			auto result = currentPhase_->phaseResult_;
+			currentPhase_.reset();
+
+			//クエストなどをクリアして、ターンを進める場合
+			if (result == PhaseBase::PHASE_RESULT::NEXT_TURN)
+			{
+				turn_++; //ターンを進める
+
+				//4ターン目になった瞬間の処理
+				if (turn_ == 4 && playerStatus_->currentRoute_ == PLAYER_ROUTE::NONE)
+				{
+					//メニュー選択に戻さずそのままイベントを強制スタート
+					currentPhase_ = std::make_unique<EventPhase>(playerStatus_);
+				}
+			}
+			//CANCELの場合などは turn_ は増えず、そのまま拠点メニューに戻る
+
+			isInputBlocked_ = true; //次のフレームは入力を受け付けないフラグを立てる
+			return;
 		}
 	}
 
@@ -99,6 +110,19 @@ void GameScene::Draw(void)
 		DrawGraph(0, 0, stageImg_, TRUE);
 		//メニュー画面の描画処理
 		DrawFormatString(0, 0, 0xFFFFFF, "Scene : Game 現在のターン %d", turn_);
+
+		//現在のルートを文字列に変換して表示する
+		std::string routeName = "未選択";
+		switch (playerStatus_->currentRoute_)
+		{
+		case PLAYER_ROUTE::BREAKTHROUGH: routeName = "打破"; break;
+		case PLAYER_ROUTE::SALVATION:    routeName = "救世"; break;
+		case PLAYER_ROUTE::TRUTH:        routeName = "真理"; break;
+		case PLAYER_ROUTE::SELFLESS:     routeName = "無欲"; break;
+		}
+		// ターンの少し下に黄色っぽく表示
+		DrawFormatString(0, 30, GetColor(255, 255,0), "現在のルート : %s", routeName.c_str());
+
 		if (SceneManager::GetInstance().IsTutorialEnabled())
 		{
 			DrawTutorial();
