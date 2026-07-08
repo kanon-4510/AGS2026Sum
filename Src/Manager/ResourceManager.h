@@ -20,6 +20,7 @@ public:
 		GAME_OVER,
 		//プレイヤー
 		PLAYER,
+		BATTLE_PLAYER,
 		//ステージ
 		STAGE
 	};

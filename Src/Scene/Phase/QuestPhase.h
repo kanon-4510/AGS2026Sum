@@ -213,7 +213,11 @@ private:
 	//s“®‚Ì‡”Ô‚É]‚Á‚Äˆ—‚ğs‚¤ŠÖ”
 	void ProcessActionLoop(void);
 	
-	void ProcessStatusEffect(void);//ó‘ÔˆÙí
+	//ó‘ÔˆÙí
+	void ProcessStatusEffect(void);
+
+	//“G‚Ì€–S”»’è
+	void CheckEnemyDeath(void);
 
 	//Œ‹‰Ê‚ğ•\¦‚·‚éŠÖ”
 	void DisplayResult(void);
