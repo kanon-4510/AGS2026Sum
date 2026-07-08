@@ -177,8 +177,13 @@ Enemy* SpawnEnemyByTurn(int turn)
     int spawnX = 270;
     int spawnY = 180;
 
+    if (turn >= 16)
+    {
+        std::vector<MotionConfig> BossAnims;
+        return new Enemy("魔王", 999, 50, 50, 50, 50, 0, "こうげき", "回復", "状態異常", BossAnims, spawnX, spawnY);
+    }
     //13〜15ターン目
-    if (turn >= 13)
+    else if (turn >= 13)
     {
         int enemyType = GetRand(4);
         switch (enemyType)

@@ -33,5 +33,6 @@ private:
 
 	bool isFinished_ = false; // フェーズが終了したかどうかを管理するフラグ
 
+	void DrawTutorial(void); //チュートリアルの描画処理
 };
 

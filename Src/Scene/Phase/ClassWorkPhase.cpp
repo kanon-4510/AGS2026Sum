@@ -3,9 +3,10 @@
 #include "../../Common/Color.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
+#include "../GameScene.h"
 #include "ClassWorkPhase.h"
 
-ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus):playerStatus_(playerstatus)
+ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus, GameScene& gameScene):playerStatus_(playerstatus), gameScene_(gameScene)
 {
 
 }
@@ -18,6 +19,8 @@ void ClassWorkPhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
 
+	ProcessTutorial();
+
 	ProcessClassworkSelection();
 	ProcessClassworkDecision();
 }
@@ -25,6 +28,8 @@ void ClassWorkPhase::Update(void)
 void ClassWorkPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
+
+	DrawTutorial();
 
 	DrawFormatString(100, 100, (select_ == CLASSWORK_SELECT::PHARMACY ? Color::YELLOW : Color::WHITE), "薬学調合");
 	DrawFormatString(100, 140, (select_ == CLASSWORK_SELECT::MARTIALARTS ? Color::YELLOW : Color::WHITE), "武術訓練");
@@ -158,4 +163,31 @@ void ClassWorkPhase::ProcessClassworkDecision()
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL;
 		isFinished_ = true;
 	}
+}
+
+void ClassWorkPhase::ProcessTutorial(void)
+{
+	if (!SceneManager::GetInstance().IsTutorialEnabled())
+	{
+		return;
+	}
+	if (gameScene_.GetTurn() == 2)
+	{
+		select_ = CLASSWORK_SELECT::MAGICKNOWLEDGE;
+	}
+}
+
+void ClassWorkPhase::DrawTutorial(void)
+{
+	if (!SceneManager::GetInstance().IsTutorialEnabled())
+	{
+		return;
+	}
+	if (gameScene_.GetTurn() == 2)
+	{
+		DrawString(0, 500
+			,"ここでは授業を選択することができます\n受ける授業によって得られるスキルが異なります\n今回は魔法知識を選択します"
+			, 0xFFFFFF);
+	}
+		
 }
