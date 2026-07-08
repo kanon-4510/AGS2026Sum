@@ -248,7 +248,6 @@ void QuestPhase::DetermineActionOrder(void)
 		{
 			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF;       //弱化魔法
 		}
-		// 将来のバフ・デバフ魔法もここに条件を足すだけ！
 	}
 
 	//敵の追加（DecideActionでランダムに行動を決定）
@@ -341,7 +340,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (roll < criticalChance)
 					{
 						battleMessage_ += "クリティカルヒット！";
-						activeEnemy_->Damage(playerStatus_->Attack() * 2);
+						activeEnemy_->Damage(playerStatus_->Attack() * 3);
 					}
 					else
 					{
@@ -368,28 +367,23 @@ void QuestPhase::ProcessActionLoop(void)
 					case MAGIC_TYPE::DEBUFF:
 						if (chosenMagicIdx_ == 0)
 						{
-							battleMessage_ += unit.name + " の毒魔法！";
+							battleMessage_ += unit.name + " のポイズン！";
 							enemyStatusEffect_ = STATUS_EFFECT::POISON;
 						}
 						else if (chosenMagicIdx_ == 1)
 						{
-							battleMessage_ += unit.name + " の凍結魔法！";
+							battleMessage_ += unit.name + " のフリーズ！";
 							enemyStatusEffect_ = STATUS_EFFECT::FREEZE;
 						}
 						else if (chosenMagicIdx_ == 2)
 						{
-							battleMessage_ += unit.name + " の閃光！";
+							battleMessage_ += unit.name + " のフラッシュ！";
 							enemyStatusEffect_ = STATUS_EFFECT::FLASH;
 						}
 						else if (chosenMagicIdx_ == 3)
 						{
-							battleMessage_ += unit.name + " の呪い！";
+							battleMessage_ += unit.name + " のカース！";
 							enemyStatusEffect_ = STATUS_EFFECT::CURSE;
-						}
-						else if (chosenMagicIdx_ == 4)
-						{
-							battleMessage_ += unit.name + " の沈黙魔法！";
-							enemyStatusEffect_ = STATUS_EFFECT::SILENCE;
 						}
 						break;
 					default:
@@ -608,42 +602,42 @@ void QuestPhase::ProcessActionLoop(void)
 			else
 			{
 				//全Waveクリア 経験値と場所ボーナスを付与
-				int rand = GetRand(20) - 10;	//乱数の取得
-				int statusBonus = 15+rand;
+				int rand = 15+(GetRand(20)-10);	//乱数の取得
+				int statusBonus = 0;//実際にボーナス計算された後の値を入れる変数
 
 				switch (location_)
 				{
 				case QUEST_LOCATION::PLAINS:
-					playerStatus_->GetExp(statusBonus);
-					locationRewardMsg_ = "追加で経験値を" + std::to_string(statusBonus) + "獲得した";
+					playerStatus_->GetExp(rand);
+					locationRewardMsg_ = "追加で経験値を" + std::to_string(rand) + "獲得した";
 					break;
 				case QUEST_LOCATION::FOREST:
-					playerStatus_->pharmacy_ += statusBonus;
+					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Pharmacy, rand);
 					locationRewardMsg_ = "追加で薬学を" + std::to_string(statusBonus) + "獲得した";
 					break;
 				case QUEST_LOCATION::SHRINE:
-					playerStatus_->martialArts_ += statusBonus;
+					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MartialArts, rand);
 					locationRewardMsg_ = "追加で武術を" + std::to_string(statusBonus) + "獲得した";
 					break;
 				case QUEST_LOCATION::CONTINENT:
-					playerStatus_->magicKnowledge_+=statusBonus;
+					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MagicKnowledge, rand);
 					locationRewardMsg_ = "追加で魔法知識を" + std::to_string(statusBonus) + "獲得した";
 					break;
 				case QUEST_LOCATION::CATHEDRAL:
-					playerStatus_->faith_ += statusBonus;
+					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Faith, rand);
 					locationRewardMsg_ = "追加で信仰を" + std::to_string(statusBonus) + "獲得した";
 					break;
 				case QUEST_LOCATION::RUINS:
-					playerStatus_->archaeology_ += statusBonus;
+					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Archaeology, rand);
 					locationRewardMsg_ = "追加で考古学を" + std::to_string(statusBonus) + "獲得した";
 					break;
 				case QUEST_LOCATION::HILL:
-					playerStatus_->astrology_ += statusBonus;
+					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Astrology,rand);
 					locationRewardMsg_ = "追加で占星術を" + std::to_string(statusBonus) + "獲得した";
 					break;
 				}
 
-				if (isHellQuest_)playerStatus_->GetExp(100);//激ムズクエストは莫大な経験値を付与
+				if (isHellQuest_)playerStatus_->GetExp(150);//激ムズクエストは莫大な経験値を付与
 
 				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 				battleStep_ = BATTLE_STEP::RESULT;
@@ -671,6 +665,20 @@ void QuestPhase::ProcessStatusEffect(void)
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ = activeEnemy_->GetName() + "は毒のダメージを受けた";
 			activeEnemy_->Damage(1);
+			hasEffectMessage = true;
+		}
+		else if (enemyStatusEffect_ == STATUS_EFFECT::CURSE)
+		{
+			enemyCurs_--;
+			if (enemyCurs_ <= 0)
+			{
+				battleMessage_ = activeEnemy_->GetName()+"にかかった呪いが発動した……";
+				//activeEnemy_->currentHp_=1; //殺す
+			}
+			else
+			{
+				battleMessage_ = "呪いまで あと " + std::to_string(enemyCurs_) + "ターン";
+			}
 			hasEffectMessage = true;
 		}
 		//定数ダメージ(poison)
@@ -795,7 +803,7 @@ void QuestPhase::ProcessPlayerSubAction(void)
 {
 	//選択肢の数を、埋め込まれた配列のサイズから自動取
 	int maxSubItems = static_cast<int>(subActionMessages_.size());
-	if (maxSubItems == 0) return; // 念のため
+	if (maxSubItems == 0) return; //念のため
 	
 	//カーソル移動処理
 	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
@@ -832,11 +840,11 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		case 1:
 			//回復
 			magicTypeMessages_.push_back("ヒール1");
-			if (playerStatus_->pharmacy_ >= 70)
+			if (playerStatus_->magicKnowledge_ >= 70)
 			{
 				magicTypeMessages_.push_back("ヒール2");
 			}
-			if (playerStatus_->pharmacy_ >= 140)
+			if (playerStatus_->magicKnowledge_ >= 140)
 			{
 				magicTypeMessages_.push_back("ヒール3");
 			}
@@ -849,13 +857,17 @@ void QuestPhase::ProcessPlayerSubAction(void)
 			//状態異常付与
 			magicTypeMessages_.push_back("毒");
 
-			if (playerStatus_->archaeology_ >= 70)
+			if (playerStatus_->magicKnowledge_ >= 10)
 			{
 				magicTypeMessages_.push_back("凍結");
 			}
-			if (playerStatus_->archaeology_ >= 140)
+			if (playerStatus_->magicKnowledge_ >= 10)
 			{
 				magicTypeMessages_.push_back("閃光");
+			}
+			if (playerStatus_->magicKnowledge_ >= 10)
+			{
+				magicTypeMessages_.push_back("呪い");
 			}
 			break;
 		default:

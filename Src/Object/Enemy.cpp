@@ -111,7 +111,7 @@ void Enemy::Update()
     }
 }
 
-//DxLibの描画処理（メインループ内で毎フレーム呼び出す）
+//描画処理（メインループ内で毎フレーム呼び出す）
 void Enemy::Draw() const 
 {
     if (IsDead()) return; //死んでいたら描画しない
@@ -119,7 +119,7 @@ void Enemy::Draw() const
     //1.敵の画像を描画
     if (images_[currentAnim_][currentFrame_] > 0)
     {
-        DxLib::DrawGraph(x_, y_, images_[currentAnim_][currentFrame_], true);
+        DrawRotaGraph(x_,y_,2.5,0,images_[currentAnim_][currentFrame_],true);
     }
 
     //2. 敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255) ）
@@ -174,8 +174,8 @@ void Enemy::InitAnimation(const std::vector<MotionConfig>& motionList)
 Enemy* SpawnEnemyByTurn(int turn)
 {
     //画面中央付近に表示するための基準座標
-    int spawnX = 270;
-    int spawnY = 180;
+    int spawnX = 300;
+    int spawnY = 300;
 
     //13〜15ターン目
     if (turn >= 13)
@@ -390,8 +390,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Skelton/Warrior/Attack_3.png",      1, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Warrior/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Warrior/Dead.png",          4, 1, 128, 128 }};
-            return new Enemy("剣スケルトン", 50, 10, 10, 10, 10, 0, "こうげき", "ざんげき", "まもる", skeletonWarriorAnims, spawnX, spawnY);
-        }
+            return new Enemy("剣スケルトン", 50, 10, 10, 10, 10, 0, "こうげき", "ざんげき", "まもる", skeletonWarriorAnims, spawnX, spawnY);}
         }
     }
     //1〜3ターン目
@@ -407,8 +406,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Slime/Blue/Attack_1.png",      10, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Blue/Attack_2.png",      13, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Blue/Hurt.png",          6, 1, 128, 128 },
-                { "Data/Image/Enemy/Slime/Blue/Dead.png",          3, 1, 128, 128 }
-            };
+                { "Data/Image/Enemy/Slime/Blue/Dead.png",          3, 1, 128, 128 }};
             return new Enemy("スライム", 26, 1, 1, 1, 7, 5, "こうげき", "こうげき", "パンチ", slimeAnims, spawnX, spawnY);
         }
         case 1: {
@@ -418,8 +416,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Wolf/Red/Attack_1.png",      4, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/Red/Attack_2.png",      7, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/Red/Hurt.png",          2, 1, 128, 128 },
-                { "Data/Image/Enemy/Wolf/Red/Dead.png",          2, 1, 128, 128 }
-            };
+                { "Data/Image/Enemy/Wolf/Red/Dead.png",          2, 1, 128, 128 }};
             return new Enemy("オオカミ男", 21, 1, 1, 1, 12, 8, "こうげき", "こうげき", "ひっかく", WerewolfAnims, spawnX, spawnY);
         }
         case 2: {
@@ -429,8 +426,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Skelton/Archer/Attack_1.png",      4, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Attack_2.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Hurt.png",          2, 1, 128, 128 },
-                { "Data/Image/Enemy/Skelton/Archer/Dead.png",          5, 1, 128, 128 }
-            };
+                { "Data/Image/Enemy/Skelton/Archer/Dead.png",          5, 1, 128, 128 }};
             return new Enemy("弓スケルトン",21,1,1,1, 9, 7, "こうげき", "どくのや", "こうげき", skeletonArcherAnims, spawnX, spawnY);
         }
         case 3: {
@@ -440,10 +436,8 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Zombie/Attack.png",     4, 1, 128, 128 },
                 { "Data/Image/Enemy/Zombie/Attack.png",     4, 1, 128, 128 },
                 { "Data/Image/Enemy/Zombie/Hurt.png",       4, 1, 128, 128 },
-                { "Data/Image/Enemy/Zombie/Dead.png",       5, 1, 128, 128 }
-            };
-            return new Enemy("ゾンビ", 21,2,2,2,9,6,"こうげき", "こうげき", "こうげき", zombieAnims, spawnX, spawnY);
-        }
+                { "Data/Image/Enemy/Zombie/Dead.png",       5, 1, 128, 128 }};
+            return new Enemy("ゾンビ", 21,2,2,2,9,6,"こうげき", "こうげき", "こうげき", zombieAnims, spawnX, spawnY);}
         }
     }
 }
@@ -503,10 +497,8 @@ Enemy* SpawnRushEnemy(int stage)
                 { "Data/Image/Enemy/Gorgon/Evil/Attack_2.png",     10, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Evil/Attack_3.png",      5, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Evil/Hurt.png",          3, 1, 128, 128 },
-                { "Data/Image/Enemy/Gorgon/Evil/Dead.png",          3, 1, 128, 128 }
-        };
-        return new Enemy("イビルゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "毒牙", "石化の魔眼", evilGorgonAnims, spawnX, spawnY);
-    }
+                { "Data/Image/Enemy/Gorgon/Evil/Dead.png",          3, 1, 128, 128 }};
+        return new Enemy("イビルゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "毒牙", "石化の魔眼", evilGorgonAnims, spawnX, spawnY);}
     }
     return nullptr;
 }

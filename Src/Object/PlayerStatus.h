@@ -3,6 +3,16 @@
 #include <string>
 #include <vector>
 
+	//ルート
+	enum class PLAYER_ROUTE 
+	{
+		NONE,           //未選択（1?3ターン）
+		BREAKTHROUGH,   //打破
+		SALVATION,      //救世
+		TRUTH,          //真理
+		SELFLESS        //無欲
+	};
+
 class PlayerStatus
 {
 public:
@@ -45,26 +55,38 @@ public:
 	int archaeology_ = 0;
 	int astrology_ = 0;
 
+	// 追加：ボーナス計算付きのポイント獲得関数
+	int AddSkillPoint(SkillType type, int baseAmount);
+
 	//追加効果の種類
-	enum class BonusType {
-		ItemBonus,      // 薬学：アイテム効果上昇
-		AttackBonus,    // 武術：攻撃力上昇
-		MagicBonus,     // 魔法知識：魔法威力上昇
-		DefenseBonus,   // 信仰：ダメージ軽減
-		ExpBonus,       // 考古学：経験値上昇
-		LuckBonus       // 占星術：運の上昇
+	enum class BonusType 
+	{
+		ItemBonus,      //薬学　　：アイテム効果上昇
+		AttackBonus,    //武術　　：攻撃力上昇
+		MagicBonus,     //魔法知識：魔法の使用許可
+		DefenseBonus,   //信仰　　：ダメージ軽減
+		ExpBonus,       //考古学　：経験値上昇
+		LuckBonus       //占星術　：運の上昇
 	};
 
 	//職業ごとのステータスボーナス
-	struct JobBonus {
+	struct JobBonus 
+	{
 		int hp = 0;
 		int power = 0;
 		int magic = 0;
 		int speed = 0;
 		int luck = 0;
 	};
+	PLAYER_ROUTE currentRoute_ = PLAYER_ROUTE::NONE; //現在のルート
 
-	std::string job = "魔法使い";	//現在の職業
+	//技能ボーナス用の補正倍率（初期値は1.0倍）
+	float attackMultiplier_ = 1.0f;//攻撃力補正
+	float maxHpMultiplier_ = 1.0f; //最大HP補正
+	float maxMpMultiplier_ = 1.0f; //最大MP補正
+	float speedMultiplier_ = 1.0f; //素早さ・回避補正
+
+	std::string job = "見習い魔女";	//現在の職業
 	std::vector<JobData> jobList;	//職業リストを作成
 
 	PlayerStatus();

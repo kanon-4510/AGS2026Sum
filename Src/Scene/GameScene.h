@@ -15,6 +15,7 @@ public:
 		PHASE_CLASSWORK,	//授業
 		PHASE_JOB_CHANGE,	//資格試験
 		PHASE_FINAL,		//最終日
+		PHASE_EVENT,		//イベント
 		MAX					//最大値
 	};
 
