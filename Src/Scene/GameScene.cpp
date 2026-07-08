@@ -204,10 +204,10 @@ void GameScene::ProcessPhaseDecision()
 			currentPhase_ = std::make_unique<QuestPhase>(playerStatus_,*this);
 			break;
 		case QUEST_PHASE::PHASE_CLASSWORK:
-			currentPhase_ = std::make_unique<ClassWorkPhase>(playerStatus_, *this);
+			currentPhase_ = std::make_unique<ClassWorkPhase>(playerStatus_,*this);
 			break;
 		case QUEST_PHASE::PHASE_JOB_CHANGE:
-			currentPhase_ = std::make_unique<JobChangePhase>(playerStatus_);
+			currentPhase_ = std::make_unique<JobChangePhase>(playerStatus_, *this);
 			break;
 		}
 	}

@@ -3,9 +3,10 @@
 #include "../../Common/Color.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
+#include "../GameScene.h"
 #include "JobChangePhase.h"
 
-JobChangePhase::JobChangePhase(PlayerStatus* playerStatus) :playerStatus_(playerStatus)
+JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene) :playerStatus_(playerStatus), gameScene_(gameScene)
 {
     playerStatus_->InitJob(); //職業の初期化
 }
@@ -160,7 +161,11 @@ void JobChangePhase::DrawTutorial(void)
 {
     if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
 
-	DrawString(0, 500
-        , "ここでは職業を選択することができます\n選ぶ職業によって得られる恩恵が変わります\n今回は一般魔法使いを選択します"
-        , Color::WHITE);
+	if (gameScene_.GetTurn() == 3)
+    {
+        DrawString(0, 500
+            , "ここでは職業を選択することができます\n選ぶ職業によって得られる恩恵が変わります\n今回は一般魔法使いを選択します"
+            , Color::WHITE);
+    }
+	
 }

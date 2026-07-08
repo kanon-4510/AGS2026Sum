@@ -3,6 +3,8 @@
 #include "PhaseBase.h"
 #include "../../Object/PlayerStatus.h"
 
+class GameScene;
+
 class JobChangePhase : public PhaseBase
 {
 public:
@@ -12,7 +14,7 @@ public:
 	static constexpr int bonusX = 400;	//職業ボーナスの描画位置X
 	static constexpr int bonusY = 100;	//職業ボーナスの描画位置Y
 
-	JobChangePhase(PlayerStatus* playerStatus);		//デフォルトコンストラクタ
+	JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ
 
 	void Update(void) override;		//更新処理
@@ -25,6 +27,7 @@ public:
 	virtual bool IsFinished() const override;
 
 private:
+	GameScene& gameScene_; // ゲームシーンへの参照
 	PlayerStatus* playerStatus_; // プレイヤーのステータスへのポインタ
 	InputManager& ins_ = InputManager::GetInstance();
 	int selectedIndex_ = 0; // 現在選択されている職業のインデックス

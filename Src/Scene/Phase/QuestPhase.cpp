@@ -4,7 +4,7 @@
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "../../Utility/AsoUtility.h"
-#include "../../Scene/GameScene.h"
+#include "../GameScene.h"
 #include "../../Object/Enemy.h"
 #include "QuestPhase.h"
 
