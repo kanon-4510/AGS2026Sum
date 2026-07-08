@@ -26,6 +26,9 @@ public:
 	constexpr static int RATE_BASE = 100;		//ステータスアップの確率の基準値
 	constexpr static int SKILL_UP_RATE = 70;	//ステータスアップの確率
 
+	constexpr static int PLAYER_POS_X = 700;	//プレイヤーの描画位置X
+	constexpr static int PLAYER_POS_Y = 200;	//プレイヤーの描画位置Y
+
 	int level_ = 1;
 	int exp_ = 0;
 	int maxHp_ = 10;
@@ -94,6 +97,9 @@ public:
 	//描画処理
 	void Draw();
 
+	//クエスト用の画像などを描画する処理
+	void DrawQuestImages();
+
 	//職業の初期化
 	void InitJob();
 
@@ -145,4 +151,7 @@ public:
 	std::string GetJobName() const { return job; }
 
 	bool hasChallengedHellQuest_ = false; //激ムズクエストに挑戦したかどうかのフラグ
+private:
+	int battlePlayer_;	//プレイヤーの画像を格納
+
 };

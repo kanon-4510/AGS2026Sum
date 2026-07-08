@@ -13,7 +13,7 @@ extern Enemy* SpawnEnemyByTurn(int currentTurn);
 extern Enemy* SpawnRushEnemy(int stage); //ラッシュ専用の敵生成関数
 
 //コンストラクタ
-QuestPhase::QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest)
+QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool isHellQuest)
 	: gameScene_(gameScene)
 	, playerStatus_(playerStatus)
 	, isHellQuest_(isHellQuest)
@@ -23,8 +23,8 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHe
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
 	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
 	battleStep_ = BATTLE_STEP::DIFFICULTY_SELECTION;
-	locationMenu_ = {"平原","魔法の森","岩山の道場","魔大陸","壊れた聖堂","古代遺跡","星の丘"};	//ここで難易度メニューを動的に作成
-	selectableLocations_ = {QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL};
+	locationMenu_ = { "平原","魔法の森","岩山の道場","魔大陸","壊れた聖堂","古代遺跡","星の丘" };	//ここで難易度メニューを動的に作成
+	selectableLocations_ = { QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL };
 
 	//13ターン目以降 かつ まだ一度も挑んでいないなら
 	if (gameScene_.GetTurn() >= 13 && !playerStatus_->hasChallengedHellQuest_)
@@ -68,7 +68,7 @@ void QuestPhase::Draw(void)
 	DrawString(0, 0, "Scene : Quest", 0xFFFFFF);
 	DrawTutorial();
 
-	if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
+	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
 	{
 		activeEnemy_->Draw(); //敵の描画
 
@@ -87,7 +87,7 @@ void QuestPhase::Draw(void)
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)//難易度選択中はコマンドやHPを表示しない
 	{
 		DrawString(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y - 30, "どこに行く？", 0xFFFFFF);
-		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y,locationMenu_, difficultyCursor_);
+		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, locationMenu_, difficultyCursor_);
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
 	{
@@ -105,7 +105,7 @@ void QuestPhase::Draw(void)
 		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
 		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, subActionMessages_, subMenuCursor_);
 	}
-	else if(battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
+	else if (battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
 	{
 		//魔法の種類の描画
 		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, magicTypeMessages_, magicMenuCursor_);
@@ -118,12 +118,14 @@ void QuestPhase::Draw(void)
 		DrawString(0, 210, "基礎ステータスが上がった！", 0xFFFFFF);
 		DrawString(0, 230, "Enterキーで次へ", 0xFFFFFF);
 	}
-	
+
 	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
 	{
 		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
 		DrawString(NEXT_MSG_X, NEXT_MSG_Y, "Enterキーで次へ", 0xFF0000);
 	}
+
+	playerStatus_->DrawQuestImages();
 }
 
 bool QuestPhase::IsFinished() const
@@ -138,7 +140,7 @@ void QuestPhase::ProcessDifficulty(void)
 	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
 
 	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
+	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//選んだメニューの「文字列」で分岐させる
@@ -225,7 +227,7 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.clear();
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
-	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0});
+	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0 });
 	if (command_ == COMMAND::ATTACK)
 	{
 		actionOrder_.back().skillName = "単体攻撃";
@@ -238,15 +240,15 @@ void QuestPhase::DetermineActionOrder(void)
 		{
 			actionOrder_.back().magicType = MAGIC_TYPE::MAGIC_ATTACK; //攻撃魔法
 		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::HEAL)) 
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::HEAL))
 		{
 			actionOrder_.back().magicType = MAGIC_TYPE::HEAL;         //回復魔法
 		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::BUFF)) 
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::BUFF))
 		{
 			actionOrder_.back().magicType = MAGIC_TYPE::BUFF;         //強化魔法
 		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::DEBUFF)) 
+		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::DEBUFF))
 		{
 			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF;       //弱化魔法
 		}
@@ -262,7 +264,7 @@ void QuestPhase::DetermineActionOrder(void)
 	}
 
 	//ソート（スピード順）
-	std::sort(actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b){return a.speed > b.speed;});
+	std::sort(actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b) {return a.speed > b.speed; });
 
 	currentActionIdx_ = 0;
 	battleStep_ = BATTLE_STEP::ACTION_LOOP;
@@ -315,7 +317,7 @@ void QuestPhase::ProcessActionLoop(void)
 			//閃光(命中低下)
 			if (!skipAction && statusEffect_ == STATUS_EFFECT::FLASH)
 			{
-				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC &&(unit.magicType == MAGIC_TYPE::MAGIC_ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
+				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC && (unit.magicType == MAGIC_TYPE::MAGIC_ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
 				{
 					if (GetRand(99) < 50) isMiss = true; //50%で外れる
 				}
@@ -326,7 +328,7 @@ void QuestPhase::ProcessActionLoop(void)
 			{
 				//メッセージは設定済みなので何もしない
 			}
-			else if(isMiss)
+			else if (isMiss)
 			{
 				battleMessage_ += "目が眩んで攻撃が外れた";
 			}
@@ -439,7 +441,7 @@ void QuestPhase::ProcessActionLoop(void)
 
 				//技の名前によって特別な効果を発動させる
 				if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
-					|| unit.skillName == "自己再生")
+					|| unit.skillName == "自己再生" || unit.skillName == "回復")
 				{
 					//Power分回復
 					int healAmount = activeEnemy_->GetPower3();
@@ -564,7 +566,7 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 
 		//倒した時の上書き
-		if (activeEnemy_->IsDead ())
+		if (activeEnemy_->IsDead())
 		{
 			battleMessage_ = activeEnemy_->GetName() + "を倒した！";
 		}
@@ -579,75 +581,8 @@ void QuestPhase::ProcessActionLoop(void)
 		//もし敵を倒していたら
 		if (activeEnemy_->IsDead())
 		{
-			//倒した敵から経験値を獲得(ゲキムズ以外)
-			if (!isHellQuest_) playerStatus_->GetExp(activeEnemy_->GetExp());
-
-			//今の敵を消去
-			delete activeEnemy_;
-			activeEnemy_ = nullptr;
-
-			int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;//最大Wave数を動的に切り替え
-
-			//連戦チェック
-			if (currentWave_ < maxWaves)
-			{
-				currentWave_++; //次のWaveへ
-				//次の敵の呼び出し分け
-				if (isHellQuest_)activeEnemy_ = SpawnRushEnemy(currentWave_ - 1); //0スタートの配列に合わせる
-				else activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); //次の敵を生成
-				
-				actionOrder_.clear(); //行動リストを綺麗に掃除
-				currentActionIdx_ = 0;//インデックスも0に戻す
-				battleMessage_ = "";  //メッセージをリセットして次のターンへ！
-				enemyStatusEffect_ = STATUS_EFFECT::NONE;
-				return;
-			}
-			else
-			{
-				//全Waveクリア 経験値と場所ボーナスを付与
-				int rand = 15+(GetRand(20)-10);	//乱数の取得
-				int statusBonus = 0;//実際にボーナス計算された後の値を入れる変数
-
-				switch (location_)
-				{
-				case QUEST_LOCATION::PLAINS:
-					playerStatus_->GetExp(rand);
-					locationRewardMsg_ = "追加で経験値を" + std::to_string(rand) + "獲得した";
-					break;
-				case QUEST_LOCATION::FOREST:
-					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Pharmacy, rand);
-					locationRewardMsg_ = "追加で薬学を" + std::to_string(statusBonus) + "獲得した";
-					break;
-				case QUEST_LOCATION::SHRINE:
-					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MartialArts, rand);
-					locationRewardMsg_ = "追加で武術を" + std::to_string(statusBonus) + "獲得した";
-					break;
-				case QUEST_LOCATION::CONTINENT:
-					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MagicKnowledge, rand);
-					locationRewardMsg_ = "追加で魔法知識を" + std::to_string(statusBonus) + "獲得した";
-					break;
-				case QUEST_LOCATION::CATHEDRAL:
-					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Faith, rand);
-					locationRewardMsg_ = "追加で信仰を" + std::to_string(statusBonus) + "獲得した";
-					break;
-				case QUEST_LOCATION::RUINS:
-					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Archaeology, rand);
-					locationRewardMsg_ = "追加で考古学を" + std::to_string(statusBonus) + "獲得した";
-					break;
-				case QUEST_LOCATION::HILL:
-					statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Astrology,rand);
-					locationRewardMsg_ = "追加で占星術を" + std::to_string(statusBonus) + "獲得した";
-					break;
-				}
-
-				if (isHellQuest_)playerStatus_->GetExp(150);//激ムズクエストは莫大な経験値を付与
-
-				wasMagicUsedLastTurn_ = magicUsedThisTurn_;
-				battleStep_ = BATTLE_STEP::RESULT;
-				statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
-				enemyStatusEffect_ = STATUS_EFFECT::NONE;
-				return;
-			}
+			CheckEnemyDeath();
+			return; //敵を倒した場合は次のターン
 		}
 
 		//敵がまだ生きていれば、次のキャラの行動へ
@@ -736,10 +671,90 @@ void QuestPhase::ProcessStatusEffect(void)
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		//もし敵を倒していたら
+		if (activeEnemy_->IsDead())
+		{
+			CheckEnemyDeath();
+			return; //敵を倒した場合は次のターン
+		}
+
 		battleMessage_ = ""; //メッセージをリセット
 		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 		currentActionIdx_ = 0;
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+	}
+}
+
+void QuestPhase::CheckEnemyDeath(void)
+{
+	//倒した敵から経験値を獲得(ゲキムズ以外)
+	if (!isHellQuest_) playerStatus_->GetExp(activeEnemy_->GetExp());
+
+	//今の敵を消去
+	delete activeEnemy_;
+	activeEnemy_ = nullptr;
+
+	int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;//最大Wave数を動的に切り替え
+
+	//連戦チェック
+	if (currentWave_ < maxWaves)
+	{
+		currentWave_++; //次のWaveへ
+		//次の敵の呼び出し分け
+		if (isHellQuest_)activeEnemy_ = SpawnRushEnemy(currentWave_ - 1); //0スタートの配列に合わせる
+		else activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn()); //次の敵を生成
+
+		actionOrder_.clear(); //行動リストを綺麗に掃除
+		currentActionIdx_ = 0;//インデックスも0に戻す
+		battleMessage_ = "";  //メッセージをリセットして次のターンへ！
+		enemyStatusEffect_ = STATUS_EFFECT::NONE;
+		return;
+	}
+	else
+	{
+		//全Waveクリア 経験値と場所ボーナスを付与
+		int rand = 15 + (GetRand(20) - 10);	//乱数の取得
+		int statusBonus = 0;//実際にボーナス計算された後の値を入れる変数
+
+		switch (location_)
+		{
+		case QUEST_LOCATION::PLAINS:
+			playerStatus_->GetExp(rand);
+			locationRewardMsg_ = "追加で経験値を" + std::to_string(rand) + "獲得した";
+			break;
+		case QUEST_LOCATION::FOREST:
+			statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Pharmacy, rand);
+			locationRewardMsg_ = "追加で薬学を" + std::to_string(statusBonus) + "獲得した";
+			break;
+		case QUEST_LOCATION::SHRINE:
+			statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MartialArts, rand);
+			locationRewardMsg_ = "追加で武術を" + std::to_string(statusBonus) + "獲得した";
+			break;
+		case QUEST_LOCATION::CONTINENT:
+			statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::MagicKnowledge, rand);
+			locationRewardMsg_ = "追加で魔法知識を" + std::to_string(statusBonus) + "獲得した";
+			break;
+		case QUEST_LOCATION::CATHEDRAL:
+			statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Faith, rand);
+			locationRewardMsg_ = "追加で信仰を" + std::to_string(statusBonus) + "獲得した";
+			break;
+		case QUEST_LOCATION::RUINS:
+			statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Archaeology, rand);
+			locationRewardMsg_ = "追加で考古学を" + std::to_string(statusBonus) + "獲得した";
+			break;
+		case QUEST_LOCATION::HILL:
+			statusBonus = playerStatus_->AddSkillPoint(PlayerStatus::SkillType::Astrology, rand);
+			locationRewardMsg_ = "追加で占星術を" + std::to_string(statusBonus) + "獲得した";
+			break;
+		}
+
+		if (isHellQuest_)playerStatus_->GetExp(150);//激ムズクエストは莫大な経験値を付与
+
+		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
+		battleStep_ = BATTLE_STEP::RESULT;
+		statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
+		enemyStatusEffect_ = STATUS_EFFECT::NONE;
+		return;
 	}
 }
 
@@ -760,7 +775,7 @@ void QuestPhase::ProcessPlayerAction()
 	int commandIndex = static_cast<int>(command_); //enum class を int に変換して操作する
 	int maxItems = static_cast<int>(COMMAND::MAX);
 
-	
+
 	//カーソル移動
 	Utility::ProcessCommandMenuSelection(commandIndex, maxItems);
 	//更新された int の値を、安全に元の enum class 型に戻して代入する
@@ -917,15 +932,15 @@ void QuestPhase::MagicSelection()
 
 void QuestPhase::DrawCommandSelection(void)
 {
-	Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y,{"攻撃","魔法"},static_cast<int>(command_));
+	Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, { "攻撃","魔法" }, static_cast<int>(command_));
 }
 
 void QuestPhase::ProcessTutorial(void)
 {
 	if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
-	
+
 	//チュートリアルの内容をここに書く
-	if(gameScene_.GetTurn() == 1)
+	if (gameScene_.GetTurn() == 1)
 	{
 		// 最初のクエスト（turn == 0）以外は通常の自由戦闘なので何もしない
 		if (gameScene_.GetTurn() != 1) return;
@@ -965,16 +980,16 @@ void QuestPhase::DrawTutorial(void)
 		tutorialMessage_ = "チュートリアル\nここではステージを選択できます\n好きなステージを選んで下さい\nEnterキーを押してみましょう";
 	}
 	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
-		&&battleTurn_ == 1)
+		&& battleTurn_ == 1)
 	{
 		tutorialMessage_ = "チュートリアル\n攻撃を選びましょう！\n攻撃を選んでEnterキーを押してみましょう";
 	}
-	else if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 2)
 	{
 		tutorialMessage_ = "チュートリアル\n次は魔法で攻撃をしましょう\n魔法を選んでEnterキーを押してみましょう";
 	}
-	else if(battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 3)
 	{
 		tutorialMessage_ = "チュートリアル\n魔法を使うと１ターンの休憩が必要です\n攻撃を選んでEnterキーを押してみましょう";
@@ -986,7 +1001,7 @@ void QuestPhase::DrawTutorial(void)
 	}
 	//チュートリアルの内容をここに書く
 	//例：最初のターンだけ特別な説明を表示するなど
-	if(gameScene_.GetTurn() == 1)
+	if (gameScene_.GetTurn() == 1)
 	{
 		DrawFormatString(0, 500, 0xFFFFFF, tutorialMessage_.c_str());
 	}

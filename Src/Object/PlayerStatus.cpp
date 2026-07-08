@@ -1,9 +1,11 @@
 #include "PlayerStatus.h"
 #include <EffekseerForDXLib.h>
 #include "../Manager/SceneManager.h"
+#include "../Manager/ResourceManager.h"
 
 PlayerStatus::PlayerStatus()
 {
+	battlePlayer_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BATTLE_PLAYER).handleId_;
 }
 
 void PlayerStatus::Draw()
@@ -56,6 +58,11 @@ void PlayerStatus::Draw()
 
 	int jobSpeedBonus = GetJobBonus().speed;
 	if (jobSpeedBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 90, GREEN, "(職業ボーナス+%d)", jobSpeedBonus);
+}
+
+void PlayerStatus::DrawQuestImages()
+{
+	DrawGraph(PLAYER_POS_X, PLAYER_POS_Y, battlePlayer_, true);
 }
 
 void PlayerStatus::InitJob()
