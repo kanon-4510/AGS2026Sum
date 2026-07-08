@@ -106,6 +106,8 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
 {
     auto& jobList = playerStatus_->GetJobList();
 
+    DrawTutorial();
+
     if (!jobList.empty() && selectedIndex_ < jobList.size()) {
 
         //Œã‚ÅŒ³‚É–ß‚¹‚é‚æ‚¤‚ÉAŒ»Ý‚Ì–{“–‚ÌE‹Æ–¼‚ð‘Þ”ð‚³‚¹‚Ä‚¨‚­
@@ -153,4 +155,13 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
 bool JobChangePhase::IsFinished() const
 {
 	return isFinished_;
+}
+
+void JobChangePhase::DrawTutorial(void)
+{
+    if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
+
+	DrawString(0, 500
+        , "‚±‚±‚Å‚ÍE‹Æ‚ð‘I‘ð‚·‚é‚±‚Æ‚ª‚Å‚«‚Ü‚·\n‘I‚ÔE‹Æ‚É‚æ‚Á‚Ä“¾‚ç‚ê‚é‰¶Œb‚ª•Ï‚í‚è‚Ü‚·\n¡‰ñ‚Íˆê”Ê–‚–@Žg‚¢‚ð‘I‘ð‚µ‚Ü‚·"
+        , Color::WHITE);
 }

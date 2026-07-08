@@ -2,6 +2,8 @@
 #include "../../Object/PlayerStatus.h"
 #include "PhaseBase.h"
 
+class GameScene;
+
 class ClassWorkPhase : public PhaseBase
 {
 public:
@@ -21,7 +23,7 @@ public:
 
 	static constexpr int SKILL_UP = 50;	//技能上昇幅
 
-	ClassWorkPhase(PlayerStatus* playerstatus);		//デフォルトコンストラクタ
+	ClassWorkPhase(PlayerStatus* playerstatus, GameScene& gameScene);		//デフォルトコンストラクタ
 	~ClassWorkPhase(void);		//デストラクタ
 
 	void Update(void) override;		//更新処理
@@ -32,6 +34,7 @@ public:
 	// フェーズが終了したかどうかを親に伝える
 	virtual bool IsFinished() const override;
 private:
+	GameScene& gameScene_;
 	PlayerStatus* playerStatus_;
 	InputManager& ins_ = InputManager::GetInstance();
 	int timer_ = 0; //フェーズの経過時間を管理するタイマー
@@ -42,4 +45,10 @@ private:
 
 	void ProcessClassworkSelection(void);	//履修選択の処理
 	void ProcessClassworkDecision(void);	//履修選択の確定
+
+	//チュートリアル
+	void ProcessTutorial(void);
+	
+	//チュートリアルの描画処理
+	void DrawTutorial(void);
 };

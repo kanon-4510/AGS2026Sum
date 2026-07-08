@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Object\Enemy.cpp" />
-    <ClCompile Include="Src\Scene\Phase\FinalPhase.cpp" />
     <ClCompile Include="Src\Object\JobData.cpp" />
     <ClCompile Include="Src\Object\PlayerStatus.cpp" />
     <ClCompile Include="Src\Scene\Phase\PhaseBase.cpp" />
@@ -50,7 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Object\Enemy.h" />
-    <ClInclude Include="Src\Scene\Phase\FinalPhase.h" />
     <ClInclude Include="Src\Object\JobData.h" />
     <ClInclude Include="Src\Object\PlayerStatus.h" />
     <ClInclude Include="Src\Scene\Phase\PhaseBase.h" />

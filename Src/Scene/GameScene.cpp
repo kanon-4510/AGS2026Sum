@@ -7,7 +7,6 @@
 #include "Phase/QuestPhase.h"
 #include "Phase/ClassWorkPhase.h"
 #include "Phase/JobChangePhase.h"
-#include "Phase/FinalPhase.h"
 #include "GameScene.h"
 
 //デフォルトコンストラクタ
@@ -44,6 +43,11 @@ void GameScene::Update(void)
 		{
 			ProcessTutorial();
 		}
+	}
+
+	if (turn_ == 16)
+	{
+		phase_ = QUEST_PHASE::PHASE_QUEST;
 	}
 	
 	//まず現在のフェーズのUpdateを回す
@@ -89,15 +93,6 @@ void GameScene::Draw(void)
 	if (currentPhase_) {
 		//ここが呼ばれていないと、どれだけ切り替わっても画面は変変わらない
 		currentPhase_->Draw();
-	}
-	else if(turn_ >= MAX_TURN){
-		DrawFormatString(0, 0, 0xFFFFFF, "Scene : Game 現在のターン %d", turn_);
-
-		int color = GetColor(255, 255, 255);
-		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
-
-		DrawFormatString(100, 100, (phase_ == QUEST_PHASE::PHASE_FINAL ? selectColor : color), "ボスバトル");
-		playerStatus_->Draw();
 	}
 	else 
 	{
@@ -163,13 +158,6 @@ void GameScene::DrawTutorial(void)
 
 void GameScene::ProcessPhaseSelection(void)
 {
-	//フェーズ選択の処理
-	if(turn_ >= MAX_TURN)
-	{
-		phase_ = QUEST_PHASE::PHASE_FINAL;
-		return;
-	}
-
 	//安全に int 型の変数に写し取る
 	int currentIndex = static_cast<int>(phase_);
 	int maxItems = static_cast<int>(QUEST_PHASE::PHASE_FINAL);
@@ -191,13 +179,10 @@ void GameScene::ProcessPhaseDecision()
 			currentPhase_ = std::make_unique<QuestPhase>(playerStatus_,*this);
 			break;
 		case QUEST_PHASE::PHASE_CLASSWORK:
-			currentPhase_ = std::make_unique<ClassWorkPhase>(playerStatus_);
+			currentPhase_ = std::make_unique<ClassWorkPhase>(playerStatus_, *this);
 			break;
 		case QUEST_PHASE::PHASE_JOB_CHANGE:
 			currentPhase_ = std::make_unique<JobChangePhase>(playerStatus_);
-			break;
-		case QUEST_PHASE::PHASE_FINAL:
-			currentPhase_ = std::make_unique<FinalPhase>(playerStatus_);
 			break;
 		}
 	}

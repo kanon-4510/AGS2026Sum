@@ -191,9 +191,6 @@ private:
 	int chosenMagicIdx_ = 0;		//選択した魔法の種類のインデックス
 
 	//------関数---------
-	//チュートリアル
-	void ProcessTutorial(void);
-	
 	//ターンを管理する関数
 	void ManageTurn(void);
 	
@@ -220,6 +217,9 @@ private:
 
 	//結果を表示する関数
 	void DisplayResult(void);
+
+	//チュートリアル
+	void ProcessTutorial(void);
 
 	//Draw
 	//--------------

@@ -442,7 +442,7 @@ void QuestPhase::ProcessActionLoop(void)
 
 			//技の名前によって特別な効果を発動させる
 			if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ" 
-				|| unit.skillName == "自己再生")
+				|| unit.skillName == "自己再生" || unit.skillName == "回復")
 			{
 				//Power分回復
 				int healAmount = activeEnemy_->GetPower3(); 

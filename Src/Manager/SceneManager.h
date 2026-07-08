@@ -43,7 +43,7 @@ public:
 	// デルタタイムの取得
 	float GetDeltaTime(void) const;
 
-	// ?? チュートリアルのON/OFFを切り替える関数を追加
+	//チュートリアルのON/OFFを切り替える関数を追加
 	bool IsTutorialEnabled() const { return isTutorial_; }
 	void ToggleTutorial() { isTutorial_ = !isTutorial_; }
 
