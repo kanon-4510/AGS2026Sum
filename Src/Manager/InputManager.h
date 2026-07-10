@@ -117,6 +117,9 @@ public:
 	// マウスが右クリックされたか(押しっぱなしはNG)
 	bool IsTrgMouseRight(void) const;
 
+	// マウスが指定した矩形の中にあるか
+	bool IsMouseOverRect(int x, int y, int w, int h) const;
+
 	// コントローラの入力情報を取得する
 	JOYPAD_IN_STATE GetJPadInputState(JOYPAD_NO no);
 
