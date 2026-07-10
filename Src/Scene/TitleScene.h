@@ -46,13 +46,12 @@ private:
 	//メンバー変数
 	int titleImage_;		//タイトル画像の格納領域
 	int currentSelection_;	//現在の選択肢
-	//bool isCheckTutorial_;	//チュートリアル選択画面を開いているか
 	int tutorialIndex_ = 0;	//0：ON,1：OFF
-	//bool isConfirmingExit_;	//ゲーム終了確認中かどうか
-	int confirmIndex_ = 1;		//ゲーム終了確認の選択肢インデックス
+	int confirmIndex_ = 1;	//ゲーム終了確認の選択肢インデックス
 
 	void ProcessTitleSelection(void);	//タイトル選択の処理
 	void ProcessTitleDecision(void);	//タイトル決定の処理
+	void ProcessTitleMouse(void);		//タイトル選択のマウス処理
 	void Tutorial(void);				//チュートリアルのON/OFF切り替え処理
 	void ExitGame(void);				//ゲーム終了の確認処理
 };

@@ -26,6 +26,8 @@ void TitleScene::Init(void)
 //更新処理
 void TitleScene::Update(void)
 {
+	ProcessTitleMouse();
+
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
 		ProcessTitleDecision();
@@ -138,6 +140,59 @@ void TitleScene::ProcessTitleDecision(void)
 			break;
 		default:
 			break;
+		}
+	}
+}
+
+void TitleScene::ProcessTitleMouse(void)
+{
+	// シングルトンからインスタンスを引っ張ってくる
+	auto& input = InputManager::GetInstance();
+
+	// タイトルの選択肢をマウスで選択する処理
+	if (mode_ == TITLE_MODE::NORMAL)
+	{
+		if (input.IsTrgMouseLeft())
+		{
+			if (input.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y - 5, 90, 20))
+			{
+				mode_ = TITLE_MODE::TUTORIAL;
+				arrow_offset_ = 0; // 矢印のオフセット値を更新
+			}
+			else if (input.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y + 35, 90, 20))
+			{
+				mode_ = TITLE_MODE::EXIT;
+				arrow_offset_ = 40; // 矢印のオフセット値を更新
+			}
+		}
+	}
+	else if(mode_ == TITLE_MODE::TUTORIAL)
+	{
+		if (input.IsTrgMouseLeft())
+		{
+			if (input.IsMouseOverRect(TITLE_MESSAGE_X - 55, TITLE_MESSAGE_Y - 55, 215, 25))
+			{
+				SceneManager::GetInstance().ToggleTutorial(); //ON/OFFを切り替える
+			}
+			else if (input.IsMouseOverRect(515, 515, 95, 25))
+			{
+				//ゲームシーンへ遷移
+				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+			}
+		}
+	}
+	else if(mode_ == TITLE_MODE::EXIT)
+	{
+		if (input.IsTrgMouseLeft())
+		{
+			if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 30, 20))
+			{
+				Application::isRunning_ = false; //ゲームを終了
+			}
+			else if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 220) / 2 + 130, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
+			{
+				mode_ = TITLE_MODE::NORMAL; //通常メニューに戻る
+			}
 		}
 	}
 }

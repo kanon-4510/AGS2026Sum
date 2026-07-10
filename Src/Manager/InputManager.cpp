@@ -182,6 +182,13 @@ bool InputManager::IsTrgMouseRight(void) const
 	return FindMouse(MOUSE_INPUT_RIGHT).keyTrgDown;
 }
 
+bool InputManager::IsMouseOverRect(int x, int y, int w, int h) const
+{
+	//GetMousePos()で取れる現在のマウス座標を使って判定
+	return (mousePos_.x >= x && mousePos_.x <= x + w &&
+		mousePos_.y >= y && mousePos_.y <= y + h);
+}
+
 InputManager::InputManager(void)
 {
 	mouseInput_ = -1;
