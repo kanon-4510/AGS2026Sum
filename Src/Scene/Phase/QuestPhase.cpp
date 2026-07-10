@@ -12,6 +12,42 @@
 extern Enemy* SpawnEnemyByTurn(int currentTurn);
 extern Enemy* SpawnRushEnemy(int stage); //ラッシュ専用の敵生成関数
 
+// ゲーム内の全魔法データベース
+const std::vector<MagicData> MAGIC_DATABASE = 
+{
+	//【攻撃魔法】
+	{1,"ファイア",    MAGIC_TYPE::ATTACK,1.5f,STATUS_EFFECT::NONE,0,0},
+	{2,"フレイム",    MAGIC_TYPE::ATTACK,3.0f,STATUS_EFFECT::NONE,0,140},
+	{3,"プロミネンス",MAGIC_TYPE::ATTACK,5.0f,STATUS_EFFECT::NONE,0,550},
+	{4,"ビッグバン",  MAGIC_TYPE::ATTACK,10.0f,STATUS_EFFECT::NONE,0,1000},
+
+	//【回復魔法】高中低、状態異常回復＋回復
+	{5, "ドレイン",  MAGIC_TYPE::HEAL,3.0f,STATUS_EFFECT::NONE,0,430,true,false},
+	{6, "ヒール",    MAGIC_TYPE::HEAL,0.5f,STATUS_EFFECT::NONE,0,0},
+	{7, "ハイヒール",MAGIC_TYPE::HEAL,1.0f,STATUS_EFFECT::NONE,0,140},
+	{8, "メガヒール",MAGIC_TYPE::HEAL,2.0f,STATUS_EFFECT::NONE,0,520},
+	{9, "キュア",    MAGIC_TYPE::HEAL,0.0f,STATUS_EFFECT::NONE,0,80,false,true},
+	{10,"レスキュー",MAGIC_TYPE::HEAL,1.0f,STATUS_EFFECT::NONE,0,270,false,true},
+
+	//【状態異常＋攻撃】高中低（確率は低30%, 中50%, 高70%）
+	{11,"アシッドニードル",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::POISON,30,50},
+	{12,"ヴェノムスピア",  MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::POISON,50,200},
+	{13,"トキシックランス",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::POISON,70,470},
+	{14,"コールドブレス",  MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FREEZE,30,50},
+	{15,"スノーテンペスト",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FREEZE,50,200},
+	{16,"アイシクルノヴァ",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FREEZE,70,470},
+	{17,"フォトンシュート",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FLASH,30,50},
+	{18,"プリズムレーザー",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FLASH,50,200},
+	{19,"ミラージュレイン",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FLASH,70,470},
+	{20,"リーサルクロー",  MAGIC_TYPE::DEBUFF,3.0f,STATUS_EFFECT::CURSE,5,300},
+	{21,"フェイタルソード",MAGIC_TYPE::DEBUFF,4.5f,STATUS_EFFECT::CURSE,10,650},
+
+	//【確定状態異常】
+	{22,"ポイズン",  MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::POISON,100,380},
+	{23,"フリーズ",  MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FREEZE,100,380},
+	{24,"フラッシュ",MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FLASH,100,380},
+};
+
 //コンストラクタ
 QuestPhase::QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest)
 	: gameScene_(gameScene)
@@ -108,7 +144,47 @@ void QuestPhase::Draw(void)
 	else if(battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
 	{
 		//魔法の種類の描画
-		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, magicTypeMessages_, magicMenuCursor_);
+		//Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, magicTypeMessages_, magicMenuCursor_);
+		if (battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
+		{
+			//同時に画面に表示したい最大件数（枠のサイズ）
+			const int MAX_DISPLAY = 6;
+
+			// リストが空の場合は描画しない
+			if (!magicTypeMessages_.empty())
+			{
+				// スクロールの開始位置（オフセット）を計算
+				int scrollOffset = 0;
+				if (magicMenuCursor_ >= MAX_DISPLAY)
+				{
+					// カーソルが画面の下端（6個目以降）に行ったら、表示範囲をズラす
+					scrollOffset = magicMenuCursor_ - MAX_DISPLAY + 1;
+				}
+
+				//「今画面に見せるべき魔法」だけを詰め替える新しい配列
+				std::vector<std::string> visibleMessages;
+				for (int i = scrollOffset; i < scrollOffset + MAX_DISPLAY && i < magicTypeMessages_.size(); ++i)
+				{
+					visibleMessages.push_back(magicTypeMessages_[i]);
+				}
+
+				//切り出したリストと、枠内での相対カーソル位置を渡して描画！
+				int relativeCursor = magicMenuCursor_ - scrollOffset;
+				Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, visibleMessages, relativeCursor);
+
+				//（おまけ）上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
+				//※ 座標(180, 200など)はゲームの画面に合わせて微調整してください
+				if (scrollOffset > 0)
+				{
+					DrawFormatString(COMMAND_MSG_X+150, COMMAND_MSG_Y-20, 0xFFFFFF, "▲"); // 上にスクロールできる
+				}
+				if (scrollOffset + MAX_DISPLAY < magicTypeMessages_.size())
+				{
+					//1行の高さが仮に30ピクセルだとした場合の計算です
+					DrawFormatString(COMMAND_MSG_X+150, COMMAND_MSG_Y + (visibleMessages.size() * 30)+40, 0xFFFFFF, "▼"); // 下にスクロールできる
+				}
+			}
+		}
 	}
 	else if (battleStep_ == BATTLE_STEP::RESULT)
 	{
@@ -145,8 +221,8 @@ void QuestPhase::ProcessDifficulty(void)
 		if (locationMenu_[difficultyCursor_] == "エクストラ")
 		{
 			isHellQuest_ = true;
-			playerStatus_->hasChallengedHellQuest_ = true;	//二度と選べないようにフラグを回収
-			location_ = QUEST_LOCATION::EXTRA;			//場所を魔大陸に設定
+			playerStatus_->hasChallengedHellQuest_ = true;//二度と選べないようにフラグを回収
+			location_ = QUEST_LOCATION::EXTRA;			  //場所を魔大陸に設定
 
 			//通常敵のメモリを解放し5連戦用の1体目とすげ替える
 			delete activeEnemy_;
@@ -230,25 +306,21 @@ void QuestPhase::DetermineActionOrder(void)
 	{
 		actionOrder_.back().skillName = "単体攻撃";
 	}
-	// 魔法攻撃（1）の場合
+	// 魔法攻撃の場合
 	if (command_ == COMMAND::MAGIC)
 	{
 		// サブメニューの選択肢に応じて魔法の性質を分ける！
-		if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::MAGIC_ATTACK))
+		if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::ATTACK))
 		{
-			actionOrder_.back().magicType = MAGIC_TYPE::MAGIC_ATTACK; //攻撃魔法
+			actionOrder_.back().magicType = MAGIC_TYPE::ATTACK; //攻撃魔法
 		}
 		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::HEAL)) 
 		{
-			actionOrder_.back().magicType = MAGIC_TYPE::HEAL;         //回復魔法
-		}
-		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::BUFF)) 
-		{
-			actionOrder_.back().magicType = MAGIC_TYPE::BUFF;         //強化魔法
+			actionOrder_.back().magicType = MAGIC_TYPE::HEAL;   //回復魔法
 		}
 		else if (subMenuCursor_ == static_cast<int>(MAGIC_TYPE::DEBUFF)) 
 		{
-			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF;       //弱化魔法
+			actionOrder_.back().magicType = MAGIC_TYPE::DEBUFF; //弱化魔法
 		}
 	}
 
@@ -315,7 +387,7 @@ void QuestPhase::ProcessActionLoop(void)
 			//閃光(命中低下)
 			if (!skipAction && statusEffect_ == STATUS_EFFECT::FLASH)
 			{
-				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC &&(unit.magicType == MAGIC_TYPE::MAGIC_ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
+				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC &&(unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
 				{
 					if (GetRand(99) < 50) isMiss = true; //50%で外れる
 				}
@@ -351,44 +423,48 @@ void QuestPhase::ProcessActionLoop(void)
 				}
 				else if (command_ == COMMAND::MAGIC)
 				{
-					switch (unit.magicType)
+					//selectedMagic_ は、前のメニュー選択画面で確定した MagicData 構造体とします
+					battleMessage_ += unit.name + "の" + selectedMagic_.name + "！";
+
+					//①ダメージ処理（威力が0より大きければダメージを与える）
+					if (selectedMagic_.powerMultiplier > 0)
 					{
-					case MAGIC_TYPE::MAGIC_ATTACK:
-						battleMessage_ += unit.name + " の攻撃魔法！";
-						activeEnemy_->Damage(playerStatus_->MagicAttack());
-						break;
+						//魔力 × (魔法の威力) など、威力を反映させた計算式にする
+						int magicDamage = playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier;
+						activeEnemy_->Damage(magicDamage);
+					}
+
+					//②カテゴリ別の特殊処理（回復や状態異常）
+					switch (selectedMagic_.type)
+					{
 					case MAGIC_TYPE::HEAL:
-						battleMessage_ += unit.name + " の回復魔法！";
-						playerStatus_->Heal();
-						break;
-					case MAGIC_TYPE::BUFF:
-						battleMessage_ += unit.name + " の状態回復魔法！";
-						statusEffect_ = STATUS_EFFECT::NONE;
-						statusTurns_ = 4;
+						//powerの数値を回復量として使う
+						//通常の回復処理（威力が0より大きい場合だけ回復メッセージが出る）
+						if (!selectedMagic_.isDrain && selectedMagic_.powerMultiplier > 0.0f)
+						{
+							int healAmount = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
+							playerStatus_->Heal(healAmount);
+							battleMessage_ += "回復した！";
+						}
+						//状態異常治療フラグが true だったら治す
+						if (selectedMagic_.curesStatus)
+						{
+							statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
+							statusTurns_ = 4;
+							battleMessage_ += "状態異常が回復された！";
+						}
 						break;
 					case MAGIC_TYPE::DEBUFF:
-						if (chosenMagicIdx_ == 0)
+						//状態異常を付与する魔法の場合
+						if (selectedMagic_.ailment != STATUS_EFFECT::NONE)
 						{
-							battleMessage_ += unit.name + " のポイズン！";
-							enemyStatusEffect_ = STATUS_EFFECT::POISON;
+							//魔法ごとに設定された「状態異常確率」で判定
+							if (GetRand(99) < selectedMagic_.ailmentChance)
+							{
+								enemyStatusEffect_ = selectedMagic_.ailment;
+								battleMessage_ += "敵に状態異常を与えた！";
+							}
 						}
-						else if (chosenMagicIdx_ == 1)
-						{
-							battleMessage_ += unit.name + " のフリーズ！";
-							enemyStatusEffect_ = STATUS_EFFECT::FREEZE;
-						}
-						else if (chosenMagicIdx_ == 2)
-						{
-							battleMessage_ += unit.name + " のフラッシュ！";
-							enemyStatusEffect_ = STATUS_EFFECT::FLASH;
-						}
-						else if (chosenMagicIdx_ == 3)
-						{
-							battleMessage_ += unit.name + " のカース！";
-							enemyStatusEffect_ = STATUS_EFFECT::CURSE;
-						}
-						break;
-					default:
 						break;
 					}
 				}
@@ -791,7 +867,7 @@ void QuestPhase::ProcessPlayerAction()
 			battleStep_ = BATTLE_STEP::DETERMINE;
 			return;
 		case QuestPhase::COMMAND::MAGIC:
-			subActionMessages_ = { "攻撃","回復","強化","状態異常付与" };
+			subActionMessages_ = { "攻撃","回復","状態異常付与" };
 			break;
 		case QuestPhase::COMMAND::MAX:
 			break;
@@ -820,65 +896,45 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	{
 		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく
 		//例：chosenSubMenuIdx_ = subMenuCursor_; 
-		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡します
+		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡す
 
 		magicMenuCursor_ = 0;
 
 		//一度リストを空にする
 		magicTypeMessages_.clear();
+		availableMagics_.clear(); //裏側で持っておく魔法データのリストも空にする
 
-		//行動決定へ進む
-		switch (subMenuCursor_)
+		// ① カーソルの位置から「どのカテゴリを選んだか」を判定
+		MAGIC_TYPE selectedCategory; switch (subMenuCursor_)
 		{
-		case 0:
-			//攻撃
-			magicTypeMessages_.push_back("魔法1");
+		case 0: selectedCategory = MAGIC_TYPE::ATTACK;  break;//攻撃
+		case 1: selectedCategory = MAGIC_TYPE::HEAL;    break;//回復
+		case 2: selectedCategory = MAGIC_TYPE::DEBUFF;  break;//状態異常付与
+		}
 
-			//レベルに応じて追加
-			if (playerStatus_->magicKnowledge_ >= 70)
+		//②データベースから、選んだカテゴリの魔法をすべて探す
+		//（※ MAGIC_DATABASE は、前回作った全魔法のリストです）
+		for (const auto& magic : MAGIC_DATABASE)
+		{
+			if (magic.type == selectedCategory)
 			{
-				magicTypeMessages_.push_back("魔法2");
-			}
-			if (playerStatus_->magicKnowledge_ >= 140)
-			{
-				magicTypeMessages_.push_back("魔法3");
-			}
-			break;
-		case 1:
-			//回復
-			magicTypeMessages_.push_back("ヒール1");
-			if (playerStatus_->magicKnowledge_ >= 70)
-			{
-				magicTypeMessages_.push_back("ヒール2");
-			}
-			if (playerStatus_->magicKnowledge_ >= 140)
-			{
-				magicTypeMessages_.push_back("ヒール3");
-			}
-			break;
-		case 2:
-			//強化
-			magicTypeMessages_ = { "状態異常回復" };
-			break;
-		case 3:
-			//状態異常付与
-			magicTypeMessages_.push_back("毒");
+				//裏側のデータリストにはそのまま保存（次のステップで使うため）
+				availableMagics_.push_back(magic);
 
-			if (playerStatus_->magicKnowledge_ >= 10)
-			{
-				magicTypeMessages_.push_back("凍結");
+				//画面に表示するテキストの判定
+				if (playerStatus_->magicKnowledge_ >= magic.reqMagicKnowledge)
+				{
+					//魔法知識が足りているなら本名を表示
+					magicTypeMessages_.push_back(magic.name);
+				}
+				else
+				{
+					//魔法知識が足りない場合は「???」にする
+					//必要数値を横に添えてあげる
+					std::string hiddenName = "? ? ? (知識:" + std::to_string(magic.reqMagicKnowledge) + ")";
+					magicTypeMessages_.push_back(hiddenName);
+				}
 			}
-			if (playerStatus_->magicKnowledge_ >= 10)
-			{
-				magicTypeMessages_.push_back("閃光");
-			}
-			if (playerStatus_->magicKnowledge_ >= 10)
-			{
-				magicTypeMessages_.push_back("呪い");
-			}
-			break;
-		default:
-			break;
 		}
 
 		battleStep_ = BATTLE_STEP::MAGIC_SELECTION;
@@ -892,8 +948,8 @@ void QuestPhase::ProcessPlayerSubAction(void)
 
 void QuestPhase::MagicSelection()
 {
-	//選択肢の数を、埋め込まれた配列のサイズから自動取
-	int maxMagItems = static_cast<int>(magicTypeMessages_.size());
+	// 選択肢の数を、埋め込まれた配列のサイズから自動取得
+		int maxMagItems = static_cast<int>(magicTypeMessages_.size());
 	if (maxMagItems == 0) return;
 
 	//カーソル移動処理
@@ -903,11 +959,34 @@ void QuestPhase::MagicSelection()
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
-		//ここで最終的に何番目の魔法・状態異常を選んだかを記憶する
-		chosenMagicIdx_ = magicMenuCursor_;
+		//今カーソルが合っている魔法の「データ」を取り出す
+		auto& chosenMagic = availableMagics_[magicMenuCursor_];
 
-		battleStep_ = BATTLE_STEP::DETERMINE;
+		//プレイヤーの魔法知識が、その魔法の必要知識に達しているかチェック！
+		if (playerStatus_->magicKnowledge_ >= chosenMagic.reqMagicKnowledge)
+		{
+			//【条件クリア】使える場合
+
+			//先ほどの ActionLoop (実際の行動処理) でダメージ計算などに使うため、
+			//選ばれた魔法のデータそのものを変数に記憶しておく
+			selectedMagic_ = chosenMagic;
+
+			//（※チームメイトのコードの他部分で idx が必要な場合のために残す）
+			chosenMagicIdx_ = magicMenuCursor_;
+
+			battleStep_ = BATTLE_STEP::DETERMINE;
+		}
+		else
+		{
+			//【条件未達】使えない魔法（「???」）を選ぼうとした場合
+			//ここでは battleStep_ を進めない（決定させない）
+
+			//エラー音（ブブーッ）を鳴らす
+			//PlaySoundMem(errorSound_, DX_PLAYTYPE_BACK); 
+		}
 	}
+
+	//キャンセル処理
 	if (ins_.IsTrgDown(KEY_INPUT_TAB) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{

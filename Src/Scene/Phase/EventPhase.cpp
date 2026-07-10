@@ -9,9 +9,9 @@ EventPhase::EventPhase(PlayerStatus* playerStatus) : playerStatus_(playerStatus)
 	waitTimer_ = 0;
 
 	// d—l‘’Ê‚è‚Ì4‚Â‚Ì‘I‘ğˆ‚ğ—pˆÓ
-	routeMenu_ = {"‹w‚ğ“¢‚Â‚½‚ß‚Ì‹­‘å‚È—Í‚ğ‹‚ß‚Ä",
-				  "–‚‰¤‚©‚ç¢ŠE‚ğç‚è•½˜a‚ğ‚à‚½‚ç‚·",
-				  "t‚Ì”w‚ğ•‰‚¢ˆÌ‘å‚È–‚–@g‚¢‚É‚È‚é"};
+	routeMenu_ = {"‹w‚ğ“¢‚Â‚½‚ß‚Ì‹­‘å‚È—Í‚ğ“¾‚é‚½‚ß",
+				  "–‚‰¤‚©‚ç¢ŠE‚ğç‚è•½˜a‚ğ‚à‚½‚ç‚·‚½‚ß",
+				  "t‚Ì”w‚ğ’Ç‚¢ˆÌ‘å‚È–‚–@g‚¢‚É‚È‚é‚½‚ß"};
 }
 
 void EventPhase::Update(void)

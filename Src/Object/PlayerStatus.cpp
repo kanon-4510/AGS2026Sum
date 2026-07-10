@@ -107,9 +107,9 @@ int PlayerStatus::MagicAttack()
 	return SkillBonus(BonusType::MagicBonus, magicWithJob);
 }
 
-void PlayerStatus::Heal()
+void PlayerStatus::Heal(int amount)
 {
-	hp_ += SkillBonus(BonusType::ItemBonus, heal_);
+	hp_ += SkillBonus(BonusType::ItemBonus, amount);
 	if (hp_ > GetMaxHp()) 
 	{
 		hp_ = GetMaxHp();
