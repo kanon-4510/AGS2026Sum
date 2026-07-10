@@ -110,7 +110,7 @@ public:
 	int MagicAttack();
 
 	//‰ñ•œˆ—
-	void Heal();
+	void Heal(int amount);
 
 	void FullHeal();
 
