@@ -96,6 +96,11 @@ public:
 	static constexpr int DIFFICULTY_MSG_X = 0;
 	static constexpr int DIFFICULTY_MSG_Y = 40;
 
+	//次に進むメッセージの位置
+	static constexpr int DIFFICULTY_ENTER_MSG_X = 0;
+	static constexpr int DIFFICULTY_ENTER_MSG_Y = 400;
+
+
 	//現在のターンメッセージの位置
 	static constexpr int TURN_MSG_X = 0;
 	static constexpr int TURN_MSG_Y = 80;
@@ -119,7 +124,7 @@ public:
 	//次に進むメッセージの位置
 	static constexpr int NEXT_MSG_X = 0;
 	static constexpr int NEXT_MSG_Y = 190;
-
+	
 	//経験値（仮）
 	static constexpr int EXP_GAIN = 10;
 
