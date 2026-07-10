@@ -83,12 +83,14 @@ void QuestPhase::Draw(void)
 			DrawFormatString(ENEMY_HP_MSG_X, ENEMY_HP_MSG_Y, 0xFFFFFF, "%sのHP %d", activeEnemy_->GetName().c_str(), activeEnemy_->GetCurrentHp());
 			//画像を表示する場合はここに activeEnemy_->Draw(); を追加
 		}
+		DrawString(NEXT_MSG_X, NEXT_MSG_Y, "Enterキーで次へ", 0xFF0000);
 	}
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)//難易度選択中はコマンドやHPを表示しない
 	{
 		DrawString(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y - 30, "どこに行く？", 0xFFFFFF);
 		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, locationMenu_, difficultyCursor_);
+		DrawString(DIFFICULTY_ENTER_MSG_X, DIFFICULTY_ENTER_MSG_Y, "Enterキーで次へ", 0xFF0000);
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
 	{
@@ -123,7 +125,6 @@ void QuestPhase::Draw(void)
 	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
 	{
 		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
-		DrawString(NEXT_MSG_X, NEXT_MSG_Y, "Enterキーで次へ", 0xFF0000);
 	}
 }
 

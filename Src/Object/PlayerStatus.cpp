@@ -65,10 +65,10 @@ void PlayerStatus::DrawQuestImages()
 	//敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255)）
 	unsigned int white = GetColor(255, 255, 255);
 	DrawString(PLAYER_POS_X, PLAYER_POS_Y - 40, name.c_str(), white);
-	DrawFormatString(PLAYER_POS_X, PLAYER_POS_Y - 20, white, "HP: %d / %d", hp_, maxHp_);
+	DrawFormatString(PLAYER_POS_X, PLAYER_POS_Y - 20, white, "HP: %d / %d", hp_, GetMaxHp());
 
 	int barWidth = 100; //バーの最大幅
-	int currentBarWidth = barWidth * hp_ / maxHp_;
+	int currentBarWidth = barWidth * hp_ / GetMaxHp();
 	//赤い背景
 	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - 5, PLAYER_POS_X + barWidth, PLAYER_POS_Y, GetColor(255, 0, 0), TRUE);
 	//緑の現在値
