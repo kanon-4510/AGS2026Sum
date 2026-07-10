@@ -4,14 +4,14 @@
 #include <vector>
 
 	//ルート
-	enum class PLAYER_ROUTE 
-	{
-		NONE,           //未選択（1?3ターン）
-		BREAKTHROUGH,   //打破
-		SALVATION,      //救世
-		TRUTH,          //真理
-		SELFLESS        //無欲
-	};
+enum class PLAYER_ROUTE
+{
+	NONE,           //未選択（1?3ターン）
+	BREAKTHROUGH,   //打破
+	SALVATION,      //救世
+	TRUTH,          //真理
+	SELFLESS        //無欲
+};
 
 class PlayerStatus
 {
@@ -26,8 +26,8 @@ public:
 	constexpr static int RATE_BASE = 100;		//ステータスアップの確率の基準値
 	constexpr static int SKILL_UP_RATE = 70;	//ステータスアップの確率
 
-	constexpr static int PLAYER_POS_X = 700;	//プレイヤーの描画位置X
-	constexpr static int PLAYER_POS_Y = 200;	//プレイヤーの描画位置Y
+	constexpr static int PLAYER_POS_X = 900;	//プレイヤーの描画位置X
+	constexpr static int PLAYER_POS_Y = 300;	//プレイヤーの描画位置Y
 
 	int level_ = 1;
 	int exp_ = 0;
@@ -147,11 +147,16 @@ public:
 	//職業名を書き換える
 	void SetJob(std::string newJobName) { job = newJobName; }
 
+	//プレイヤーの名前を外から参照できるようにする
+	std::string GetName() const { return name; }
+
 	//現在の職業名を外から参照できるようにする
 	std::string GetJobName() const { return job; }
 
 	bool hasChallengedHellQuest_ = false; //激ムズクエストに挑戦したかどうかのフラグ
 private:
+	std::string name = "ルピナス";	//プレイヤーの名前
+
 	int battlePlayer_;	//プレイヤーの画像を格納
 
 };

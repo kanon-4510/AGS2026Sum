@@ -130,6 +130,13 @@ public:
 	static constexpr float ENEMY_INCREASE = 0.7f;
 	static constexpr float HARD_INCREASE = 1.5f;
 
+	//アニメーションナンバー
+	static constexpr int ANIM_ACT_1 = 0;
+	static constexpr int ANIM_ACT_2 = 1;
+	static constexpr int ANIM_ACT_3 = 2;
+	static constexpr int ANIM_DAMAGE = 3;
+	static constexpr int ANIM_DEAD = 4;
+
 	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest = false);//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
 

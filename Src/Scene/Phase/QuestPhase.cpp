@@ -54,7 +54,7 @@ void QuestPhase::Update(void)
 	//ターン管理関数
 	ManageTurn();
 
-	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
+	if (activeEnemy_ != nullptr)
 	{
 		activeEnemy_->Update(); //敵の更新処理
 	}
@@ -74,7 +74,8 @@ void QuestPhase::Draw(void)
 
 		int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;
 		DrawFormatString(0, 100, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, maxWaves);//連戦（Wave）の表示
-		DrawFormatString(PLAYER_HP_MSG_X, PLAYER_HP_MSG_Y, 0xFFFFFF, "プレイヤーのHP %d / %d", playerStatus_->hp_, playerStatus_->GetMaxHp());
+		DrawFormatString(PLAYER_HP_MSG_X, PLAYER_HP_MSG_Y, 0xFFFFFF, "%sのHP %d / %d", playerStatus_->GetName().c_str(), playerStatus_->hp_, playerStatus_->GetMaxHp());
+		playerStatus_->DrawQuestImages();	//プレイヤーの画像を描画
 
 		//敵のHPを activeEnemy_ から直接もらう
 		if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
@@ -124,8 +125,6 @@ void QuestPhase::Draw(void)
 		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
 		DrawString(NEXT_MSG_X, NEXT_MSG_Y, "Enterキーで次へ", 0xFF0000);
 	}
-
-	playerStatus_->DrawQuestImages();
 }
 
 bool QuestPhase::IsFinished() const
@@ -227,7 +226,7 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.clear();
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
-	actionOrder_.push_back({ "プレイヤー", playerStatus_->speed_, true, 0, (int)command_, 0 });
+	actionOrder_.push_back({ playerStatus_->GetName().c_str(), playerStatus_->speed_, true, 0, (int)command_, 0 });
 	if (command_ == COMMAND::ATTACK)
 	{
 		actionOrder_.back().skillName = "単体攻撃";
@@ -344,10 +343,12 @@ void QuestPhase::ProcessActionLoop(void)
 					if (roll < criticalChance)
 					{
 						battleMessage_ += "クリティカルヒット！";
+						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						activeEnemy_->Damage(playerStatus_->Attack() * 3);
 					}
 					else
 					{
+						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						activeEnemy_->Damage(playerStatus_->Attack());
 					}
 				}
@@ -356,37 +357,38 @@ void QuestPhase::ProcessActionLoop(void)
 					switch (unit.magicType)
 					{
 					case MAGIC_TYPE::MAGIC_ATTACK:
-						battleMessage_ += unit.name + " の攻撃魔法！";
+						battleMessage_ += unit.name + "の攻撃魔法！";
+						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						activeEnemy_->Damage(playerStatus_->MagicAttack());
 						break;
 					case MAGIC_TYPE::HEAL:
-						battleMessage_ += unit.name + " の回復魔法！";
+						battleMessage_ += unit.name + "の回復魔法！";
 						playerStatus_->Heal();
 						break;
 					case MAGIC_TYPE::BUFF:
-						battleMessage_ += unit.name + " の状態回復魔法！";
+						battleMessage_ += unit.name + "の状態回復魔法！";
 						statusEffect_ = STATUS_EFFECT::NONE;
 						statusTurns_ = 4;
 						break;
 					case MAGIC_TYPE::DEBUFF:
 						if (chosenMagicIdx_ == 0)
 						{
-							battleMessage_ += unit.name + " のポイズン！";
+							battleMessage_ += unit.name + "のポイズン！";
 							enemyStatusEffect_ = STATUS_EFFECT::POISON;
 						}
 						else if (chosenMagicIdx_ == 1)
 						{
-							battleMessage_ += unit.name + " のフリーズ！";
+							battleMessage_ += unit.name + "のフリーズ！";
 							enemyStatusEffect_ = STATUS_EFFECT::FREEZE;
 						}
 						else if (chosenMagicIdx_ == 2)
 						{
-							battleMessage_ += unit.name + " のフラッシュ！";
+							battleMessage_ += unit.name + "のフラッシュ！";
 							enemyStatusEffect_ = STATUS_EFFECT::FLASH;
 						}
 						else if (chosenMagicIdx_ == 3)
 						{
-							battleMessage_ += unit.name + " のカース！";
+							battleMessage_ += unit.name + "のカース！";
 							enemyStatusEffect_ = STATUS_EFFECT::CURSE;
 						}
 						break;
@@ -464,7 +466,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (statusEffect_ == STATUS_EFFECT::NONE)
 					{
 						statusEffect_ = STATUS_EFFECT::FREEZE;
-						battleMessage_ += "プレイヤーは凍りついた";
+						battleMessage_ += playerStatus_->GetName() + "は凍りついた";
 					}
 					else battleMessage_ += "しかしうまく決まらなかった";
 				}
@@ -477,7 +479,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (statusEffect_ == STATUS_EFFECT::NONE)
 					{
 						statusEffect_ = STATUS_EFFECT::SILENCE;
-						battleMessage_ += "プレイヤーは沈黙になった";
+						battleMessage_ += playerStatus_->GetName() + "は沈黙になった";
 					}
 					else battleMessage_ += "しかしうまく決まらなかった";
 				}
@@ -490,7 +492,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (statusEffect_ == STATUS_EFFECT::NONE)
 					{
 						statusEffect_ = STATUS_EFFECT::POISON;
-						battleMessage_ += "プレイヤーは毒状態になった";
+						battleMessage_ += playerStatus_->GetName() + "は毒状態になった";
 					}
 					else battleMessage_ += "しかしうまく決まらなかった";
 				}
@@ -503,7 +505,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (statusEffect_ == STATUS_EFFECT::NONE)
 					{
 						statusEffect_ = STATUS_EFFECT::CURSE;
-						battleMessage_ += "プレイヤーは呪われた";
+						battleMessage_ += playerStatus_->GetName() + "は呪われた";
 					}
 					else battleMessage_ += "しかしうまく決まらなかった";
 				}
@@ -516,7 +518,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (statusEffect_ == STATUS_EFFECT::NONE)
 					{
 						statusEffect_ = STATUS_EFFECT::FLASH;
-						battleMessage_ += "プレイヤーは目がくらんだ";
+						battleMessage_ += playerStatus_->GetName() + "は目がくらんだ";
 					}
 					else battleMessage_ += "しかしうまく決まらなかった";
 				}
@@ -526,18 +528,18 @@ void QuestPhase::ProcessActionLoop(void)
 					//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
 					int damage = 0;
 
-					if (unit.command == 0)
+					if (unit.command == ANIM_ACT_1)
 					{
 						damage = activeEnemy_->GetPower1();
 
 						activeEnemy_->ChangeAnim(unit.command);
 					}
-					else if (unit.command == 1)
+					else if (unit.command == ANIM_ACT_2)
 					{
 						damage = activeEnemy_->GetPower2();
 						activeEnemy_->ChangeAnim(unit.command);
 					}
-					else if (unit.command == 2)
+					else if (unit.command == ANIM_ACT_3)
 					{
 						damage = activeEnemy_->GetPower3();
 						activeEnemy_->ChangeAnim(unit.command);
@@ -568,6 +570,7 @@ void QuestPhase::ProcessActionLoop(void)
 		//倒した時の上書き
 		if (activeEnemy_->IsDead())
 		{
+			activeEnemy_->ChangeAnim(ANIM_DEAD);
 			battleMessage_ = activeEnemy_->GetName() + "を倒した！";
 		}
 	}
@@ -602,6 +605,7 @@ void QuestPhase::ProcessStatusEffect(void)
 		{
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ = activeEnemy_->GetName() + "は毒のダメージを受けた";
+			activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 			activeEnemy_->Damage(1);
 			hasEffectMessage = true;
 		}
@@ -624,7 +628,7 @@ void QuestPhase::ProcessStatusEffect(void)
 		{
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			if (enemyStatusEffect_ == STATUS_EFFECT::POISON)battleMessage_ = "お互いに毒のダメージを受けた";
-			else battleMessage_ = "プレイヤーは毒のダメージを受けた";
+			else battleMessage_ = playerStatus_->GetName() + "は毒のダメージを受けた";
 			playerStatus_->Damage(1);
 			hasEffectMessage = true;
 		}
@@ -778,7 +782,7 @@ void QuestPhase::ProcessPlayerAction()
 
 	//カーソル移動
 	Utility::ProcessCommandMenuSelection(commandIndex, maxItems);
-	//更新された int の値を、安全に元の enum class 型に戻して代入する
+	//更新された intの値を、安全に元の enum class 型に戻して代入する
 	command_ = static_cast<COMMAND>(commandIndex);
 
 	//決定処理

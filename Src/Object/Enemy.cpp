@@ -41,14 +41,23 @@ Enemy::~Enemy()
 
 void Enemy::ChangeAnim(int command)
 {
-    // command (0:通常, 1:中技, 2:大技) に応じてアニメーションを強制固定
+    // command (0:通常, 1:中技, 2:大技, 3:ダメージ, 4:死亡) に応じてアニメーションを強制固定
     if (command == 0)      currentAnim_ = ENEMY_ANIM::ACT_1;
     else if (command == 1) currentAnim_ = ENEMY_ANIM::ACT_2;
     else if (command == 2) currentAnim_ = ENEMY_ANIM::ACT_3;
+    else if (command == 3) currentAnim_ = ENEMY_ANIM::DAMAGE;
+    else if (command == 4) currentAnim_ = ENEMY_ANIM::DEAD;
     else                   currentAnim_ = ENEMY_ANIM::IDLE; // 想定外の数値は待機へ
 
     currentFrame_ = 0; // アニメーションを最初のコマにリセット
     animeTimer_ = 0;   // タイマーもリセット
+
+    if (currentAnim_ == ENEMY_ANIM::IDLE) {
+        isAnimFinished_ = true;
+    }
+    else {
+        isAnimFinished_ = false;
+    }
 }
 
 //技のランダム決定
@@ -61,7 +70,7 @@ EnemyActionInfo Enemy::DecideAction()const
 //ダメージ処理
 void Enemy::Damage(int damage) 
 {
-    // 軽減値の分だけダメージを減らす
+    //軽減値の分だけダメージを減らす
     int Damage = damage - guard_;
 
     //ダメージがマイナスにならないようにする
@@ -102,32 +111,44 @@ void Enemy::Update()
     // 次のフレームへ進める
     if (++currentFrame_ >= totalFrames)
     {
-        // 攻撃(ACT1~3)やダメージの場合、自動で待機(IDLE)に戻す
+        //最後のコマまで再生し終えたので、このアニメーションは「完了」とする！
+        isAnimFinished_ = true;
+
+        //自動で待機(IDLE)に戻す
         if (currentAnim_ <= ENEMY_ANIM::ACT_3 || currentAnim_ == ENEMY_ANIM::DAMAGE)
         {
             currentAnim_ = ENEMY_ANIM::IDLE;
+            currentFrame_ = 0; // IDLEの最初のコマへリセット
         }
-        currentFrame_ = 0;
+        //死亡(DEAD)の場合
+        else if (currentAnim_ == ENEMY_ANIM::DEAD)
+        {
+            //最後のコマ（消滅直前のドット絵など）でピタッと停止させる
+            currentFrame_ = totalFrames - 1;
+        }
     }
 }
 
-//描画処理（メインループ内で毎フレーム呼び出す）
+//描画処理
 void Enemy::Draw() const 
 {
-    if (IsDead()) return; //死んでいたら描画しない
+    if (currentAnim_ == ENEMY_ANIM::DEAD && IsAnimFinished())
+    {
+        return; // ここで関数を終了して、描画をスキップする
+    }
 
-    //1.敵の画像を描画
+    //敵の画像を描画
     if (images_[currentAnim_][currentFrame_] > 0)
     {
         DrawRotaGraph(x_,y_,2.5,0,images_[currentAnim_][currentFrame_],true);
     }
 
-    //2. 敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255) ）
+    //敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255)）
     unsigned int white = GetColor(255, 255, 255);
     DrawFormatString(x_, y_ - 40, white, "%s", name_.c_str());
     DrawFormatString(x_, y_ - 20, white, "HP: %d / %d", currentHp_, maxHp_);
 
-    //3.【応用】簡易的なHPバー（緑色の矩形）を描画するなら
+    //簡易的なHPバー（緑色の矩形）を描画
     if (maxHp_ > 0) 
     {
         int barWidth = 100; //バーの最大幅
@@ -428,8 +449,8 @@ Enemy* SpawnEnemyByTurn(int turn)
             std::vector<MotionConfig> skeletonArcherAnims = {
                 { "Data/Image/Enemy/Skelton/Archer/Idle.png",          7, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Attack_1.png",      4, 1, 128, 128 },
+                { "Data/Image/Enemy/Skelton/Archer/Attack_2.png",     12, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Attack_1.png",      4, 1, 128, 128 },
-                { "Data/Image/Enemy/Skelton/Archer/Attack_2.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Dead.png",          5, 1, 128, 128 }};
             return new Enemy("弓スケルトン",21,1,1,1, 9, 7, "こうげき", "どくのや", "こうげき", skeletonArcherAnims, spawnX, spawnY);

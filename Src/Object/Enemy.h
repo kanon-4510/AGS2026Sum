@@ -84,6 +84,7 @@ public:
 	int GetSpeed() const { return speed_; }
 	int GetExp() const { return exp_; }
 	bool IsDead() const { return currentHp_ <= 0; }
+	bool IsAnimFinished() const { return isAnimFinished_; }
 	std::string GetSkill(int index) const;
 private:
 	// クラスの内部で、外で作った「ENEMY_MOTION」や「MotionConfig」を利用する
@@ -94,6 +95,7 @@ private:
 	ENEMY_ANIM currentAnim_ = ENEMY_ANIM::IDLE; // 現在再生中のアニメ
 	int animeTimer_ = 0;	// アニメーションのタイマー
 	int currentFrame_ = 0;	// 現在のフレーム
+	bool isAnimFinished_ = true;	//アニメーションが終了したかどうかのフラグ
 
 	std::string name_;
 	int maxHp_;

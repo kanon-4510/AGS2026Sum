@@ -50,7 +50,7 @@ void ResourceManager::Init(void)
 	//------------------------------------
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "/Player/Player.png");
 	resourcesMap_.emplace(SRC::PLAYER, std::move(res));
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "/Player/Battle_Player.png");
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "/Player/Battle_Playe1.png");
 	resourcesMap_.emplace(SRC::BATTLE_PLAYER, std::move(res));
 	//ステージ
 	//------------------------------------
