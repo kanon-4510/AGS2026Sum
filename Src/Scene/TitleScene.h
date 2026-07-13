@@ -11,7 +11,10 @@ public:
 	static constexpr int TITLE_MESSAGE_Y = Application::SCREEN_SIZE_Y - 200;		//タイトルメッセージ
 
 	static constexpr int ARROW_X = TITLE_MESSAGE_X - 20;	//矢印の表示位置X
-	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;		//矢印の表示位置Y
+	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;			//矢印の表示位置Y
+
+	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ]
+	static constexpr int EXIT_ARROW_X = 630;			//ゲーム終了確認メッセージ
 
 	enum class TITLE_MODE
 	{
@@ -41,7 +44,10 @@ private:
 	TITLE_MODE mode_ = TITLE_MODE::NORMAL; //初期状態は通常メニュー
 	TITLE_SELECTION titleSelection_;	//タイトルの選択肢
 
-	int arrow_offset_ = 0;	//矢印のオフセット値
+	//矢印のオフセット値
+	int normalOffset_ = 0;
+	int tutorialOffset_ = 0;
+	int exitOffset_ = 0;
 
 	//メンバー変数
 	int titleImage_;		//タイトル画像の格納領域
