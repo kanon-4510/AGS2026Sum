@@ -89,8 +89,6 @@ public:
 		MAX
 	};
 
-
-
 	struct ActionUnit
 	{
 		std::string name;		//表示用（プレイヤー or 敵の名前）
@@ -110,12 +108,10 @@ public:
 	static constexpr int DIFFICULTY_MSG_X = 0;
 	static constexpr int DIFFICULTY_MSG_Y = 40;
 
-	//���ɐi�ރ��b�Z�[�W�̈ʒu
+	//次に進むメッセージの位置
 	static constexpr int DIFFICULTY_ENTER_MSG_X = 0;
 	static constexpr int DIFFICULTY_ENTER_MSG_Y = 400;
 
-
-	//���݂̃^�[�����b�Z�[�W�̈ʒu
 	//現在のターンメッセージの位置
 	static constexpr int TURN_MSG_X = 0;
 	static constexpr int TURN_MSG_Y = 80;
@@ -140,17 +136,9 @@ public:
 	static constexpr int NEXT_MSG_X = 0;
 	static constexpr int NEXT_MSG_Y = 190;
 	
-	//�o���l�i���j
-
-	//経験値（仮）
-	static constexpr int EXP_GAIN = 10;
-
-	static constexpr int MAX_HP = 30; //
-	static constexpr int HP_RECOVERY_AMOUNT = 20; //アイテム使用時のHP回復量
-
 	static constexpr int MAX_DISPLAY = 6;//同時に画面に表示したい最大件数（枠のサイズ）
 
-	//�A�j���[�V�����i���o�[
+	//アニメーションナンバー
 	static constexpr int ANIM_ACT_1 = 0;
 	static constexpr int ANIM_ACT_2 = 1;
 	static constexpr int ANIM_ACT_3 = 2;
@@ -243,7 +231,7 @@ private:
 	//行動の順番に従って処理を行う関数
 	void ProcessActionLoop(void);
 
-	//�G�̎��S����
+	//敵の死亡判定
 	void CheckEnemyDeath(void);
 	void ProcessStatusEffect(void);//状態異常
 

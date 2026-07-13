@@ -22,7 +22,7 @@ public:
 	constexpr static int STATUS_BONUS_X = 380;	//ステータスのボーナス分の描画位置X
 	constexpr static int STATUS_BONUS_COLOR = 0x00FF00;	//ステータスのボーナス分の描画色
 
-	constexpr static int NEED_EXP = 10;			//必要経験値
+	constexpr static int NEED_EXP = 30;			//必要経験値
 	constexpr static int RATE_BASE = 100;		//ステータスアップの確率の基準値
 	constexpr static int SKILL_UP_RATE = 70;	//ステータスアップの確率
 
