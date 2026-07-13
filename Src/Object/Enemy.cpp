@@ -271,7 +271,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Minotaur/Lesser/Attack.png",        5, 1, 128, 128 },
                 { "Data/Image/Enemy/Minotaur/Lesser/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Minotaur/Lesser/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("下級タウロス", 100, 10, 10, 10, 10, 0, "こうげき", "こうげき", "自己再生", lesserTaurosAnims, spawnX, spawnY);
+            return new Enemy("下級タウロス", 100, 10, 10, 10,20,13, "こうげき", "こうげき", "自己再生", lesserTaurosAnims, spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> vampireAnims = {
                 { "Data/Image/Enemy/Vampire/Idle.png",          5, 1, 128, 128 },
@@ -280,7 +280,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Vampire/Attack_3.png",      6, 1, 128, 128 },
                 { "Data/Image/Enemy/Vampire/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Vampire/Dead.png",          8, 1, 128, 128 }};
-            return new Enemy("ヴァンパイア", 100, 10, 10, 10, 10, 0, "こうげき", "血槍", "沈黙の呪い", vampireAnims, spawnX, spawnY);
+            return new Enemy("ヴァンパイア", 100, 10, 10, 10,20, 0, "こうげき", "血槍", "沈黙の呪い", vampireAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> crowTenguAnims = {
                 { "Data/Image/Enemy/Tengu/Karasu/Idle.png",          6, 1, 128, 128 },
@@ -289,7 +289,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Tengu/Karasu/Attack_3.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Tengu/Karasu/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Tengu/Karasu/Dead.png",          6, 1, 128, 128 }};
-            return new Enemy("カラス天狗", 100, 10, 10, 10, 10, 0, "こうげき", "居合切り", "破魔空間", crowTenguAnims, spawnX, spawnY);
+            return new Enemy("カラス天狗", 100, 10, 10, 10,25, 0, "こうげき", "居合切り", "破魔空間", crowTenguAnims, spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> fireCasterAnims = {
                 { "Data/Image/Enemy/Caster/Fire/Idle.png",          7, 1, 128, 128 },
@@ -307,8 +307,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Gorgon/Nomal/Attack_3.png",     16, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Nomal/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Nomal/Dead.png",          3, 1, 128, 128 }};
-            return new Enemy("ゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "かみつく", "薙ぎ払い", gorgonAnims, spawnX, spawnY);
-        }
+            return new Enemy("ゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "かみつく", "薙ぎ払い", gorgonAnims, spawnX, spawnY);}
         }
     }
     //7〜9ターン目
@@ -325,7 +324,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/slime/Red/Attack_2.png",     13, 1, 128, 128 },
                 { "Data/Image/Enemy/slime/Red/Hurt.png",          6, 1, 128, 128 },
                 { "Data/Image/Enemy/slime/Red/Dead.png",          3, 1, 128, 128 }};
-            return new Enemy("溶岩スライム", 80, 10, 10, 10, 10, 0, "こうげき", "溶岩パンチ", "溶岩パンチ", lavaSlimeAnims, spawnX, spawnY);
+            return new Enemy("溶岩スライム",70,6,9,9,18,14, "こうげき", "溶岩パンチ", "溶岩パンチ", lavaSlimeAnims, spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> ghostAnims = {
                 { "Data/Image/Enemy/Ghost/Ghost_Yurei/Idle.png",          5, 1, 128, 128 },
@@ -334,7 +333,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Ghost/Ghost_Yurei/Attack_3.png",      4, 1, 128, 128 },
                 { "Data/Image/Enemy/Ghost/Ghost_Yurei/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Ghost/Ghost_Yurei/Dead.png",          4, 1, 128, 128 }};
-            return new Enemy("ゴースト", 80, 10, 10, 10, 10, 0, "こうげき", "呪い", "発狂", ghostAnims, spawnX, spawnY);
+            return new Enemy("ゴースト",62,8,0,5,17,11, "こうげき", "呪い", "発狂", ghostAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> morningKnightAnims = {
                 { "Data/Image/Enemy/Knight/Morning/Idle.png",          4, 1, 128, 128 },
@@ -344,7 +343,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Knight/Morning/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Knight/Morning/Dead.png",          6, 1, 128, 128 }
             };
-            return new Enemy("朝の騎士", 80, 10, 10, 10, 10, 0, "こうげき", "斬撃", "守る", morningKnightAnims, spawnX, spawnY);
+            return new Enemy("朝の騎士",65,7,13,10,19,13, "こうげき", "斬撃", "守る", morningKnightAnims, spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> magicBombAnims = {
                 { "Data/Image/Enemy/Spirit/Idle.png",          6, 1, 128, 128 },
@@ -353,7 +352,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Spirit/Attack_3.png",     13, 1, 128, 128 },
                 { "Data/Image/Enemy/Spirit/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Spirit/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("マジックボム", 80, 10, 10, 10, 10, 0, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
+            return new Enemy("マジックボム",53,8,12,14,20,12, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> trentAnims = {
                 { "Data/Image/Enemy/Plent/Idle.png",          5, 1, 128, 128 },
@@ -362,8 +361,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Plent/Attack_3.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Plent/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Plent/Dead.png",          2, 1, 128, 128 }};
-            return new Enemy("トレント", 80, 10, 10, 10, 10, 0, "こうげき", "毒の粉", "大地の恵み", trentAnims, spawnX, spawnY);
-        }
+            return new Enemy("トレント",56,8,3,6,16,14, "こうげき", "毒の粉", "大地の恵み", trentAnims, spawnX, spawnY);}
         }
     }
     //4〜6ターン目
@@ -380,7 +378,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Slime/Green/Attack_2.png",     13, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Green/Hurt.png",          6, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Green/Dead.png",          3, 1, 128, 128 }};
-            return new Enemy("毒スライム", 50, 10, 10, 10, 10, 0, "こうげき", "毒パンチ", "こうげき", poisonSlimeAnims, spawnX, spawnY);
+            return new Enemy("毒スライム", 35,5,3,5,13,20, "こうげき", "毒パンチ", "こうげき", poisonSlimeAnims, spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> whiteWolfAnims{
                 { "Data/Image/Enemy/Wolf/White/Idle.png",           8, 1, 128, 128 },
@@ -389,7 +387,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Wolf/White/Attack_3.png",       7, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/White/Hurt.png",           2, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/White/Dead.png",           2, 1, 128, 128 }};
-            return new Enemy("ホワイトウルフ", 50, 10, 10, 10, 10, 0, "こうげき", "ひっかく", "きりさく", whiteWolfAnims, spawnX, spawnY);
+            return new Enemy("ホワイトウルフ",32,6,7,8,12,25, "こうげき", "ひっかく", "きりさく", whiteWolfAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> blackWolfAnims{
                 { "Data/Image/Enemy/Wolf/Black/Idle.png",           8, 1, 128, 128 },
@@ -398,7 +396,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Wolf/Black/Attack_3.png",       7, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/Black/Hurt.png",           2, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/Black/Dead.png",           2, 1, 128, 128 }};
-            return new Enemy("ブラックウルフ", 50, 10, 10, 10, 10, 0, "こうげき", "ひっかく", "きりさく", blackWolfAnims, spawnX, spawnY);
+            return new Enemy("ブラックウルフ",32,3,4,5,19,23, "こうげき", "ひっかく", "きりさく", blackWolfAnims, spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> tengAnims{
                 { "Data/Image/Enemy/Tengu/Yamabushi/Idle.png",          6, 1, 128, 128 },
@@ -407,7 +405,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Tengu/Yamabushi/Attack_3.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Tengu/Yamabushi/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Tengu/Yamabushi/Dead.png",          6, 1, 128, 128 }};
-            return new Enemy("天狗", 50, 10, 10, 10, 10, 0, "こうげき", "いあいぎり", "ふきつなかぜ", tengAnims, spawnX, spawnY);
+            return new Enemy("天狗",34,3,8,2,15,18, "こうげき", "いあいぎり", "ふきつなかぜ", tengAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> skeletonWarriorAnims{
                 { "Data/Image/Enemy/Skelton/Warrior/Idle.png",          7, 1, 128, 128 },
@@ -416,7 +414,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Skelton/Warrior/Attack_3.png",      1, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Warrior/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Warrior/Dead.png",          4, 1, 128, 128 }};
-            return new Enemy("剣スケルトン", 50, 10, 10, 10, 10, 0, "こうげき", "ざんげき", "まもる", skeletonWarriorAnims, spawnX, spawnY);}
+            return new Enemy("剣スケルトン",40,3,7,7,14,19, "こうげき", "ざんげき", "まもる", skeletonWarriorAnims, spawnX, spawnY);}
         }
     }
     //1〜3ターン目
@@ -433,7 +431,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Slime/Blue/Attack_2.png",      13, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Blue/Hurt.png",          6, 1, 128, 128 },
                 { "Data/Image/Enemy/Slime/Blue/Dead.png",          3, 1, 128, 128 }};
-            return new Enemy("スライム", 26, 1, 1, 1, 7, 5, "こうげき", "こうげき", "パンチ", slimeAnims, spawnX, spawnY);
+            return new Enemy("スライム", 26, 1, 1, 1, 7, 25, "こうげき", "こうげき", "パンチ", slimeAnims, spawnX, spawnY);
         }
         case 1: {
             std::vector<MotionConfig> WerewolfAnims = {
@@ -443,7 +441,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Wolf/Red/Attack_2.png",      7, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/Red/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Wolf/Red/Dead.png",          2, 1, 128, 128 }};
-            return new Enemy("オオカミ男", 21, 1, 1, 1, 12, 8, "こうげき", "こうげき", "ひっかく", WerewolfAnims, spawnX, spawnY);
+            return new Enemy("オオカミ男", 21, 1, 1, 1, 30, 28, "こうげき", "こうげき", "ひっかく", WerewolfAnims, spawnX, spawnY);
         }
         case 2: {
             std::vector<MotionConfig> skeletonArcherAnims = {
@@ -453,7 +451,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Skelton/Archer/Attack_1.png",      4, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Skelton/Archer/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("弓スケルトン",21,1,1,1, 9, 7, "こうげき", "どくのや", "こうげき", skeletonArcherAnims, spawnX, spawnY);
+            return new Enemy("弓スケルトン",21,1,1,1, 9, 27, "こうげき", "どくのや", "こうげき", skeletonArcherAnims, spawnX, spawnY);
         }
         case 3: {
             std::vector<MotionConfig> zombieAnims = {
@@ -463,7 +461,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Zombie/Attack.png",     4, 1, 128, 128 },
                 { "Data/Image/Enemy/Zombie/Hurt.png",       4, 1, 128, 128 },
                 { "Data/Image/Enemy/Zombie/Dead.png",       5, 1, 128, 128 }};
-            return new Enemy("ゾンビ", 21,2,2,2,9,6,"こうげき", "こうげき", "こうげき", zombieAnims, spawnX, spawnY);}
+            return new Enemy("ゾンビ", 21,2,2,2,9,26,"こうげき", "こうげき", "こうげき", zombieAnims, spawnX, spawnY);}
         }
     }
 }

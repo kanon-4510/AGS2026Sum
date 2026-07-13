@@ -33,7 +33,8 @@ void EventPhase::Update(void)
 	Utility::ProcessCommandMenuSelection(cursor_, maxItems);
 
 	// 決定キーが押されたらルート確定
-	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN))
+	if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
+		InputManager::GetInstance().IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		switch (cursor_)
 		{

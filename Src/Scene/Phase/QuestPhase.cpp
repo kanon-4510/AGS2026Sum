@@ -17,35 +17,33 @@ const std::vector<MagicData> MAGIC_DATABASE =
 {
 	//【攻撃魔法】
 	{1,"ファイア",    MAGIC_TYPE::ATTACK,1.5f,STATUS_EFFECT::NONE,0,0},
-	{2,"フレイム",    MAGIC_TYPE::ATTACK,3.0f,STATUS_EFFECT::NONE,0,140},
-	{3,"プロミネンス",MAGIC_TYPE::ATTACK,5.0f,STATUS_EFFECT::NONE,0,550},
-	{4,"ビッグバン",  MAGIC_TYPE::ATTACK,10.0f,STATUS_EFFECT::NONE,0,1000},
+	{2,"フレイム",    MAGIC_TYPE::ATTACK,2.0f,STATUS_EFFECT::NONE,0,100},
+	{3,"プロミネンス",MAGIC_TYPE::ATTACK,4.0f,STATUS_EFFECT::NONE,0,350},
+	{4,"ビッグバン",  MAGIC_TYPE::ATTACK,10.0f,STATUS_EFFECT::NONE,0,999},
 
 	//【回復魔法】高中低、状態異常回復＋回復
-	{5, "ドレイン",  MAGIC_TYPE::HEAL,3.0f,STATUS_EFFECT::NONE,0,430,true,false},
-	{6, "ヒール",    MAGIC_TYPE::HEAL,0.5f,STATUS_EFFECT::NONE,0,0},
-	{7, "ハイヒール",MAGIC_TYPE::HEAL,1.0f,STATUS_EFFECT::NONE,0,140},
-	{8, "メガヒール",MAGIC_TYPE::HEAL,2.0f,STATUS_EFFECT::NONE,0,520},
-	{9, "キュア",    MAGIC_TYPE::HEAL,0.0f,STATUS_EFFECT::NONE,0,80,false,true},
-	{10,"レスキュー",MAGIC_TYPE::HEAL,1.0f,STATUS_EFFECT::NONE,0,270,false,true},
+	{5, "ドレイン",  MAGIC_TYPE::HEAL,0.7f,STATUS_EFFECT::NONE,0,230,true,false},
+	{6, "ヒール",    MAGIC_TYPE::HEAL,0.3f,STATUS_EFFECT::NONE,0,0},
+	{7, "ハイヒール",MAGIC_TYPE::HEAL,0.5f,STATUS_EFFECT::NONE,0,100},
+	{8, "メガヒール",MAGIC_TYPE::HEAL,1.0f,STATUS_EFFECT::NONE,0,360},
+	{9, "キュア",    MAGIC_TYPE::HEAL,0.0f,STATUS_EFFECT::NONE,0,60,false,true},
+	{10,"レスキュー",MAGIC_TYPE::HEAL,0.5f,STATUS_EFFECT::NONE,0,250,false,true},
 
-	//【状態異常＋攻撃】高中低（確率は低30%, 中50%, 高70%）
+	//【状態異常攻撃】高中低（確率は低30%, 中50%, 高70%,100%）
 	{11,"アシッドニードル",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::POISON,30,50},
-	{12,"ヴェノムスピア",  MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::POISON,50,200},
-	{13,"トキシックランス",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::POISON,70,470},
-	{14,"コールドブレス",  MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FREEZE,30,50},
-	{15,"スノーテンペスト",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FREEZE,50,200},
-	{16,"アイシクルノヴァ",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FREEZE,70,470},
-	{17,"フォトンシュート",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FLASH,30,50},
-	{18,"プリズムレーザー",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FLASH,50,200},
-	{19,"ミラージュレイン",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FLASH,70,470},
-	{20,"リーサルクロー",  MAGIC_TYPE::DEBUFF,3.0f,STATUS_EFFECT::CURSE,5,300},
-	{21,"フェイタルソード",MAGIC_TYPE::DEBUFF,4.5f,STATUS_EFFECT::CURSE,10,650},
-
-	//【確定状態異常】
-	{22,"ポイズン",  MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::POISON,100,380},
-	{23,"フリーズ",  MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FREEZE,100,380},
-	{24,"フラッシュ",MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FLASH,100,380},
+	{12,"ヴェノムスピア",  MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::POISON,50,120},
+	{13,"トキシックランス",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::POISON,70,320},
+	{14,"ポイズン",		   MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::POISON,100,220},
+	{15,"コールドブレス",  MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FREEZE,30,50},
+	{16,"スノーテンペスト",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FREEZE,50,120},
+	{17,"アイシクルノヴァ",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FREEZE,70,320},
+	{18,"フリーズ",		   MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FREEZE,100,220},
+	{19,"フォトンシュート",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FLASH,30,50},
+	{20,"プリズムレーザー",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FLASH,50,120},
+	{21,"ミラージュレイン",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FLASH,70,320},
+	{22,"フラッシュ",	   MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FLASH,100,220},
+	{23,"リーサルクロー",  MAGIC_TYPE::DEBUFF,3.0f,STATUS_EFFECT::CURSE,5,180},
+	{24,"フェイタルソード",MAGIC_TYPE::DEBUFF,4.5f,STATUS_EFFECT::CURSE,10,400},
 };
 
 //コンストラクタ
@@ -151,7 +149,7 @@ void QuestPhase::Draw(void)
 		if (battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
 		{
 			//同時に画面に表示したい最大件数（枠のサイズ）
-			const int MAX_DISPLAY = 6;
+			const int MAX_DISPLAY = 4;
 
 			// リストが空の場合は描画しない
 			if (!magicTypeMessages_.empty())
@@ -164,27 +162,27 @@ void QuestPhase::Draw(void)
 					scrollOffset = magicMenuCursor_ - MAX_DISPLAY + 1;
 				}
 
-				//「今画面に見せるべき魔法」だけを詰め替える新しい配列
+				//「今画面に見せるべき魔法」だけを詰め替える
 				std::vector<std::string> visibleMessages;
 				for (int i = scrollOffset; i < scrollOffset + MAX_DISPLAY && i < magicTypeMessages_.size(); ++i)
 				{
 					visibleMessages.push_back(magicTypeMessages_[i]);
 				}
 
-				//切り出したリストと、枠内での相対カーソル位置を渡して描画！
+				//切り出したリストと、枠内での相対カーソル位置を渡して描画
 				int relativeCursor = magicMenuCursor_ - scrollOffset;
 				Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, visibleMessages, relativeCursor);
 
-				//（おまけ）上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
-				//※ 座標(180, 200など)はゲームの画面に合わせて微調整してください
+				//上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
+				//※ 座標(180, 200など)はゲームの画面に合わせて微調整
 				if (scrollOffset > 0)
 				{
 					DrawFormatString(COMMAND_MSG_X+150, COMMAND_MSG_Y-20, 0xFFFFFF, "▲"); // 上にスクロールできる
 				}
 				if (scrollOffset + MAX_DISPLAY < magicTypeMessages_.size())
 				{
-					//1行の高さが仮に30ピクセルだとした場合の計算です
-					DrawFormatString(COMMAND_MSG_X+150, COMMAND_MSG_Y + (visibleMessages.size() * 30)+40, 0xFFFFFF, "▼"); // 下にスクロールできる
+					//1行の高さが仮に30ピクセルだとした場合の計算
+					DrawFormatString(COMMAND_MSG_X+150, COMMAND_MSG_Y + (visibleMessages.size() * 30)+40, 0xFFFFFF, "▼"); //下にスクロールできる
 				}
 			}
 		}
@@ -389,7 +387,7 @@ void QuestPhase::ProcessActionLoop(void)
 			//閃光(命中低下)
 			if (!skipAction && statusEffect_ == STATUS_EFFECT::FLASH)
 			{
-				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC &&(unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
+				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC && (unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
 				{
 					if (GetRand(99) < 50) isMiss = true; //50%で外れる
 				}
@@ -431,7 +429,7 @@ void QuestPhase::ProcessActionLoop(void)
 					battleMessage_ += unit.name + "の" + selectedMagic_.name + "！";
 
 					//①ダメージ処理（威力が0より大きければダメージを与える）
-					if (selectedMagic_.powerMultiplier > 0)
+					if (selectedMagic_.powerMultiplier > 0 && selectedMagic_.type == MAGIC_TYPE::ATTACK)
 					{
 						//魔力 × (魔法の威力) など、威力を反映させた計算式にする
 						int magicDamage = playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier;
@@ -533,94 +531,7 @@ void QuestPhase::ProcessActionLoop(void)
 					activeEnemy_->SetGuard(activeEnemy_->GetPower3());
 					battleMessage_ += unit.name + "は身構えている";
 				}
-				else if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
-					|| unit.skillName == "金縛り" || unit.skillName == "発狂")
-				{
-					//プレイヤーを凍結状態にする
-					int damage = activeEnemy_->GetPower3();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::FREEZE;
-						battleMessage_ += playerStatus_->GetName() + "は凍りついた";
-					}
-					else battleMessage_ += "しかしうまく決まらなかった";
-				}
-				else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
-					|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
-				{
-					//プレイヤーを沈黙状態にする
-					int damage = activeEnemy_->GetPower3();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::SILENCE;
-						battleMessage_ += playerStatus_->GetName() + "は沈黙になった";
-					}
-					else battleMessage_ += "しかしうまく決まらなかった";
-				}
-				else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
-					|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
-				{
-					//プレイヤーを毒状態にする
-					int damage = activeEnemy_->GetPower2();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::POISON;
-						battleMessage_ += playerStatus_->GetName() + "は毒状態になった";
-					}
-					else battleMessage_ += "しかしうまく決まらなかった";
-				}
-				else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
-					|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
-				{
-					//プレイヤーを呪い状態にする
-					int damage = activeEnemy_->GetPower2();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::CURSE;
-						battleMessage_ += playerStatus_->GetName() + "は呪われた";
-					}
-					else battleMessage_ += "しかしうまく決まらなかった";
-				}
-				else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
-					|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃")
-				{
-					//プレイヤーを閃光状態にする
-					int damage = activeEnemy_->GetPower2();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::FLASH;
-						battleMessage_ += playerStatus_->GetName() + "は目がくらんだ";
-					}
-					else battleMessage_ += "しかしうまく決まらなかった";
-				}
-				else
-				{
-					//---それ以外は通常の攻撃技として処理---
-					//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
-					int damage = 0;
-
-					if (unit.command == ANIM_ACT_1)
-					{
-						damage = activeEnemy_->GetPower1();
-
-						activeEnemy_->ChangeAnim(unit.command);
-					}
-					else if (unit.command == ANIM_ACT_2)
-					{
-						damage = activeEnemy_->GetPower2();
-						activeEnemy_->ChangeAnim(unit.command);
-					}
-					else if (unit.command == ANIM_ACT_3)
-					{
-						damage = activeEnemy_->GetPower3();
-						activeEnemy_->ChangeAnim(unit.command);
-					}
-
+				else {
 					//回避判定
 					//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
 					int evasionChance = playerStatus_->astrology_ / 5;
@@ -632,12 +543,102 @@ void QuestPhase::ProcessActionLoop(void)
 					if (roll < evasionChance)
 					{
 						//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
-						battleMessage_ = "攻撃を回避した！";
+						battleMessage_ = unit.name + "の" + unit.skillName;
+						battleMessage_ += "\n攻撃を回避した！";
 					}
 					else if (!activeEnemy_->IsDead())
 					{
-						//回避失敗 通常通りダメージを受ける
-						playerStatus_->Damage(damage);
+						if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
+							|| unit.skillName == "金縛り" || unit.skillName == "発狂")
+						{
+							//プレイヤーを凍結状態にする
+							int damage = activeEnemy_->GetPower3();
+							playerStatus_->Damage(damage);
+							if (statusEffect_ == STATUS_EFFECT::NONE)
+							{
+								statusEffect_ = STATUS_EFFECT::FREEZE;
+								battleMessage_ += playerStatus_->GetName() + "は凍りついた";
+							}
+							else battleMessage_ += "しかしうまく決まらなかった";
+						}
+						else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
+							|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
+						{
+							//プレイヤーを沈黙状態にする
+							int damage = activeEnemy_->GetPower3();
+							playerStatus_->Damage(damage);
+							if (statusEffect_ == STATUS_EFFECT::NONE)
+							{
+								statusEffect_ = STATUS_EFFECT::SILENCE;
+								battleMessage_ += playerStatus_->GetName() + "は沈黙になった";
+							}
+							else battleMessage_ += "しかしうまく決まらなかった";
+						}
+						else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
+							|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
+						{
+							//プレイヤーを毒状態にする
+							int damage = activeEnemy_->GetPower2();
+							playerStatus_->Damage(damage);
+							if (statusEffect_ == STATUS_EFFECT::NONE)
+							{
+								statusEffect_ = STATUS_EFFECT::POISON;
+								battleMessage_ += playerStatus_->GetName() + "は毒状態になった";
+							}
+							else battleMessage_ += "しかしうまく決まらなかった";
+						}
+						else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
+							|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
+						{
+							//プレイヤーを呪い状態にする
+							int damage = activeEnemy_->GetPower2();
+							playerStatus_->Damage(damage);
+							if (statusEffect_ == STATUS_EFFECT::NONE)
+							{
+								statusEffect_ = STATUS_EFFECT::CURSE;
+								battleMessage_ += playerStatus_->GetName() + "は呪われた";
+							}
+							else battleMessage_ += "しかしうまく決まらなかった";
+						}
+						else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
+							|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃")
+						{
+							//プレイヤーを閃光状態にする
+							int damage = activeEnemy_->GetPower2();
+							playerStatus_->Damage(damage);
+							if (statusEffect_ == STATUS_EFFECT::NONE)
+							{
+								statusEffect_ = STATUS_EFFECT::FLASH;
+								battleMessage_ += playerStatus_->GetName() + "は目がくらんだ";
+							}
+							else battleMessage_ += "しかしうまく決まらなかった";
+						}
+						else
+						{
+							//---それ以外は通常の攻撃技として処理---
+							//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
+							int damage = 0;
+
+							if (unit.command == ANIM_ACT_1)
+							{
+								damage = activeEnemy_->GetPower1();
+
+								activeEnemy_->ChangeAnim(unit.command);
+							}
+							else if (unit.command == ANIM_ACT_2)
+							{
+								damage = activeEnemy_->GetPower2();
+								activeEnemy_->ChangeAnim(unit.command);
+							}
+							else if (unit.command == ANIM_ACT_3)
+							{
+								damage = activeEnemy_->GetPower3();
+								activeEnemy_->ChangeAnim(unit.command);
+							}
+
+							//回避失敗 通常通りダメージを受ける
+							playerStatus_->Damage(damage);
+						}
 					}
 				}
 			}
@@ -828,7 +829,7 @@ void QuestPhase::CheckEnemyDeath(void)
 			break;
 		}
 
-		if (isHellQuest_)playerStatus_->GetExp(150);//激ムズクエストは莫大な経験値を付与
+		if (isHellQuest_)playerStatus_->GetExp(450);//激ムズクエストは莫大な経験値を付与
 
 		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 		battleStep_ = BATTLE_STEP::RESULT;

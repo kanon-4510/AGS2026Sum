@@ -37,7 +37,7 @@ void PlayerStatus::Draw()
 	int magBonus = SkillBonus(BonusType::MagicBonus, 0);
 	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 190, GREEN, "(魔法+%d)", magBonus);
 
-	int defBonus = (faith_ / 10); //軽減するダメージ量
+	int defBonus = (faith_ / 15); //軽減するダメージ量
 	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 210, GREEN, "(防御+%d)", defBonus);
 
 	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
@@ -241,13 +241,13 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 		return baseValue + (martialArts_ / 5);
 
 	case BonusType::MagicBonus:
-		//魔法知10につき、魔法を+1する
-		return baseValue + (magicKnowledge_ / 10);
+		//魔法知につき、魔法を増やす
+		return baseValue;
 
 	case BonusType::DefenseBonus:
 	{
-		//信仰10につき、受けるダメージを-1する
-		int finalDamage = baseValue - (faith_ / 10);
+		//信仰15につき、受けるダメージを-1する
+		int finalDamage = baseValue - (faith_ / 15);
 		//ダメージがマイナス（回復）になってしまうのを防ぐため、最低でも1ダメージは受ける
 		if (finalDamage < 1) finalDamage = 1;
 		return finalDamage;
