@@ -641,6 +641,7 @@ void QuestPhase::ProcessActionLoop(void)
 							}
 
 							//‰ñ”ðŽ¸”s ’Êí’Ê‚èƒ_ƒ[ƒW‚ðŽó‚¯‚é
+							playerStatus_->DamageAnimation();
 							playerStatus_->Damage(damage);
 						}
 					}

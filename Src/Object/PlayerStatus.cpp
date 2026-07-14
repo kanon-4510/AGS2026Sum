@@ -19,6 +19,10 @@ void PlayerStatus::Update()
 	{
 		playerPosX_ = PLAYER_POS_X; // 演出が終わったら完全に元の位置に戻る
 	}
+	if (damageMotionTimer_ > 0)
+	{
+		damageMotionTimer_--;
+	}
 }
 
 void PlayerStatus::Draw()
@@ -87,8 +91,29 @@ void PlayerStatus::DrawQuestImages()
 	//緑の現在値
 	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - 5, PLAYER_POS_X + currentBarWidth, PLAYER_POS_Y, GetColor(0, 255, 0), TRUE);
 
-	DrawGraph(playerPosX_, PLAYER_POS_Y, battlePlayer_, true);
-	//DrawRotaGraph(PLAYER_POS_X, PLAYER_POS_Y, 0.7, 0, battlePlayer_, true);
+	bool isVisible = true; // 描画するかどうかのフラグ
+
+	if (damageMotionTimer_ > 0)
+	{
+		//2フレームごとにパタパタ点滅
+		if ((damageMotionTimer_ / 2) % 3 == 0)
+		{
+			isVisible = false;
+		}
+
+		//赤く染める
+		SetDrawBright(255, 0, 0);
+	}
+
+	if (isVisible)
+	{
+		DrawGraph(playerPosX_, PLAYER_POS_Y, battlePlayer_, true);
+	}
+
+	if (damageMotionTimer_ > 0)
+	{
+		SetDrawBright(255, 255, 255);
+	}
 }
 
 void PlayerStatus::InitJob()
@@ -319,11 +344,12 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 
 void PlayerStatus::AttackAnimation()
 {
-	attackMotionTimer_ = ANIM_COUNT;
+	attackMotionTimer_ = ANIM_COUNT_ATTACK;
 }
 
 void PlayerStatus::DamageAnimation()
 {
+	damageMotionTimer_ = ANIM_COUNT_DAMAGE;
 }
 
 int PlayerStatus::AddSkillPoint(SkillType type, int baseAmount)

@@ -29,7 +29,8 @@ public:
 	constexpr static int PLAYER_POS_X = 900;	//プレイヤーの描画位置X
 	constexpr static int PLAYER_POS_Y = 300;	//プレイヤーの描画位置Y
 
-	constexpr static int ANIM_COUNT = 5;	//アニメーションのフレーム数
+	constexpr static int ANIM_COUNT_ATTACK = 5;	//アニメーションのフレーム数
+	constexpr static int ANIM_COUNT_DAMAGE = 10;	//アニメーションのフレーム数
 	constexpr static int ANIM_MOVE_PIXELS = 3;	//動かすピクセル数
 
 	int level_ = 1;
@@ -173,4 +174,6 @@ private:
 
 	int attackMotionTimer_ = 0; // 演出用のタイマー（フレーム数）
 	int playerPosX_ = PLAYER_POS_X;           // 画像を左にずらすピクセル数
+
+	int damageMotionTimer_ = 0; // ダメージ演出用のタイマー（フレーム数）
 };
