@@ -8,6 +8,19 @@ PlayerStatus::PlayerStatus()
 	battlePlayer_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BATTLE_PLAYER).handleId_;
 }
 
+void PlayerStatus::Update()
+{
+	if (attackMotionTimer_ > 0)
+	{
+		attackMotionTimer_--;
+		playerPosX_ -= ANIM_MOVE_PIXELS; // 演出中は左にずらす
+	}
+	else
+	{
+		playerPosX_ = PLAYER_POS_X; // 演出が終わったら完全に元の位置に戻る
+	}
+}
+
 void PlayerStatus::Draw()
 {
 	//ステータスの描画処理
@@ -74,7 +87,7 @@ void PlayerStatus::DrawQuestImages()
 	//緑の現在値
 	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - 5, PLAYER_POS_X + currentBarWidth, PLAYER_POS_Y, GetColor(0, 255, 0), TRUE);
 
-	DrawGraph(PLAYER_POS_X, PLAYER_POS_Y, battlePlayer_, true);
+	DrawGraph(playerPosX_, PLAYER_POS_Y, battlePlayer_, true);
 	//DrawRotaGraph(PLAYER_POS_X, PLAYER_POS_Y, 0.7, 0, battlePlayer_, true);
 }
 
@@ -112,6 +125,8 @@ int PlayerStatus::Attack()
 	//職業ごとのプラス値を加える
 	int jobBonus = GetJobBonus().power;
 	int powerWithJob = base + jobBonus;
+
+	AttackAnimation();
 
 	//技能ステータスのボーナスを加える
 	return powerWithJob;
@@ -300,6 +315,15 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	}
 
 	return bonus;
+}
+
+void PlayerStatus::AttackAnimation()
+{
+	attackMotionTimer_ = ANIM_COUNT;
+}
+
+void PlayerStatus::DamageAnimation()
+{
 }
 
 int PlayerStatus::AddSkillPoint(SkillType type, int baseAmount)

@@ -76,7 +76,6 @@ void GameScene::Update(void)
 				}
 			}
 			//CANCELの場合などは turn_ は増えず、そのまま拠点メニューに戻る
-
 			isInputBlocked_ = true; //次のフレームは入力を受け付けないフラグを立てる
 			return;
 		}

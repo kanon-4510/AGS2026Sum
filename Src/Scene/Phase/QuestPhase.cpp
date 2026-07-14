@@ -88,6 +88,8 @@ void QuestPhase::Update(void)
 	//ターン管理関数
 	ManageTurn();
 
+	playerStatus_->Update(); //プレイヤーの更新処理
+
 	if (activeEnemy_ != nullptr)
 	{
 		activeEnemy_->Update(); //敵の更新処理
@@ -261,7 +263,7 @@ void QuestPhase::ManageTurn(void)
 	switch (battleStep_)
 	{
 	case QuestPhase::BATTLE_STEP::DIFFICULTY_SELECTION:
-		//難易度選択処理などをここに書く
+		//ステージ選択処理などをここに書く
 		ProcessDifficulty();
 		break;
 	case QuestPhase::BATTLE_STEP::COMMAND_SELECTION:
@@ -414,11 +416,13 @@ void QuestPhase::ProcessActionLoop(void)
 					if (roll < criticalChance)
 					{
 						battleMessage_ += "クリティカルヒット！";
+						playerStatus_->AttackAnimation();
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						activeEnemy_->Damage(playerStatus_->Attack() * 3);
 					}
 					else
 					{
+						playerStatus_->AttackAnimation();
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						activeEnemy_->Damage(playerStatus_->Attack());
 					}
@@ -653,7 +657,8 @@ void QuestPhase::ProcessActionLoop(void)
 	}
 
 	//②Enterキー待ちと、連戦(Wave)の処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+	if (activeEnemy_->IsAnimFinished() == true &&
+		ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		battleMessage_ = "";
@@ -749,7 +754,8 @@ void QuestPhase::ProcessStatusEffect(void)
 
 	//ここに来るのは、battleMessage_ に何かしらの文章が入っている場合
 	//Enterキー待ちをしてから次のターン（またはゲームオーバー）へ進む
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
+	if (activeEnemy_->IsAnimFinished() == true && 
+		ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//もし敵を倒していたら
