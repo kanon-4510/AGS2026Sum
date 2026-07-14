@@ -29,6 +29,9 @@ public:
 	constexpr static int PLAYER_POS_X = 900;	//プレイヤーの描画位置X
 	constexpr static int PLAYER_POS_Y = 300;	//プレイヤーの描画位置Y
 
+	constexpr static int ANIM_COUNT = 5;	//アニメーションのフレーム数
+	constexpr static int ANIM_MOVE_PIXELS = 3;	//動かすピクセル数
+
 	int level_ = 1;
 	int exp_ = 0;
 	int maxHp_ = 10;
@@ -94,6 +97,9 @@ public:
 
 	PlayerStatus();
 
+	//更新処理
+	void Update();
+
 	//描画処理
 	void Draw();
 
@@ -153,10 +159,18 @@ public:
 	//現在の職業名を外から参照できるようにする
 	std::string GetJobName() const { return job; }
 
+	//攻撃アニメーションの処理
+	void AttackAnimation();
+
+	//ダメージアニメーションの処理
+	void DamageAnimation();
+
 	bool hasChallengedHellQuest_ = false; //激ムズクエストに挑戦したかどうかのフラグ
 private:
 	std::string name = "ルピナス";	//プレイヤーの名前
 
 	int battlePlayer_;	//プレイヤーの画像を格納
 
+	int attackMotionTimer_ = 0; // 演出用のタイマー（フレーム数）
+	int playerPosX_ = PLAYER_POS_X;           // 画像を左にずらすピクセル数
 };

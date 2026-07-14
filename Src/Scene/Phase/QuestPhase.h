@@ -100,7 +100,6 @@ public:
 	static constexpr int DIFFICULTY_ENTER_MSG_X = 0;
 	static constexpr int DIFFICULTY_ENTER_MSG_Y = 400;
 
-
 	//現在のターンメッセージの位置
 	static constexpr int TURN_MSG_X = 0;
 	static constexpr int TURN_MSG_Y = 80;
@@ -125,16 +124,6 @@ public:
 	static constexpr int NEXT_MSG_X = 0;
 	static constexpr int NEXT_MSG_Y = 190;
 	
-	//経験値（仮）
-	static constexpr int EXP_GAIN = 10;
-
-	static constexpr int MAX_HP = 30; //
-	static constexpr int HP_RECOVERY_AMOUNT = 20; //アイテム使用時のHP回復量
-
-	//敵の強さの上がり幅
-	static constexpr float ENEMY_INCREASE = 0.7f;
-	static constexpr float HARD_INCREASE = 1.5f;
-
 	//アニメーションナンバー
 	static constexpr int ANIM_ACT_1 = 0;
 	static constexpr int ANIM_ACT_2 = 1;

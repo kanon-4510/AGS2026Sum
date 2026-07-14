@@ -76,7 +76,6 @@ void GameScene::Update(void)
 				}
 			}
 			//CANCELの場合などは turn_ は増えず、そのまま拠点メニューに戻る
-
 			isInputBlocked_ = true; //次のフレームは入力を受け付けないフラグを立てる
 			return;
 		}
@@ -133,7 +132,7 @@ void GameScene::Draw(void)
 
 		Utility::DrawCommandMenu(200, 200,{"クエスト", "授業", "資格試験"}, (phase_));
 
-		DrawGraph(1100, 520, playerImg_, TRUE);
+		DrawGraph(700, 200, playerImg_, TRUE);
 
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();
