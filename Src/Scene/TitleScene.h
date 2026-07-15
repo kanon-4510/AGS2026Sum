@@ -14,7 +14,14 @@ public:
 	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;			//矢印の表示位置Y
 
 	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ]
-	static constexpr int EXIT_ARROW_X = 630;			//ゲーム終了確認メッセージ
+	static constexpr int EXIT_ARROW_X = 500;			//ゲーム終了確認メッセージ
+
+	enum TITLE_SELECTION
+	{
+		START_GAME,	//ゲームスタート
+		EXIT_GAME,	//ゲーム終了
+		MAX			//最大値
+	};
 
 	enum class TITLE_MODE
 	{
@@ -23,11 +30,18 @@ public:
 		EXIT,		//終了確認モード
 	};
 
-	enum TITLE_SELECTION
+	enum class MODE_SELECTION
 	{
-		START_GAME,	//ゲームスタート
-		EXIT_GAME,	//ゲーム終了
-		MAX			//最大値
+		NONE,
+		//NORMALモードの選択肢
+		NORMAL_TUTORIAL,
+		NORMAL_EXIT,
+		//TUTORIALモードの選択肢
+		TUTORIAL_CHANGE,
+		TUTORIAL_NEXT,
+		//EXITモードの選択肢
+		EXIT_YES,
+		EXIT_NO
 	};
 
 	//TitleScene(void);		//デフォルトコンストラクタ
@@ -53,11 +67,12 @@ private:
 	int titleImage_;		//タイトル画像の格納領域
 	int currentSelection_;	//現在の選択肢
 	int tutorialIndex_ = 0;	//0：ON,1：OFF
-	int confirmIndex_ = 1;	//ゲーム終了確認の選択肢インデックス
+	int confirmIndex_ = 0;	//ゲーム終了確認の選択肢インデックス
 
 	void ProcessTitleSelection(void);	//タイトル選択の処理
 	void ProcessTitleDecision(void);	//タイトル決定の処理
-	void ProcessTitleMouse(void);		//タイトル選択のマウス処理
+	void ProcessMouseSelection(void);	//タイトル選択のマウス処理
+	void ProcessMouseDecision(void);	//タイトル決定のマウス処理
 	void Tutorial(void);				//チュートリアルのON/OFF切り替え処理
 	void ExitGame(void);				//ゲーム終了の確認処理
 };
