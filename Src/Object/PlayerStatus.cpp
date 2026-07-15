@@ -94,14 +94,25 @@ void PlayerStatus::InitJob()
 	jobList.push_back(JobData("ôpt"	,5,0,0,  0,  0,  0,  0,100,  0));
 	jobList.push_back(JobData("è‚¢t"	,5,0,0,  0,  0,  0,  0,  0,100));
 
-	jobList.push_back(JobData("˜B‹àpt",15,0,0,500,  0,  0,  0,  0,  0));
-	jobList.push_back(JobData("¹‹Rm"	,15,0,0,  0,500,  0,  0,  0,  0));
-	jobList.push_back(JobData("Œ«Ò"	,15,0,0,  0,  0,500,  0,  0,  0));
-	jobList.push_back(JobData("ˆ«–‚âP‚¢",15,0,0,  0,  0,  0,500,  0,  0));
-	jobList.push_back(JobData("€—ìpt",15,0,0,  0,  0,  0,  0,500,  0));
-	jobList.push_back(JobData("—\Œ¾Ò"	,15,0,0,  0,  0,  0,  0,  0,500));
+	jobList.push_back(JobData("˜B‹àpt",20,0,0,170,  0, 30,  0,100,  0));
+	jobList.push_back(JobData("¹‹Rm"	,20,0,0,  0,230,  0, 70,  0,  0));
+	jobList.push_back(JobData("Œ«Ò"	,20,0,0,  0,  0,200,  0, 50, 50));
+	jobList.push_back(JobData("ˆ«–‚âP‚¢",20,0,0, 70, 30,  0,200,  0,  0));
+	jobList.push_back(JobData("€—ìpt",20,0,0,  0,  0,100,  0,200,  0));
+	jobList.push_back(JobData("—\Œ¾Ò"	,20,0,0, 30,  0,  0, 40,  0,230));
 
-	jobList.push_back(JobData("‘å–‚–@g‚¢",30,0,0,300,300,300,300,300,300));
+	jobList.push_back(JobData("‘å–‚–@g‚¢",40,0,0,200,200,200,200,200,200));
+
+	//ƒWƒ‡ƒuƒ`ƒFƒ“ƒW‚µ‚½—p
+	hasCurseStart = false;
+	hasFirstHitNull = false; 
+	hasMagicUnlock = false;
+	hasCritBoost = false; 
+	hasMagicToAttack = false; 
+	hasAutoRegen = false; 
+	hasGuts = false;
+	isFirstHitUsed = false; 
+	isGutsUsed = false;
 }
 
 int PlayerStatus::Attack()
@@ -146,10 +157,20 @@ void PlayerStatus::Damage(int damage)
 	int finalDamage = SkillBonus(BonusType::DefenseBonus, damage);
 
 	hp_ -= finalDamage;
-	if (hp_ <= 0) 
+	if (hp_ <= 0)
 	{
-		hp_ = 0;
-		Death();
+		//H‚¢‚µ‚Î‚è”­“®ƒ`ƒFƒbƒN
+		if (hasGuts && !isGutsUsed)
+		{
+			hp_ = 1; //1‚Å‘Ï‚¦‚é
+			isGutsUsed = true; //Á”ï‚·‚é
+			//¦‰æ–Ê‚Éu’v–½‚ğ‘Ï‚¦‚½v‚Æo‚µ‚½‚¢ê‡‚ÍAƒtƒ‰ƒO‚ğ•Ô‚è’l‚É‚·‚é‚©QuestPhase‚Å”»’è‚µ‚Ü‚·
+		}
+		else
+		{
+			hp_ = 0;
+			Death();
+		}
 	}
 }
 
@@ -269,34 +290,99 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 {
 	JobBonus bonus;
 
+	//ƒWƒ‡ƒuƒ`ƒFƒ“ƒW‚µ‚½—p
+	hasCurseStart = false;
+	hasFirstHitNull = false;
+	hasMagicUnlock = false;
+	hasCritBoost = false;
+	hasMagicToAttack = false;
+	hasAutoRegen = false;
+	hasGuts = false;
+
 	//E‹Æ‚²‚Æ‚ÌƒXƒe[ƒ^ƒXƒ{[ƒiƒX‚ğİ’è
 	if (this->job == "ˆê”Ê–‚–@g‚¢") 
 	{
+		bonus.hp = 7;
 		bonus.magic = 5;
 	}
-	if (this->job == "•t‰Ápt") 
+
+	if (this->job == "•t‰Ápt")
 	{
-		bonus.hp = 10;
+		bonus.hp = 14;
+		bonus.speed = 11;
 	}
-	if (this->job == "–‚Œ•m") 
+	if (this->job == "–‚Œ•m")
 	{
-		bonus.power = 10;
+		bonus.hp = 6;
+		bonus.power = 12;
+		bonus.speed = 7;
 	}
-	if (this->job == "–‚“±t") 
+	if (this->job == "–‚“±t")
+	{
+		bonus.magic = 25;
+	}
+	if (this->job == "¹EÒ")
+	{
+		bonus.hp = 16;
+		bonus.magic = 9;
+	}
+	if (this->job == "ôpt")
+	{
+		bonus.hp = 2;
+		bonus.power = 8;
+		bonus.magic = 15;
+	}
+	if (this->job == "è‚¢t")
 	{
 		bonus.magic = 10;
+		bonus.speed = 15;
 	}
-	if (this->job == "¹EÒ") 
+
+	if (this->job == "˜B‹àpt")
 	{
-		bonus.hp = 10;
+		bonus.hp = 24;
+		bonus.speed = 21;
+		hasAutoRegen = true; //–ˆƒ^[ƒ“HP‰ñ•œ
 	}
-	if (this->job == "ôpt") 
+	if (this->job == "¹‹Rm")
 	{
+		bonus.hp = 12;
+		bonus.power = 20;
+		bonus.speed = 13;
+		hasCritBoost = true; //ƒNƒŠƒeƒBƒJƒ‹”{—¦ã¸
+	}
+	if (this->job == "Œ«Ò")
+	{
+		bonus.magic = 45;
+		hasMagicToAttack = true; //UŒ‚‚É–‚—Í‰ÁZ
+	}
+	if (this->job == "ˆ«–‚âP‚¢")
+	{
+		bonus.hp = 27;
+		bonus.magic = 18;
+		hasGuts = true; //H‚¢‚µ‚Î‚è
+	}
+	if (this->job == "€—ìpt")
+	{
+		bonus.hp = 7;
+		bonus.power = 13;
+		bonus.magic = 25;
+		hasCurseStart = true; //ŠJ–‹ô‚¢
+	}
+	if (this->job == "—\Œ¾Ò")
+	{
+		bonus.magic = 20;
+		bonus.speed = 25;
+		hasFirstHitNull = true; //‰Œ‚–³Œø
+	}
+
+	if (this->job == "‘å–‚–@g‚¢")
+	{
+		bonus.hp = 20;
 		bonus.power = 10;
-	}
-	if (this->job == "è‚¢t") 
-	{
-		bonus.speed = 10;
+		bonus.magic = 25;
+		bonus.speed = 15;
+		hasMagicUnlock = true; //–‚–@§ŒÀ‚È‚µ
 	}
 
 	return bonus;

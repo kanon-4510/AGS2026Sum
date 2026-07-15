@@ -64,12 +64,12 @@ public:
 	//追加効果の種類
 	enum class BonusType 
 	{
-		ItemBonus,      //薬学　　：アイテム効果上昇
-		AttackBonus,    //武術　　：攻撃力上昇
-		MagicBonus,     //魔法知識：魔法の使用許可
-		DefenseBonus,   //信仰　　：ダメージ軽減
-		ExpBonus,       //考古学　：経験値上昇
-		LuckBonus       //占星術　：運の上昇
+		ItemBonus,   //薬学　　：回復効果上昇
+		AttackBonus, //武術　　：会心発生率上昇
+		MagicBonus,  //魔法知識：魔法の使用許可
+		DefenseBonus,//信仰　　：ダメージ軽減量
+		ExpBonus,    //考古学　：獲得経験値上昇
+		LuckBonus    //占星術　：回避率上昇
 	};
 
 	//職業ごとのステータスボーナス
@@ -79,7 +79,6 @@ public:
 		int power = 0;
 		int magic = 0;
 		int speed = 0;
-		int luck = 0;
 	};
 	PLAYER_ROUTE currentRoute_ = PLAYER_ROUTE::NONE; //現在のルート
 
@@ -94,69 +93,51 @@ public:
 
 	PlayerStatus();
 
-	//描画処理
-	void Draw();
+	void Draw();//描画処理
+	void DrawQuestImages();//クエスト用の画像などを描画する処理
 
-	//クエスト用の画像などを描画する処理
-	void DrawQuestImages();
-
-	//職業の初期化
-	void InitJob();
-
-	//攻撃処理
-	int Attack();
-
-	//魔法攻撃処理
-	int MagicAttack();
+	int Attack();//攻撃処理
+	int MagicAttack();//魔法攻撃処理
 
 	//回復処理
 	void Heal(int amount);
-
 	void FullHeal();
 
-	//ダメージ処理
-	void Damage(int damage);
+	void Damage(int damage);//ダメージ処理
+	void Death();	//死亡処理
 
-	//死亡処理
-	void Death();
-
-	//HPを外から参照できるようにする
-	int GetMaxHp();
-
-	//速度を外から参照できるようにする
-	int GetSpeed();
-
-	//経験値処理
-	void GetExp(int exp);
+	int GetMaxHp();//HPを外から参照できるようにする
+	int GetSpeed();//速度を外から参照できるようにする
+	void GetExp(int exp);//経験値処理
 
 	//レベルアップした時の処理
 	void LevelUp();
 
-	//転職可能かどうかを判定する関数
-	bool JobCheck(const JobData& job);
+	//職業関連
+	void InitJob();//職業の初期化
+	bool JobCheck(const JobData& job);//転職可能かどうかを判定する関数
+	int SkillBonus(BonusType type, int baseValue);//技能ごとの追加効果を処理する関数
+	JobBonus GetJobBonus();//現在の職業に応じたステータスボーナスを計算する関数
+	void SetJob(std::string newJobName) { job = newJobName; }//職業名を書き換える
+	//ユニークスキル用のフラグ
+	bool hasCurseStart = false;   //開幕呪い
+	bool hasFirstHitNull = false; //初撃無効
+	bool hasMagicUnlock = false;  //魔法制限なし
+	bool hasCritBoost = false;    //クリティカル倍率上昇
+	bool hasMagicToAttack = false;//攻撃時に魔力加算
+	bool hasAutoRegen = false;    //毎ターンHP回復
+	bool hasGuts = false;         //食いしばり（HP1で耐える）
+	//スキルの「消費」を管理するフラグ
+	bool isFirstHitUsed = false;  //初撃無効を消費したか
+	bool isGutsUsed = false;      //食いしばりを消費したか
 
-	//技能ごとの追加効果を処理する関数
-	int SkillBonus(BonusType type, int baseValue);
-
-	//現在の職業に応じたステータスボーナスを計算する関数
-	JobBonus GetJobBonus();
-
-	//全職業リストを外から参照できるようにする
-	const std::vector<JobData>& GetJobList() const { return jobList; }
-
-	//職業名を書き換える
-	void SetJob(std::string newJobName) { job = newJobName; }
-
-	//プレイヤーの名前を外から参照できるようにする
-	std::string GetName() const { return name; }
-
-	//現在の職業名を外から参照できるようにする
-	std::string GetJobName() const { return job; }
+	const std::vector<JobData>& GetJobList() const { return jobList; }//全職業リストを外から参照できるようにする
+	std::string GetName() const { return name; }					  //プレイヤーの名前を外から参照できるようにする
+	std::string GetJobName() const { return job; }					  //現在の職業名を外から参照できるようにする
 
 	bool hasChallengedHellQuest_ = false; //激ムズクエストに挑戦したかどうかのフラグ
 private:
 	std::string name = "ルピナス";	//プレイヤーの名前
 
 	int battlePlayer_;	//プレイヤーの画像を格納
-
 };
