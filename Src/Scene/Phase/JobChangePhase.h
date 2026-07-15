@@ -29,6 +29,8 @@ public:
 	void DrawJobBonus(const JobData& job);
 
 	void DrawDetails(void); //職業の詳細情報を描画する関数
+	
+	void DrawAnimation(void); //職業の詳細情報を描画する関数
 
     // フェーズが終了したかどうかを親に伝える
 	virtual bool IsFinished() const override;
@@ -38,11 +40,18 @@ private:
 	PlayerStatus* playerStatus_; // プレイヤーのステータスへのポインタ
 	InputManager& ins_ = InputManager::GetInstance();
 	int bgImg_; // 背景画像のハンドル
+	//ページを左にめくる画像のハンドル
+	int pageLeftImg_[8];	//右から左
+	int pageRightImg_[8];	//左から右
+	int pageAnimeTimer_ = -1;	// アニメーションのタイマー
+	int currentFrame_ = 0;	// 現在のフレーム
+
 	int selectedIndex_ = 0; // 現在選択されている職業のインデックス
 
 	int timer_ = 200; //メッセージ表示のカウントを管理する変数
 
 	bool isShowingDetails_ = false; //詳細表示中かどうかを管理するフラグ
+	bool ispageLR_ = false; //右か左かフラグ(trueで右から左にめくる)
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 	
 	void ProcessJobListSelection(void); //職業選択の処理

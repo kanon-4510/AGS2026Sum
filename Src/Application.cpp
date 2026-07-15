@@ -39,7 +39,7 @@ Application::Application(void)
 void Application::Init(void)
 {
 	// ウィンドウタイトル
-	SetWindowText("AGS2025");
+	SetWindowText("AGS2026");
 
 
 	// 画面サイズ設定

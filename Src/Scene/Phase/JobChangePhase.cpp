@@ -10,6 +10,10 @@
 JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene) :playerStatus_(playerStatus), gameScene_(gameScene)
 {
     bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BOOK).handleId_;
+    LoadDivGraph("Data/Image/Book/ListBookRtoL.png",
+        8,4,2,790,790, pageLeftImg_);
+    LoadDivGraph("Data/Image/Book/ListBookLtoR.png",
+        8,4,2,790,790, pageRightImg_);
     playerStatus_->InitJob(); //職業の初期化
 }
 
@@ -88,6 +92,7 @@ void JobChangePhase::Draw(void)
     else
     {
         DrawDetails();
+        DrawAnimation();
         //DrawJobBonus(jobList[selectedIndex_]);
     }
     
@@ -286,6 +291,29 @@ void JobChangePhase::DrawDetails(void)
     }
 }
 
+void JobChangePhase::DrawAnimation(void)
+{
+    if (pageAnimeTimer_ >= 0)
+    {
+        int animSpeed = 8;  // コマの切り替わる速さ（3フレームごとに1コマ進む）
+        int currentFrame = pageAnimeTimer_ / animSpeed;
+
+        if (currentFrame > 7) {
+            currentFrame = 7; // 配列の範囲（0～7）を超えないようにガード
+        }
+        if(ispageLR_)
+        {
+            //本のめくりアニメーションを描画（座標は画面に合わせて調整してください）
+            DrawGraph(jobListX, jobListY - 230, pageLeftImg_[currentFrame], true);
+        }
+        else
+        {
+            //本のめくりアニメーションを描画（座標は画面に合わせて調整してください）
+            DrawGraph(jobListX, jobListY - 230, pageRightImg_[currentFrame], true);
+		}
+    }
+}
+
 bool JobChangePhase::IsFinished() const
 {
 	return isFinished_;
@@ -339,16 +367,29 @@ void JobChangePhase::ProcessDetailsListSelection(void)
     {
         return; //詳細表示中でなければ何もしない
     }
+
+    if (pageAnimeTimer_ >= 0)
+    {
+        pageAnimeTimer_++;
+        if (pageAnimeTimer_ >= 60)
+        {
+            pageAnimeTimer_ = -1; // 24フレーム経ったら停止状態に戻す
+        }
+    }
     //プレイヤーが持っている全職業リストを取得
     auto& jobList = playerStatus_->GetJobList();
 
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RIGHT) ||
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT)) {
         selectedIndex_ = (selectedIndex_ + 1) % jobList.size();
+		ispageLR_ = true; //右にめくる
+        pageAnimeTimer_ = 0;
     }
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_LEFT) ||
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_LEFT)) {
         selectedIndex_ = (selectedIndex_ - 1 + jobList.size()) % jobList.size();
+        ispageLR_ = false; //左にめくる
+        pageAnimeTimer_ = 0;
     }
 
     //決定キーが押されたら
