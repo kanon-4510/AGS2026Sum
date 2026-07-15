@@ -7,8 +7,11 @@ class GameScene;
 class ClassWorkPhase : public PhaseBase
 {
 public:
-	static constexpr int bonusX = 400;	//技能ボーナスの描画位置X
-	static constexpr int bonusY = 140;	//技能ボーナスの描画位置Y
+	static constexpr int TEXT_POS_X = 150;	//授業のテキスト描画位置X
+	static constexpr int TEXT_POS_Y = 150;	//授業のテキスト描画位置Y
+	
+	static constexpr int bonusX = 340;	//技能ボーナスの描画位置X
+	static constexpr int bonusY = 150;	//技能ボーナスの描画位置Y
 
 	enum CLASSWORK_SELECT
 	{
@@ -38,6 +41,7 @@ private:
 	PlayerStatus* playerStatus_;
 	InputManager& ins_ = InputManager::GetInstance();
 	int timer_ = 0; //フェーズの経過時間を管理するタイマー
+	int bgImg_ = -1; //背景画像のハンドル
 
 	bool isFinished_ = false; // フェーズが終了したかどうかを管理するフラグ
 

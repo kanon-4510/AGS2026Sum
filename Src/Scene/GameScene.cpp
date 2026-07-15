@@ -129,8 +129,9 @@ void GameScene::Draw(void)
 		
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
-
-		Utility::DrawCommandMenu(200, 200,{"クエスト", "授業", "資格試験"}, (phase_));
+		SetFontSize(32);
+		Utility::DrawCommandMenu(200, 100, { "クエスト", "授業", "資格試験" }, (phase_), 60);
+		SetFontSize(DEFAULT_FONT_SIZE);
 
 		DrawGraph(700, 200, playerImg_, TRUE);
 

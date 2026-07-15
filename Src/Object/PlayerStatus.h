@@ -16,7 +16,7 @@ enum class PLAYER_ROUTE
 class PlayerStatus
 {
 public:
-	constexpr static int STATUS_X = 300;			//ステータスの描画位置X
+	constexpr static int STATUS_X = 500;			//ステータスの描画位置X
 	constexpr static int STATUS_COLOR = 0xFFFFFF;	//ステータスの描画色
 
 	constexpr static int STATUS_BONUS_X = 380;	//ステータスのボーナス分の描画位置X

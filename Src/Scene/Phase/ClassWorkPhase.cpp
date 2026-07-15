@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include "../../Application.h"
 #include "../../Common/Color.h"
+#include "../../Manager/ResourceManager.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "../GameScene.h"
@@ -8,7 +9,7 @@
 
 ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus, GameScene& gameScene):playerStatus_(playerstatus), gameScene_(gameScene)
 {
-
+	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
 }
 
 ClassWorkPhase::~ClassWorkPhase(void)
@@ -28,22 +29,23 @@ void ClassWorkPhase::Update(void)
 void ClassWorkPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
-
+	DrawGraph(0, 0, bgImg_, true);
 	DrawTutorial();
 
-	DrawFormatString(100, 100, (select_ == CLASSWORK_SELECT::PHARMACY ? Color::YELLOW : Color::WHITE), "薬学調合");
-	DrawFormatString(100, 140, (select_ == CLASSWORK_SELECT::MARTIALARTS ? Color::YELLOW : Color::WHITE), "武術訓練");
-	DrawFormatString(100, 180, (select_ == CLASSWORK_SELECT::MAGICKNOWLEDGE ? Color::YELLOW : Color::WHITE), "魔法知識");
-	DrawFormatString(100, 220, (select_ == CLASSWORK_SELECT::FAITH ? Color::YELLOW : Color::WHITE), "信仰");
-	DrawFormatString(100, 260, (select_ == CLASSWORK_SELECT::ARCHAEOLOGY ? Color::YELLOW : Color::WHITE), "考古学");
-	DrawFormatString(100, 300, (select_ == CLASSWORK_SELECT::ASTROLOGY ? Color::YELLOW : Color::WHITE), "占星術");
-
+	SetFontSize(24);
+	DrawFormatString(TEXT_POS_X, TEXT_POS_Y, (select_ == CLASSWORK_SELECT::PHARMACY ? Color::YELLOW : Color::WHITE), "薬学調合");
+	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 50, (select_ == CLASSWORK_SELECT::MARTIALARTS ? Color::YELLOW : Color::WHITE), "武術訓練");
+	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 100, (select_ == CLASSWORK_SELECT::MAGICKNOWLEDGE ? Color::YELLOW : Color::WHITE), "魔法知識");
+	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 150, (select_ == CLASSWORK_SELECT::FAITH ? Color::YELLOW : Color::WHITE), "信仰");
+	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 200, (select_ == CLASSWORK_SELECT::ARCHAEOLOGY ? Color::YELLOW : Color::WHITE), "考古学");
+	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 250, (select_ == CLASSWORK_SELECT::ASTROLOGY ? Color::YELLOW : Color::WHITE), "占星術");
+	
 	DrawSkillBonus();
+	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void ClassWorkPhase::DrawSkillBonus(void)
 {
-
 	DrawString(bonusX, bonusY, "【技能効果ボーナス】", Color::YELLOW);
 
 	//現在のボーナス値と、授業を受けた後のボーナス値を比較するための変数

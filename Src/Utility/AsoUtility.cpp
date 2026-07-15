@@ -50,12 +50,12 @@ Vector2 AsoUtility::Round(Vector2F value)
 	return ret;
 }
 
-void Utility::DrawCommandMenu(int x, int y, const std::vector<std::string>& labels, int cursor)
+void Utility::DrawCommandMenu(int x, int y, const std::vector<std::string>& labels, int cursor, int interval)
 {
 	for (int i = 0; i < (int)labels.size(); ++i) {
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //‘I‘ð’†‚Í‰©F‚É‚·‚é
-		DrawFormatString(x, y + i * 40, (cursor == i ? selectColor : color), labels[i].c_str());
+		DrawFormatString(x, y + i * interval, (cursor == i ? selectColor : color), labels[i].c_str());
 	}
 }
 

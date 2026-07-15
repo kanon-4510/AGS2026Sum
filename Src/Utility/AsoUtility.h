@@ -10,7 +10,7 @@ namespace Utility {
 	// ...既存の関数たち...
 
 	// 引数に vector を使うことで、3択でも4択でも対応可能にします
-	void DrawCommandMenu(int x, int y, const std::vector<std::string>& labels, int cursor);
+	void DrawCommandMenu(int x, int y, const std::vector<std::string>& labels, int cursor, int interval = 40);
 
 	// DrawCommandMenuの数に合わせて選択をできるようにする
 	void ProcessCommandMenuSelection(int& cursor, int maxItems);

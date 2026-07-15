@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include "../../Application.h"
 #include "../../Common/Color.h"
+#include "../../Manager/ResourceManager.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "../GameScene.h"
@@ -8,68 +9,26 @@
 
 JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene) :playerStatus_(playerStatus), gameScene_(gameScene)
 {
+    bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BOOK).handleId_;
     playerStatus_->InitJob(); //職業の初期化
 }
 
 void JobChangePhase::Update(void)
 {
-	auto& ins = InputManager::GetInstance();
-
-    //プレイヤーが持っている全職業リストを取得
-    auto& jobList = playerStatus_->GetJobList();
-
-    //上下キーで選択中の職業（selectedIndex）を動かす処理
-    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_UP) ||
-        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP)) {
-        selectedIndex_ = (selectedIndex_ - 1 + jobList.size()) % jobList.size();
-    }
-    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_DOWN) ||
-        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN)) {
-        selectedIndex_ = (selectedIndex_ + 1) % jobList.size();
-    }
-
-    //決定キーが押されたら
-    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
-        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
-        const auto& selectedJob = jobList[selectedIndex_];
-
-        //現在の職業名を取得
-        std::string Job = playerStatus_->GetJobName();
-
-        if (selectedJob.status.name == Job) {
-            //現在の職業と同じなら転職できない
-			timer_ = 0; //メッセージ表示のカウントをリセット
-        }
-        //PlayerStatusのJobCheckを呼び出して判定
-        else if (playerStatus_->JobCheck(selectedJob)) {
-            //条件クリア！職業を変更する
-            playerStatus_->SetJob(selectedJob.status.name);
-			PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
-            //転職成功のSEなどを鳴らすと良い
-            isFinished_ = true;
-        }
-        else {
-            //条件を満たしていない
-        }
-    }
-    else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
-        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
-        //キャンセルキーが押されたらフェーズを終了する
-        PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
-        isFinished_ = true;
-	}
+	//職業リストの選択処理
+    ProcessJobListSelection();
+	//職業詳細の選択処理
+    ProcessDetailsListSelection();
 }
 
 void JobChangePhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Job Change", 0xFFFFFF);
-
+	DrawGraph(jobListX, jobListY, bgImg_, true);
     auto& jobList = playerStatus_->GetJobList();
 
     //現在の職業名を取得
     std::string Job = playerStatus_->GetJobName();
-
-    DrawString(100, 50, "【資格試験 - 職業選択】", Color::WHITE);
 
     if(timer_ < COUNT_MAX)
     {
@@ -77,29 +36,63 @@ void JobChangePhase::Draw(void)
         timer_++; //メッセージ表示のカウントを増やす
 	}
 
-    for (int i = 0; i < jobList.size(); i++) {
-        int color = Color::GRAY; //デフォルトはグレー（なれない）
-
-        //条件チェック
-        if (playerStatus_->JobCheck(jobList[i])) {
-            color = Color::WHITE; //なれる職業は白
+    SetFontSize(24);
+    if (!isShowingDetails_)
+    {
+        DrawString(430, 150, "目 次", Color::BLACK);
+        
+        int half = static_cast<int>(jobList.size() / 2);
+        if (jobList.size() % 2 != 0) {
+            half++; // 奇数の場合、前半（左列）が1つ多くなるように調整
         }
 
-        //もしループ中の職業が「現在の職業」なら色を緑色にする
-        bool isCurrent = (jobList[i].status.name == Job);
-        if (isCurrent) {
-            color = Color::GREEN; //現在の職業は緑
-        }
+        for (int i = 0; i < jobList.size(); i++) {
+            int color = Color::GRAY; //デフォルトはグレー（なれない）
 
-        //選択中の職業
-        if (i == selectedIndex_) {
-            DrawString(80, 100 + i * 25, "→", color);
-        }
+            //条件チェック
+            if (playerStatus_->JobCheck(jobList[i])) {
+                color = Color::WHITE; //なれる職業は白
+            }
 
-        DrawFormatString(100, 100 + i * 25, color, "%s", jobList[i].status.name.c_str());
+            //もしループ中の職業が「現在の職業」なら色を緑色にする
+            bool isCurrent = (jobList[i].status.name == Job);
+            if (isCurrent) {
+                color = Color::GREEN; //現在の職業は緑
+            }
+
+            //描画位置の設定
+            int drawX = 400;
+            int drawY = 200;
+
+            if (i < half) {
+                //前半半分左側の列
+                drawY = 200 + i * JOB_LIST_SPACING;
+            }
+            else {
+                //後半半分右側の列
+                drawX = 700; //右列のX座標。職業名の長さに合わせて数値を調整してください
+                drawY = 200 + (i - half) * JOB_LIST_SPACING; //Y座標を上（200）から再スタート
+            }
+
+            //選択中の職業
+            //選択中の職業（矢印「→」）
+            if (i == selectedIndex_) {
+                //描画するX座標（drawX）の少し左（-20 ピクセル）に矢印を出すように自動化
+                DrawString(drawX - JOB_LIST_SPACING, drawY, "→", color);
+            }
+
+            //計算した drawX, drawY で描画
+            DrawFormatString(drawX, drawY, color, "%s", jobList[i].status.name.c_str());
+        }
     }
-
-    DrawJobBonus(jobList[selectedIndex_]);
+    else
+    {
+        DrawDetails();
+        //DrawJobBonus(jobList[selectedIndex_]);
+    }
+    
+   
+    SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void JobChangePhase::DrawJobBonus(const JobData& job)
@@ -152,9 +145,243 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
     }
 }
 
+void JobChangePhase::DrawDetails(void)
+{
+    if (!isShowingDetails_)
+    {
+		return; // すでに詳細表示中なら何もしない
+    }
+	//選択中の職業の詳細情報を描画する処理
+    //selectedIndex_が１なら一般魔法使いの詳細を出す
+    if (selectedIndex_ == 0)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+		DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+		DrawFormatString(380, 300, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
+    }
+    if (selectedIndex_ == 1)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+		DrawFormatString(380, 300, Color::BLACK, "薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
+    }
+    if (selectedIndex_ == 2)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
+    }
+    if (selectedIndex_ == 3)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
+    }
+    if (selectedIndex_ == 4)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "信仰: %d", jobList[selectedIndex_].status.reqFaith_);
+    }
+    if (selectedIndex_ == 5)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
+    }
+    if (selectedIndex_ == 6)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
+    }
+    if (selectedIndex_ == 7)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
+    }
+    if (selectedIndex_ == 8)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
+    }
+    if (selectedIndex_ == 9)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
+    }
+    if (selectedIndex_ == 10)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "信仰: %d", jobList[selectedIndex_].status.reqFaith_);
+    }
+    if (selectedIndex_ == 11)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
+    }
+    if (selectedIndex_ == 12)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 300, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
+    }
+    if (selectedIndex_ == 13)
+    {
+        auto& jobList = playerStatus_->GetJobList();
+		DrawFormatString(380, 150, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
+
+		DrawString(330, 200, "必要レベルとステータス", Color::BLACK);
+        DrawFormatString(380, 250, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+        DrawFormatString(380, 280, Color::BLACK, "薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
+        DrawFormatString(380, 310, Color::BLACK, "武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
+        DrawFormatString(380, 340, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
+        DrawFormatString(380, 370, Color::BLACK, "信仰: %d", jobList[selectedIndex_].status.reqFaith_);
+        DrawFormatString(380, 400, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
+        DrawFormatString(380, 430, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
+    }
+}
+
 bool JobChangePhase::IsFinished() const
 {
 	return isFinished_;
+}
+
+void JobChangePhase::ProcessJobListSelection(void)
+{
+    if (isShowingDetails_)
+    {
+        return; //詳細表示中でなければ何もしない
+    }
+
+    //プレイヤーが持っている全職業リストを取得
+    auto& jobList = playerStatus_->GetJobList();
+
+    //上下キーで選択中の職業（selectedIndex）を動かす処理
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_UP) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP)) {
+        selectedIndex_ = (selectedIndex_ - 1 + jobList.size()) % jobList.size();
+    }
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_DOWN) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN)) {
+        selectedIndex_ = (selectedIndex_ + 1) % jobList.size();
+    }
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RIGHT) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT)) {
+        selectedIndex_ = (selectedIndex_ + 7) % jobList.size();
+    }
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_LEFT) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_LEFT)) {
+        selectedIndex_ = (selectedIndex_ - 7 + jobList.size()) % jobList.size();
+    }
+
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+    {
+        isShowingDetails_ = true;
+    }
+    else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+    {
+        //キャンセルキーが押されたらフェーズを終了する
+        PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
+        isFinished_ = true;
+    }
+}
+
+void JobChangePhase::ProcessDetailsListSelection(void)
+{
+    if (!isShowingDetails_)
+    {
+        return; //詳細表示中でなければ何もしない
+    }
+    //プレイヤーが持っている全職業リストを取得
+    auto& jobList = playerStatus_->GetJobList();
+
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RIGHT) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT)) {
+        selectedIndex_ = (selectedIndex_ + 1) % jobList.size();
+    }
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_LEFT) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_LEFT)) {
+        selectedIndex_ = (selectedIndex_ - 1 + jobList.size()) % jobList.size();
+    }
+
+    //決定キーが押されたら
+    if (isShowingDetails_ &&
+        InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
+        const auto& selectedJob = jobList[selectedIndex_];
+
+        //現在の職業名を取得
+        std::string Job = playerStatus_->GetJobName();
+
+        if (selectedJob.status.name == Job) {
+            //現在の職業と同じなら転職できない
+            timer_ = 0; //メッセージ表示のカウントをリセット
+        }
+        //PlayerStatusのJobCheckを呼び出して判定
+        else if (playerStatus_->JobCheck(selectedJob)) {
+            //条件クリア！職業を変更する
+            playerStatus_->SetJob(selectedJob.status.name);
+            PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
+            //転職成功のSEなどを鳴らすと良い
+            isFinished_ = true;
+        }
+        else {
+            //条件を満たしていない
+        }
+    }
+    else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
+        ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+    {
+        //キャンセルキーが押されたら詳細表示を閉じる
+        isShowingDetails_ = false;
+    }
 }
 
 void JobChangePhase::DrawTutorial(void)

@@ -38,7 +38,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::GAME_TITLE, std::move(res));
 	//ゲームシーン用画像
 	//----------------------------------------------
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Stage/Stage_0.png");
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Stage/Stage_.png");
 	resourcesMap_.emplace(SRC::GAME_SCENE, std::move(res));
 	//GameOverScene
 	//-------------------------------------
@@ -56,8 +56,10 @@ void ResourceManager::Init(void)
 	//------------------------------------
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Stage_1.png");
 	resourcesMap_.emplace(SRC::STAGE, std::move(res));
-	//ボタン
+	//本
 	//------------------------------------
+	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Book/JobBook.png");
+	resourcesMap_.emplace(SRC::BOOK, std::move(res));
 
 }
 

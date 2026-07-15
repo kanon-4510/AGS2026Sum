@@ -22,7 +22,9 @@ public:
 		PLAYER,
 		BATTLE_PLAYER,
 		//ステージ
-		STAGE
+		STAGE,
+		//本
+		BOOK
 	};
 
 	// 明示的にインステンスを生成する
