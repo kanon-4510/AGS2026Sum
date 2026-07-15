@@ -93,6 +93,9 @@ void InputManager::Update(void)
 		p.second.keyTrgUp = !p.second.keyNew && p.second.keyOld;
 	}
 
+	// マウスの前フレームの座標を保存
+	mousePosOld_ = mousePos_;
+
 	// マウス検知
 	mouseInput_ = GetMouseInput();
 	GetMousePoint(&mousePos_.x, &mousePos_.y);
@@ -155,6 +158,12 @@ bool InputManager::IsTrgUp(int key) const
 Vector2 InputManager::GetMousePos(void) const
 {
 	return mousePos_;
+}
+
+bool InputManager::IsMouseMoved(void) const
+{
+	// 現在の座標と前フレームの座標が異なる、かつゲームウィンドウ外から入ってきたときの極端な移動値でないかを判定
+	return (mousePos_.x != mousePosOld_.x || mousePos_.y != mousePosOld_.y);
 }
 
 int InputManager::GetMouse(void) const

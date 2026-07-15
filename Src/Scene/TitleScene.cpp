@@ -26,7 +26,11 @@ void TitleScene::Init(void)
 //更新処理
 void TitleScene::Update(void)
 {
-	ProcessTitleMouse();
+	/*if (ins_.IsMouseMoved())
+	{*/
+		ProcessMouseSelection();
+	/*}*/
+	ProcessMouseDecision();
 
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
@@ -74,8 +78,8 @@ void TitleScene::Draw(void)
 
 		DrawFormatString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y / 2, Color::WHITE, "ゲームを終了しますか？");
 
-		DrawString((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "はい", Color::WHITE);
-		DrawString((Application::SCREEN_SIZE_X - 220) / 2 + 130, Application::SCREEN_SIZE_Y / 2 + 40, "いいえ", Color::WHITE);
+		DrawString((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, "はい", Color::WHITE);
+		DrawString((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "いいえ", Color::WHITE);
 	}
 }
 
@@ -127,10 +131,12 @@ void TitleScene::ProcessTitleDecision(void)
 	}
 }
 
-void TitleScene::ProcessTitleMouse(void)
+void TitleScene::ProcessMouseSelection(void)
 {
 	//シングルトンからインスタンスを引っ張ってくる
 	auto& input = InputManager::GetInstance();
+
+	MODE_SELECTION hoveredItem = MODE_SELECTION::NONE;
 
 	//タイトルの選択肢をマウスで選択する処理
 	if (mode_ == TITLE_MODE::NORMAL)
@@ -174,15 +180,7 @@ void TitleScene::ProcessTitleMouse(void)
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
 	{
-		if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 30, 20))
-		{
-			exitOffset_ = 130;
-			if (input.IsTrgMouseLeft())
-			{
-				Application::isRunning_ = false; //ゲームを終了
-			}
-		}
-		else if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 220) / 2 + 130, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
+		if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
 		{
 			exitOffset_ = 0;
 			if (input.IsTrgMouseLeft())
@@ -190,7 +188,20 @@ void TitleScene::ProcessTitleMouse(void)
 				mode_ = TITLE_MODE::NORMAL; //通常メニューに戻る
 			}
 		}
+		else if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, 30, 20))
+		{
+			exitOffset_ = -130;
+			if (input.IsTrgMouseLeft())
+			{
+				Application::isRunning_ = false; //ゲームを終了
+			}
+		}
 	}
+}
+
+void TitleScene::ProcessMouseDecision(void)
+{
+
 }
 
 void TitleScene::Tutorial(void)
@@ -228,7 +239,7 @@ void TitleScene::ExitGame(void)
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT))
 	{
 		confirmIndex_ = 1 - confirmIndex_;	//0と1を反転させる
-		exitOffset_ = confirmIndex_ * 130; //矢印のオフセット値を更新
+		exitOffset_ = confirmIndex_ * -130; //矢印のオフセット値を更新
 	}
 
 	//最終決定
@@ -237,13 +248,13 @@ void TitleScene::ExitGame(void)
 	{
 		if (confirmIndex_ == 0)
 		{
-			//「はい」なら本当にゲーム終了
-			Application::isRunning_ = false;
+			//「いいえ」なら通常メニューモードに戻る
+			mode_ = TITLE_MODE::NORMAL;
 		}
 		else
 		{
-			//「いいえ」なら通常メニューモードに戻る
-			mode_ = TITLE_MODE::NORMAL;
+			//「はい」なら本当にゲーム終了
+			Application::isRunning_ = false;
 		}
 	}
 }

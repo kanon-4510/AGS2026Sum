@@ -102,6 +102,9 @@ public:
 	// マウス座標の取得
 	Vector2 GetMousePos(void) const;
 
+	// マウスが前フレームから動いたかどうかを取得する
+	bool IsMouseMoved(void) const;
+
 	// マウスのクリック状態を取得(MOUSE_INPUT_LEFT、RIGHT)
 	int GetMouse(void) const;
 
@@ -177,6 +180,8 @@ private:
 
 	// マウスカーソルの位置
 	Vector2 mousePos_;
+
+	Vector2 mousePosOld_; // 前フレームのマウス座標を保存する変数
 	
 	// マウスボタンの入力状態
 	int mouseInput_;
