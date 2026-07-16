@@ -248,6 +248,9 @@ void QuestPhase::ProcessDifficulty(void)
 		case QUEST_LOCATION::EXTRA: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_8.png"); break;
 		}
 
+		//バトル開始時のダメージ
+		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
+
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
 	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
@@ -263,7 +266,8 @@ void QuestPhase::ManageTurn(void)
 	switch (battleStep_)
 	{
 	case QuestPhase::BATTLE_STEP::DIFFICULTY_SELECTION:
-		//ステージ選択処理などをここに書く
+		playerStatus_->hp_ = playerStatus_->GetMaxHp();
+		//難易度選択処理などをここに書く
 		ProcessDifficulty();
 		break;
 	case QuestPhase::BATTLE_STEP::COMMAND_SELECTION:
@@ -409,22 +413,27 @@ void QuestPhase::ProcessActionLoop(void)
 				if (command_ == COMMAND::ATTACK)
 				{
 					battleMessage_ += unit.name + "の攻撃！";
+
+					//基本の攻撃力に、スキルがあれば魔力を足す
+					int attackPow = playerStatus_->Attack();
+					if (playerStatus_->hasMagicToAttack)attackPow += playerStatus_->MagicAttack();
+
 					//会心判定
 					//計算式：武術のステータス÷5
 					int criticalChance = playerStatus_->martialArts_ / 5;
-					int roll = GetRand(99);
-					if (roll < criticalChance)
+					if (GetRand(99) < criticalChance)
 					{
 						battleMessage_ += "クリティカルヒット！";
+						int critMultiplier = playerStatus_->hasCritBoost ? 6 : 2.5;
 						playerStatus_->AttackAnimation();
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-						activeEnemy_->Damage(playerStatus_->Attack() * 3);
+						activeEnemy_->Damage(attackPow * critMultiplier);
 					}
 					else
 					{
 						playerStatus_->AttackAnimation();
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-						activeEnemy_->Damage(playerStatus_->Attack());
+						activeEnemy_->Damage(attackPow);
 					}
 				}
 				else if (command_ == COMMAND::MAGIC)
@@ -450,14 +459,14 @@ void QuestPhase::ProcessActionLoop(void)
 						{
 							int healAmount = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
 							playerStatus_->Heal(healAmount);
-							battleMessage_ += "回復した！";
+							battleMessage_ += "体力回復した！";
 						}
 						//状態異常治療フラグが true だったら治す
 						if (selectedMagic_.curesStatus)
 						{
 							statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
 							statusTurns_ = 4;
-							battleMessage_ += "状態異常が回復された！";
+							battleMessage_ += "状態異常が回復した！";
 						}
 						break;
 					case MAGIC_TYPE::DEBUFF:
@@ -552,6 +561,14 @@ void QuestPhase::ProcessActionLoop(void)
 					}
 					else if (!activeEnemy_->IsDead())
 					{
+						//初撃無効スキルを持っていて、まだ使っていない場合
+						if (playerStatus_->hasFirstHitNull && !playerStatus_->isFirstHitUsed)
+						{
+							playerStatus_->isFirstHitUsed = true; //消費する
+							battleMessage_ += playerStatus_->GetName() + "は神秘の守りで攻撃を無効化した！";
+							return; //ダメージ処理に行かずに関数を抜ける
+						}
+
 						if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
 							|| unit.skillName == "金縛り" || unit.skillName == "発狂")
 						{
@@ -683,13 +700,26 @@ void QuestPhase::ProcessStatusEffect(void)
 	{
 		bool hasEffectMessage = false; //メッセージを出すべき効果があったか
 
+		//毎ターンHP回復（状態異常ダメージの前に回復させる）
+		if (playerStatus_->hasAutoRegen && playerStatus_->hp_ > 0 && playerStatus_->hp_ < playerStatus_->GetMaxHp())
+		{
+			int regenAmount = playerStatus_->GetMaxHp() / 10;
+			playerStatus_->hp_ += regenAmount;
+			if (playerStatus_->hp_ > playerStatus_->GetMaxHp())
+			{
+				playerStatus_->hp_ = playerStatus_->GetMaxHp();
+			}
+			battleMessage_ = playerStatus_->GetName() + "の傷が自然に塞がっていく！";
+			hasEffectMessage = true;
+		}
+
 		//定数ダメージ(poison)
-		if (enemyStatusEffect_ == STATUS_EFFECT::POISON)
+		else if (enemyStatusEffect_ == STATUS_EFFECT::POISON)
 		{
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ = activeEnemy_->GetName() + "は毒のダメージを受けた";
 			activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-			activeEnemy_->Damage(1);
+			activeEnemy_->Damage(activeEnemy_->GetCurrentHp()/20);
 			hasEffectMessage = true;
 		}
 		else if (enemyStatusEffect_ == STATUS_EFFECT::CURSE)
@@ -698,7 +728,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			if (enemyCurs_ <= 0)
 			{
 				battleMessage_ = activeEnemy_->GetName()+"にかかった呪いが発動した……";
-				//activeEnemy_->currentHp_=1; //殺す
+				activeEnemy_->Damage(activeEnemy_->GetCurrentHp()-1); //殺す
 			}
 			else
 			{
@@ -712,7 +742,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			if (enemyStatusEffect_ == STATUS_EFFECT::POISON)battleMessage_ = "お互いに毒のダメージを受けた";
 			else battleMessage_ = playerStatus_->GetName() + "は毒のダメージを受けた";
-			playerStatus_->Damage(1);
+			playerStatus_->Damage(playerStatus_->GetMaxHp()/10);
 			hasEffectMessage = true;
 		}
 		//ターン経過で即死(curse)
@@ -796,6 +826,11 @@ void QuestPhase::CheckEnemyDeath(void)
 		currentActionIdx_ = 0;//インデックスも0に戻す
 		battleMessage_ = "";  //メッセージをリセットして次のターンへ！
 		enemyStatusEffect_ = STATUS_EFFECT::NONE;
+		playerStatus_->isFirstHitUsed = false;
+
+		//連戦時のダメージ判定！
+		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
+
 		return;
 	}
 	else
@@ -880,7 +915,7 @@ void QuestPhase::ProcessPlayerAction()
 			battleMessage_ = "魔法を唱えられない";
 			return; //決定処理を中断
 		}
-		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_)return; //魔法の連続使用制限
+		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_ && !playerStatus_->hasMagicUnlock)return; //魔法の連続使用制限
 
 		if (command_ == COMMAND::MAGIC) magicUsedThisTurn_ = true;
 		else magicUsedThisTurn_ = false;
@@ -975,8 +1010,8 @@ void QuestPhase::ProcessPlayerSubAction(void)
 
 void QuestPhase::MagicSelection()
 {
-	// 選択肢の数を、埋め込まれた配列のサイズから自動取得
-		int maxMagItems = static_cast<int>(magicTypeMessages_.size());
+	//選択肢の数を、埋め込まれた配列のサイズから自動取得
+	int maxMagItems = static_cast<int>(magicTypeMessages_.size());
 	if (maxMagItems == 0) return;
 
 	//カーソル移動処理
