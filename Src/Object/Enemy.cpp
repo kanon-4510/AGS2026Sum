@@ -106,7 +106,18 @@ void Enemy::Update()
     if (animIndex < 0 || animIndex >= ENEMY_ANIM::MAX) { currentFrame_ = 0; return; }
 
     int totalFrames = maxFramesTable_[animIndex];
-    if (totalFrames <= 0) { currentFrame_ = 0; return; }
+    if (totalFrames <= 0)
+    {
+        currentFrame_ = 0;
+        isAnimFinished_ = true; // アニメーションは完了したとみなす
+
+        // 画像がなくても、ダメージや行動のあとは自動でIDLEに戻す
+        if (currentAnim_ <= ENEMY_ANIM::ACT_3 || currentAnim_ == ENEMY_ANIM::DAMAGE)
+        {
+            currentAnim_ = ENEMY_ANIM::IDLE;
+        }
+        return; // 安全に処理を抜ける
+    }
 
     // 次のフレームへ進める
     if (++currentFrame_ >= totalFrames)
