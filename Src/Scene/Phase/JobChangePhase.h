@@ -15,6 +15,7 @@ public:
 	static constexpr int jobListY = Application::SCREEN_HALFSIZE_Y - 280;	//職業リストの描画位置Y
 
 	static constexpr int JOB_LIST_SPACING = 40;	//職業リストの間隔
+	static constexpr int JOB_STATUS_SPACING = 50;	//職業ステータスの間隔
 
 	static constexpr int JOB_NAME_X = 380;	//職業名の描画位置X
 	static constexpr int JOB_NAME_Y = 150;	//職業名の描画位置Y
@@ -25,8 +26,8 @@ public:
 	static constexpr int JOB_STATUS_X = 730;	//必要ステータスの数値を描画位置X
 	static constexpr int JOB_STATUS_Y = 200;	//必要ステータスの数値を描画位置Y
 
-	static constexpr int JOB_BONUS_X = 700;	//職業ボーナスの描画位置X
-	static constexpr int JOB_BONUS_Y = 400;	//職業ボーナスの描画位置Y
+	static constexpr int JOB_BONUS_X = 730;	//職業ボーナスの描画位置X
+	static constexpr int JOB_BONUS_Y = 370;	//職業ボーナスの描画位置Y
 
 	JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ
@@ -37,25 +38,28 @@ public:
 	//職業ボーナスを描画する関数
 	void DrawJobBonus(const JobData& job);
 
-	void DrawDetails(void); //職業の詳細情報を描画する関数
-	
-	void DrawAnimation(void); //職業の詳細情報を描画する関数
+	//職業の詳細情報を描画する関数
+	void DrawDetails(void);
 
-    // フェーズが終了したかどうかを親に伝える
+	//職業の詳細情報を描画する関数
+	void DrawAnimation(void); 
+
+    //フェーズが終了したかどうかを親に伝える
 	virtual bool IsFinished() const override;
 
 private:
-	GameScene& gameScene_; // ゲームシーンへの参照
-	PlayerStatus* playerStatus_; // プレイヤーのステータスへのポインタ
+	GameScene& gameScene_; //ゲームシーンへの参照
+	PlayerStatus* playerStatus_; //プレイヤーのステータスへのポインタ
 	InputManager& ins_ = InputManager::GetInstance();
-	int bgImg_; // 背景画像のハンドル
+	int deskImg_; //背景画像のハンドル
+	int bookImg_; //背景画像のハンドル
 	//ページを左にめくる画像のハンドル
 	int pageLeftImg_[8];	//右から左
 	int pageRightImg_[8];	//左から右
-	int pageAnimeTimer_ = -1;	// アニメーションのタイマー
-	int currentFrame_ = 0;	// 現在のフレーム
+	int pageAnimeTimer_ = -1;	//アニメーションのタイマー
+	int currentFrame_ = 0;	//現在のフレーム
 
-	int selectedIndex_ = 0; // 現在選択されている職業のインデックス
+	int selectedIndex_ = 0; //現在選択されている職業のインデックス
 
 	int timer_ = 200; //メッセージ表示のカウントを管理する変数
 
@@ -63,8 +67,10 @@ private:
 	bool ispageLR_ = false; //右か左かフラグ(trueで右から左にめくる)
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 	
-	void ProcessJobListSelection(void); //職業選択の処理
-	void ProcessDetailsListSelection(void); //職業選択の処理
+	//職業選択の処理
+	void ProcessJobListSelection(void);
+	//職業詳細と選択の選択処理
+	void ProcessDetailsListSelection(void);
 
 	void DrawTutorial(void); //チュートリアルの描画処理
 };

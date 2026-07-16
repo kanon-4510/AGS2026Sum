@@ -23,6 +23,8 @@ public:
 		BATTLE_PLAYER,
 		//ステージ
 		STAGE,
+		//机
+		DESK,
 		//本
 		BOOK
 	};

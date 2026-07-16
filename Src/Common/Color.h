@@ -12,7 +12,9 @@ public:
     static const int SKY_BLUE = 0x87ceeb;   //空色;
     static const int PURPL = 0x800080;      //紫
     static const int CLEAR_BLUE = 0xb4b4ff; //クリアな青
+    static const int BROWN = 0x3C2D1E;      //茶色
     static const int WHITE = 0xffffff;  //白;
     static const int GRAY = 0x808080;   //灰;
+    static const int CHARCOAL_GRAY = 0x323232;   //チャコールグレー;
     static const int BLACK = 0x000000;  //黒;
 };

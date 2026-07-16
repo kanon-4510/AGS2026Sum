@@ -9,7 +9,8 @@
 
 JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene) :playerStatus_(playerStatus), gameScene_(gameScene)
 {
-    bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BOOK).handleId_;
+    deskImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::DESK).handleId_;
+    bookImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BOOK).handleId_;
     LoadDivGraph("Data/Image/Book/ListBookRtoL.png",
         8,4,2,790,790, pageLeftImg_);
     LoadDivGraph("Data/Image/Book/ListBookLtoR.png",
@@ -34,7 +35,8 @@ void JobChangePhase::Update(void)
 void JobChangePhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Job Change", 0xFFFFFF);
-	DrawGraph(jobListX, jobListY, bgImg_, true);
+	DrawGraph(0, 0, deskImg_, true);
+	DrawGraph(jobListX, jobListY, bookImg_, true);
     auto& jobList = playerStatus_->GetJobList();
 
     //現在の職業名を取得
@@ -42,14 +44,14 @@ void JobChangePhase::Draw(void)
 
     if(timer_ < COUNT_MAX)
     {
-        DrawString(100, 80, "現在の職業と同じ職業は選択できません！", Color::WHITE);
+        DrawString(100, 80, "現在の職業と同じ職業は選択できません！", Color::RED);
         timer_++; //メッセージ表示のカウントを増やす
 	}
 
     SetFontSize(24);
     if (!isShowingDetails_)
     {
-        DrawString(430, 150, "目 次", Color::BLACK);
+        DrawString(430, 150, "目 次", Color::BROWN);
         
         int half = static_cast<int>(jobList.size() / 2);
         if (jobList.size() % 2 != 0) {
@@ -130,23 +132,23 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
         playerStatus_->SetJob(trueJob);
 
         //ボーナスの描画処理
-        DrawString(JOB_BONUS_X, JOB_BONUS_Y, "【職業ボーナス】", Color::YELLOW);
+        DrawString(JOB_BONUS_X, JOB_BONUS_Y, "職業ボーナス", Color::BROWN);
 
         int offset = 1;
         if (bonus.hp > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 25, Color::WHITE, "HP    : +%d", bonus.hp);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "HP    : +%d", bonus.hp);
             offset++;
         }
         if (bonus.power > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 25, Color::WHITE, "POW   : +%d", bonus.power);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "POW   : +%d", bonus.power);
             offset++;
         }
         if (bonus.magic > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 25, Color::WHITE, "MAG   : +%d", bonus.magic);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "MAG   : +%d", bonus.magic);
             offset++;
         }
         if (bonus.speed > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 25, Color::WHITE, "SPD   : +%d", bonus.speed);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "SPD   : +%d", bonus.speed);
             offset++;
         }
 
@@ -162,138 +164,68 @@ void JobChangePhase::DrawDetails(void)
     {
 		return; // すでに詳細表示中なら何もしない
     }
-	//選択中の職業の詳細情報を描画する処理
-    //selectedIndex_が１なら一般魔法使いの詳細を出す
-    if (selectedIndex_ == 0)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
 
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-		DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-		DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
+	//プレイヤーが持っている全職業リストを取得
+    auto& jobList = playerStatus_->GetJobList();
+
+    // 職業名
+    DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BROWN, "%s", jobList[selectedIndex_].status.name.c_str());
+    // ヘッダーテキスト
+    DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BROWN);
+    // 必要レベル
+    DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
+
+	//必要ステータスのラベルと値を決定する
+    const char* statusLabel = nullptr;
+    int statusValue = 0;
+
+	//必要ステータスのラベルと値を決定する
+    switch (selectedIndex_)
+    {
+    case 0:  case 3:  case 9:
+        statusLabel = "魔法知識";
+        statusValue = jobList[selectedIndex_].status.reqMagicKnowledge_;
+        break;
+    case 1:
+        statusLabel = "薬学調合";
+        statusValue = jobList[selectedIndex_].status.reqPharmacy_;
+        break;
+    case 2:
+        statusLabel = "武術訓練";
+        statusValue = jobList[selectedIndex_].status.reqMartialArts_;
+        break;
+    case 4:  case 10:
+        statusLabel = "信仰";
+        statusValue = jobList[selectedIndex_].status.reqFaith_;
+        break;
+    case 5:  case 11:
+        statusLabel = "考古学";
+        statusValue = jobList[selectedIndex_].status.reqArchaeology_;
+        break;
+    case 6:  case 12:
+        statusLabel = "占星術";
+        statusValue = jobList[selectedIndex_].status.reqAstrology_;
+        break;
+    case 7:
+        statusLabel = "薬学";
+        statusValue = jobList[selectedIndex_].status.reqPharmacy_;
+        break;
+    case 8:
+        statusLabel = "武術";
+        statusValue = jobList[selectedIndex_].status.reqMartialArts_;
+        break;
+    case 13:
+        statusLabel = "全技能";
+        statusValue = 200;
+        break;
+    default:
+        break;
     }
-    if (selectedIndex_ == 1)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
 
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-		DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
-    }
-    if (selectedIndex_ == 2)
+	//必要ステータスのラベルと値を描画する
+    if (statusLabel != nullptr)
     {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50 , Color::BLACK, "武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
-    }
-    if (selectedIndex_ == 3)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
-    }
-    if (selectedIndex_ == 4)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "信仰: %d", jobList[selectedIndex_].status.reqFaith_);
-    }
-    if (selectedIndex_ == 5)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
-    }
-    if (selectedIndex_ == 6)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
-    }
-    if (selectedIndex_ == 7)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
-    }
-    if (selectedIndex_ == 8)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
-    }
-    if (selectedIndex_ == 9)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
-    }
-    if (selectedIndex_ == 10)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "信仰: %d", jobList[selectedIndex_].status.reqFaith_);
-    }
-    if (selectedIndex_ == 11)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
-    }
-    if (selectedIndex_ == 12)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 50, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
-    }
-    if (selectedIndex_ == 13)
-    {
-        auto& jobList = playerStatus_->GetJobList();
-		DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BLACK, "%s", jobList[selectedIndex_].status.name.c_str());
-
-		DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BLACK);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 30, Color::BLACK, "薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 60, Color::BLACK, "武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 90, Color::BLACK, "魔法知識: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 120, Color::BLACK, "信仰: %d", jobList[selectedIndex_].status.reqFaith_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 150, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + 180, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
+        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + JOB_STATUS_SPACING, Color::BLACK, "%s: %d", statusLabel, statusValue);
     }
 }
 
