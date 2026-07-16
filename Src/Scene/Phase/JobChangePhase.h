@@ -16,8 +16,8 @@ public:
 
 	static constexpr int JOB_LIST_SPACING = 40;	//職業リストの間隔
 
-	static constexpr int bonusX = 400;	//職業ボーナスの描画位置X
-	static constexpr int bonusY = 100;	//職業ボーナスの描画位置Y
+	static constexpr int bonusX = 700;	//職業ボーナスの描画位置X
+	static constexpr int bonusY = 200;	//職業ボーナスの描画位置Y
 
 	JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ

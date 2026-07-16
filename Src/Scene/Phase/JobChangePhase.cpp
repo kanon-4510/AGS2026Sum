@@ -19,10 +19,16 @@ JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene)
 
 void JobChangePhase::Update(void)
 {
-	//職業リストの選択処理
-    ProcessJobListSelection();
-	//職業詳細の選択処理
-    ProcessDetailsListSelection();
+    if (!isShowingDetails_)
+    {
+        //職業リストの選択処理
+        ProcessJobListSelection();
+    }
+    else
+    {
+        //職業詳細の選択処理
+        ProcessDetailsListSelection();
+    }
 }
 
 void JobChangePhase::Draw(void)
@@ -92,8 +98,8 @@ void JobChangePhase::Draw(void)
     else
     {
         DrawDetails();
+        DrawJobBonus(jobList[selectedIndex_]);
         DrawAnimation();
-        //DrawJobBonus(jobList[selectedIndex_]);
     }
     
    
@@ -295,7 +301,7 @@ void JobChangePhase::DrawAnimation(void)
 {
     if (pageAnimeTimer_ >= 0)
     {
-        int animSpeed = 8;  // コマの切り替わる速さ（3フレームごとに1コマ進む）
+        int animSpeed = 5;  // コマの切り替わる速さ（3フレームごとに1コマ進む）
         int currentFrame = pageAnimeTimer_ / animSpeed;
 
         if (currentFrame > 7) {
@@ -371,7 +377,7 @@ void JobChangePhase::ProcessDetailsListSelection(void)
     if (pageAnimeTimer_ >= 0)
     {
         pageAnimeTimer_++;
-        if (pageAnimeTimer_ >= 60)
+        if (pageAnimeTimer_ >= 40)
         {
             pageAnimeTimer_ = -1; // 24フレーム経ったら停止状態に戻す
         }
@@ -393,8 +399,7 @@ void JobChangePhase::ProcessDetailsListSelection(void)
     }
 
     //決定キーが押されたら
-    if (isShowingDetails_ &&
-        InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
+    if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
         const auto& selectedJob = jobList[selectedIndex_];
 
