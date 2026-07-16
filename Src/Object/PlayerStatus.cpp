@@ -104,7 +104,7 @@ void PlayerStatus::InitJob()
 	jobList.push_back(JobData("大魔法使い",40,0,0,200,200,200,200,200,200));
 
 	//ジョブチェンジした時用
-	hasCurseStart = false;
+	hasStartDamage = false;
 	hasFirstHitNull = false; 
 	hasMagicUnlock = false;
 	hasCritBoost = false; 
@@ -291,7 +291,7 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	JobBonus bonus;
 
 	//ジョブチェンジした時用
-	hasCurseStart = false;
+	hasStartDamage = false;
 	hasFirstHitNull = false;
 	hasMagicUnlock = false;
 	hasCritBoost = false;
@@ -367,7 +367,7 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 		bonus.hp = 7;
 		bonus.power = 13;
 		bonus.magic = 25;
-		hasCurseStart = true; //開幕呪い
+		hasStartDamage = true; //開幕呪い
 	}
 	if (this->job == "予言者")
 	{
@@ -390,7 +390,7 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 
 int PlayerStatus::AddSkillPoint(SkillType type, int baseAmount)
 {
-	float multiplier = 1.0f; // 基本は等倍（1.0倍）
+	float multiplier = 1.0f; //基本は等倍（1.0倍）
 
 	// 選んだルートと、上がる技能の組み合わせでボーナス（1.5倍など）をかける
 	switch (currentRoute_)

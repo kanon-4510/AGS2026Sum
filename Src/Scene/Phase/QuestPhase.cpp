@@ -246,12 +246,8 @@ void QuestPhase::ProcessDifficulty(void)
 		case QUEST_LOCATION::EXTRA: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_8.png"); break;
 		}
 
-		//バトル開始時の開幕呪い判定！
-		if (playerStatus_->hasCurseStart && GetRand(99) < 10)
-		{
-			enemyStatusEffect_ = STATUS_EFFECT::CURSE;
-			enemyCurs_ = 6; //呪いのカウントダウン設定
-		}
+		//バトル開始時のダメージ
+		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
 
 		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
 	}
@@ -726,7 +722,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			if (enemyCurs_ <= 0)
 			{
 				battleMessage_ = activeEnemy_->GetName()+"にかかった呪いが発動した……";
-				//activeEnemy_->GetCurrentHp()-=1; //殺す
+				activeEnemy_->Damage(activeEnemy_->GetCurrentHp()-1); //殺す
 			}
 			else
 			{
@@ -825,12 +821,8 @@ void QuestPhase::CheckEnemyDeath(void)
 		enemyStatusEffect_ = STATUS_EFFECT::NONE;
 		playerStatus_->isFirstHitUsed = false;
 
-		//連戦時の開幕呪い判定！
-		if (playerStatus_->hasCurseStart && GetRand(99) < 10)
-		{
-			enemyStatusEffect_ = STATUS_EFFECT::CURSE;
-			enemyCurs_ = 5;
-		}
+		//連戦時のダメージ判定！
+		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
 
 		return;
 	}

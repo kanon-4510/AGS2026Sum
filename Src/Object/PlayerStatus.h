@@ -120,16 +120,16 @@ public:
 	JobBonus GetJobBonus();//現在の職業に応じたステータスボーナスを計算する関数
 	void SetJob(std::string newJobName) { job = newJobName; }//職業名を書き換える
 	//ユニークスキル用のフラグ
-	bool hasCurseStart = false;   //開幕呪い
+	bool hasStartDamage = false;   //開幕固定ダメ
 	bool hasFirstHitNull = false; //初撃無効
 	bool hasMagicUnlock = false;  //魔法制限なし
 	bool hasCritBoost = false;    //クリティカル倍率上昇
 	bool hasMagicToAttack = false;//攻撃時に魔力加算
-	bool hasAutoRegen = false;    //毎ターンHP回復
-	bool hasGuts = false;         //食いしばり（HP1で耐える）
+	bool hasAutoRegen = false;    //リジェネ
+	bool hasGuts = false;         //根性（HP1で耐える）
 	//スキルの「消費」を管理するフラグ
 	bool isFirstHitUsed = false;  //初撃無効を消費したか
-	bool isGutsUsed = false;      //食いしばりを消費したか
+	bool isGutsUsed = false;      //根性を消費したか
 
 	const std::vector<JobData>& GetJobList() const { return jobList; }//全職業リストを外から参照できるようにする
 	std::string GetName() const { return name; }					  //プレイヤーの名前を外から参照できるようにする
