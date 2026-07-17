@@ -10,8 +10,8 @@ public:
 	static constexpr int TEXT_POS_X = 150;	//授業のテキスト描画位置X
 	static constexpr int TEXT_POS_Y = 150;	//授業のテキスト描画位置Y
 	
-	static constexpr int bonusX = 340;	//技能ボーナスの描画位置X
-	static constexpr int bonusY = 150;	//技能ボーナスの描画位置Y
+	static constexpr int bonusX = 300;	//技能ボーナスの描画位置X
+	static constexpr int bonusY = 350;	//技能ボーナスの描画位置Y
 
 	enum CLASSWORK_SELECT
 	{

@@ -46,51 +46,71 @@ void ClassWorkPhase::Draw(void)
 
 void ClassWorkPhase::DrawSkillBonus(void)
 {
-	DrawString(bonusX, bonusY, "【技能効果ボーナス】", Color::YELLOW);
+	DrawString(bonusX, bonusY, "技能ボーナス", Color::YELLOW);
 
 	//現在のボーナス値と、授業を受けた後のボーナス値を比較するための変数
 	std::string effectName = "";
-	int reqInterval = 0;	//次のレベルまでの必要値（例：薬学なら次の回復量アップまでの必要値）
+	int reqInterval = 0;	//次のレベルまでの必要値（例：薬学なら次の治癒力アップまでの必要値）
 
 	//選択されている項目に応じて、一瞬だけステータスを上げて効果の変化を測定する
+	SetFontSize(23);
 	switch (select_)
 	{
 	case CLASSWORK_SELECT::PHARMACY:
-		effectName = "回復量";
-		reqInterval = 10; //10ごとにアップ
+		DrawString(bonusX, bonusY - 200
+			, "魔法薬の調合だけでなく、魔石鑑\n定や魔道具の扱い方を学ぶ。\n受講すると回復魔法の効果が上昇\nする。"
+			, Color::WHITE);
+		effectName = "治癒力";
+		reqInterval = 10 - playerStatus_->pharmacy_ % 10; //10ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::MARTIALARTS:
+		DrawString(bonusX, bonusY - 200
+			, "魔法一筋では生きていくことなど\n出来ない。基礎的な体術や武器の\n取回しを学ぶ。\n受講すると会心発生率が上昇する。"
+			, Color::WHITE);
 		effectName = "会心率";
-		reqInterval = 5; //5ごとにアップ
+		reqInterval = 5 - playerStatus_->martialArts_ % 5; //5ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::MAGICKNOWLEDGE:
+		DrawString(bonusX, bonusY - 200
+			, "魔法についての知見を深める授業。\n魔法の原理から法陣図や記述式も\n学ぶ。\n受講すると使える魔法が増える。"
+			, Color::WHITE);
 		effectName = "使える魔法の種類";
-		reqInterval = 50; //50ごとにアップ
+		reqInterval = 50 - playerStatus_->magicKnowledge_ % 50; //50ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::FAITH:
+		DrawString(bonusX, bonusY - 200
+			, "神が人に魔法を授けるまでの神話\nと、もたらされた加護と寵愛を主\nに学ぶ。\n受講すると守備力が上昇する。"
+			, Color::WHITE);
 		effectName = "被ダメージ軽減";
-		reqInterval = 10; //10ごとにアップ
+		reqInterval = 15 - playerStatus_->faith_ % 15; //15ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ARCHAEOLOGY:
+		DrawString(bonusX, bonusY - 200
+			, "古代魔術やルーンの解読、封印術\nの解呪など魔法がたどった歴史を\n学ぶ。\n受講すると獲得経験値が上昇する。"
+			, Color::WHITE);
 		effectName = "獲得経験値";
-		reqInterval = 5; //5ごとにアップ
+		reqInterval = 5 - playerStatus_->archaeology_ % 5; //5ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ASTROLOGY:
+		DrawString(bonusX, bonusY - 200
+			, "天文を知り、星の導きから運命力\nや透視などの予見について学ぶ。\n受講すると回避率が上昇する。"
+			, Color::WHITE);
 		effectName = "回避率";
-		reqInterval = 5; //5ごとにアップ
+		reqInterval = 5 - playerStatus_->astrology_ % 5; //5ごとにアップ
 		break;
 	}
-
+	
+	SetFontSize(24);
 	//画面に効果の仕様を出力
 	DrawFormatString(bonusX, bonusY + 30, Color::WHITE, "効果内容: %s", effectName.c_str());
 
 	//「〇〇ごとに効果アップ！」と表示する
-	DrawFormatString(bonusX, bonusY + 55, Color::GREEN, "能力値 %d ごとに効果アップ！", reqInterval);
+	DrawFormatString(bonusX, bonusY + 55, Color::GREEN, "残り　%d で能力アップ！", reqInterval);
 }
 
 bool ClassWorkPhase::IsFinished() const
