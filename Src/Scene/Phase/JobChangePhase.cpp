@@ -48,11 +48,12 @@ void JobChangePhase::Draw(void)
         timer_++; //メッセージ表示のカウントを増やす
 	}
 
+
     SetFontSize(24);
     if (!isShowingDetails_)
     {
         DrawString(430, 150, "目 次", Color::BROWN);
-        
+
         int half = static_cast<int>(jobList.size() / 2);
         if (jobList.size() % 2 != 0) {
             half++; // 奇数の場合、前半（左列）が1つ多くなるように調整
@@ -96,6 +97,7 @@ void JobChangePhase::Draw(void)
             //計算した drawX, drawY で描画
             DrawFormatString(drawX, drawY, color, "%s", jobList[i].status.name.c_str());
         }
+        DrawAnimation();
     }
     else
     {
@@ -264,6 +266,15 @@ void JobChangePhase::ProcessJobListSelection(void)
         return; //詳細表示中でなければ何もしない
     }
 
+    if (pageAnimeTimer_ >= 0)
+    {
+        pageAnimeTimer_++;
+        if (pageAnimeTimer_ >= 40)
+        {
+            pageAnimeTimer_ = -1; // 24フレーム経ったら停止状態に戻す
+        }
+    }
+
     //プレイヤーが持っている全職業リストを取得
     auto& jobList = playerStatus_->GetJobList();
 
@@ -288,6 +299,8 @@ void JobChangePhase::ProcessJobListSelection(void)
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
     {
+        ispageLR_ = true; //右にめくる
+        pageAnimeTimer_ = 0;
         isShowingDetails_ = true;
     }
     else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
@@ -358,6 +371,8 @@ void JobChangePhase::ProcessDetailsListSelection(void)
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
     {
         //キャンセルキーが押されたら詳細表示を閉じる
+        ispageLR_ = false; //左にめくる
+        pageAnimeTimer_ = 0;
         isShowingDetails_ = false;
     }
 }
