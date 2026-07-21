@@ -13,7 +13,7 @@ public:
 	static constexpr int ARROW_X = TITLE_MESSAGE_X - 20;	//矢印の表示位置X
 	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;			//矢印の表示位置Y
 
-	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ]
+	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ
 	static constexpr int EXIT_ARROW_X = 500;			//ゲーム終了確認メッセージ
 
 	enum TITLE_SELECTION
@@ -57,6 +57,7 @@ private:
 
 	TITLE_MODE mode_ = TITLE_MODE::NORMAL; //初期状態は通常メニュー
 	TITLE_SELECTION titleSelection_;	//タイトルの選択肢
+	MODE_SELECTION nextMode = MODE_SELECTION::NONE;	//次のモード選択肢
 
 	//矢印のオフセット値
 	int normalOffset_ = 0;
@@ -72,7 +73,7 @@ private:
 	void ProcessTitleSelection(void);	//タイトル選択の処理
 	void ProcessTitleDecision(void);	//タイトル決定の処理
 	void ProcessMouseSelection(void);	//タイトル選択のマウス処理
-	void ProcessMouseDecision(void);	//タイトル決定のマウス処理
+	void ProcessMouseDecision(MODE_SELECTION nextMode);	//タイトル決定のマウス処理
 	void Tutorial(void);				//チュートリアルのON/OFF切り替え処理
 	void ExitGame(void);				//ゲーム終了の確認処理
 };
