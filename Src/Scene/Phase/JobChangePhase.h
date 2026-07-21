@@ -5,6 +5,14 @@
 
 class GameScene;
 
+// 職業テキスト用の構造体
+struct JobText
+{
+	const char* desc;		//職業の説明文
+	const char* skillName;	//クラススキル名
+	const char* skillDesc;	//スキルの説明文
+};
+
 class JobChangePhase : public PhaseBase
 {
 public:
@@ -18,6 +26,9 @@ public:
 
 	static constexpr int JOB_NAME_X = 380;	//職業名の描画位置X
 	static constexpr int JOB_NAME_Y = 150;	//職業名の描画位置Y
+
+	static constexpr int JOB_DESC_X = 330;	//職業の説明を描画する位置X
+	static constexpr int JOB_DESC_Y = 200;	//職業の説明を描画する位置Y
 
 	static constexpr int JOB_STATUS_SPACING_X = 670;	//必要ステータス描画位置X
 	static constexpr int JOB_STATUS_SPACING_Y = 150;	//必要ステータス描画位置Y
@@ -70,6 +81,10 @@ private:
 	void ProcessJobListSelection(void);
 	//職業詳細と選択の選択処理
 	void ProcessDetailsListSelection(void);
+
+	//職業の説明文を格納するための関数
+	// 指定したインデックスの職業テキストを取得するヘルパー関数
+	JobText GetJobText(int index) const;
 
 	void DrawTutorial(void); //チュートリアルの描画処理
 };

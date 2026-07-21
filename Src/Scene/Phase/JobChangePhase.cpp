@@ -170,11 +170,26 @@ void JobChangePhase::DrawDetails(void)
     // プレイヤーが持っている全職業リストを取得
     auto& jobList = playerStatus_->GetJobList();
 
-    // 職業名
+    // 関数を呼び出してテキストを取得
+    JobText text = GetJobText(selectedIndex_);
+
+    //職業名
     DrawFormatString(JOB_NAME_X, JOB_NAME_Y, Color::BROWN, "%s", jobList[selectedIndex_].status.name.c_str());
-    // ヘッダーテキスト
+    
+    //説明文の描画
+    DrawString(JOB_DESC_X, JOB_DESC_Y, text.desc, Color::BLACK);
+
+    if (text.skillName != nullptr)
+    {
+        DrawFormatString(JOB_DESC_X + 70, JOB_DESC_Y + 160, Color::BROWN, "%s", text.skillName);
+        
+        DrawString(JOB_DESC_X, JOB_DESC_Y + 220, text.skillDesc, Color::BLACK);
+    }
+
+    //ヘッダーテキスト
     DrawString(JOB_STATUS_SPACING_X, JOB_STATUS_SPACING_Y, "必要レベルとステータス", Color::BROWN);
-    // 必要レベル
+    
+    //必要レベル
     DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
 
     // ステータス描画用の初期Y座標
@@ -367,6 +382,37 @@ void JobChangePhase::ProcessDetailsListSelection(void)
         pageAnimeTimer_ = 0;
         isShowingDetails_ = false;
     }
+}
+
+JobText JobChangePhase::GetJobText(int index) const
+{
+    static const JobText JOB_TEXTS[] = {
+        //{職業の説明,クラススキル名,スキルの説明}
+        { "資格を取得し魔法の使用\nが公に認められた一般的\nな魔法使い。\nこれから魔法とともに冒\n険の旅に出る者。", nullptr, nullptr },
+        { "物体に魔法や術式を施し\nて戦うことを得意とする\n魔法使い。\n魔道具の扱いに長けてい\nる。", nullptr, nullptr },
+        { "武器に魔力を流し、強化\nされた物理攻撃を得意と\nする。\n剣や斧から鎧など魔力を\n流せるものは様々である。", nullptr, nullptr },
+        { "一般魔法使いより多くの\n魔法を使いこなすことが\n出来る。\n多様な魔法を用いて皆を\n導くエリート魔法使い。", nullptr, nullptr },
+        { "神からの啓示を受け、聖\nなる力を使う魔法使い。\nモンスターの浄化や呪い\nの解呪など民を守ること\nが多い職業。", nullptr, nullptr },
+        { "魔法を私利私欲に使い、\n邪悪を振り撒かんとする\n者達の総称。\n汚染・隷属など攻撃的な\n魔法を多く扱う。", nullptr, nullptr },
+        { "水晶玉を通すことで、映\nされた者が辿る運命を見\n通す力を持つ魔法使い。\n直後から最期まで指定し\nた未来を知ることが出来\nる。", nullptr, nullptr },
+        { "物質の変換や錬成など、\nこの世の真理とも呼べる\n技術を探求し模索する研\n究家。", "エリクサー", "幻の素材により調合され\nる奇跡の秘薬。\n毎ターンHPを回復する。" },
+        { "生来の肉体に加えて、天\nからの護りも加わること\nで突破力と堅牢さを兼ね\n備えた武闘派の魔法使い\n…？", "極聖光", "その拳は敵の弱点をさら\nに強く撃ち抜く。\n会心発生時の威力が上昇\nする。" },
+        { "魔導師よりもさらに魔法\nを極めた者にのみ与えら\nれる称号。\nその数は世界中で数える\nほどしかいない。", "カドゥケウス", "その杖からは魔力が際限\nなく溢れ出る。\n物理攻撃に魔力の半分を\n加算する。" },
+        { "魔を浄めることに心血を\n注ぎ続けた者。人々を救\nうための瞳と光も、魔族\nには冷酷に映るだろう。", "神秘の護り", "死をも拒絶する神の護り。\n死亡するような攻撃を1\n度だけ耐える。" },
+        { "死者の蘇生と魂の隷従、\n2つの禁忌の呪文を自在\nに操る恐ろしい魔法使い。\n歪な執着は倫理を超え命\nを支配する。", "ネクロマンス", "死者の軍勢は全てを呑み\n込む。Wave開始時魔力に\n基づくダメージを与える。" },
+        { "占いは人に留まらず星の\n未来まで見通すことが出\n来る。\n次に見えるのは吉祥かは\nたまた凶兆か。", "未来視", "未来を見通し勝利の運命\nを手繰る。敵の最初の攻\n撃を必ず避ける。" },
+        { "全てを求めた先にあるの\nはかつての師の背中。\nそこから見える景色は虹\nと影のどちらに満ちてい\nるのだろうか。", "無詠唱魔術", "どの記録にもない師の教\nえ。魔法使用のクールタ\nイムを解除する。" },
+    };
+    // 配列の要素数を自動計算
+    const int totalJobs = sizeof(JOB_TEXTS) / sizeof(JOB_TEXTS[0]);
+
+    // インデックスが範囲外の場合は空のデータを返す安全対策
+    if (index < 0 || index >= totalJobs)
+    {
+        return { "", nullptr, nullptr };
+    }
+
+    return JOB_TEXTS[index];
 }
 
 void JobChangePhase::DrawTutorial(void)
