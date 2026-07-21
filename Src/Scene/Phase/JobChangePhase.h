@@ -14,8 +14,7 @@ public:
 	static constexpr int jobListX = Application::SCREEN_HALFSIZE_X - 390;	//職業リストの描画位置X
 	static constexpr int jobListY = Application::SCREEN_HALFSIZE_Y - 280;	//職業リストの描画位置Y
 
-	static constexpr int JOB_LIST_SPACING = 40;	//職業リストの間隔
-	static constexpr int JOB_STATUS_SPACING = 50;	//職業ステータスの間隔
+	static constexpr int JOB_LIST_SPACING = 40;		//リストの間隔
 
 	static constexpr int JOB_NAME_X = 380;	//職業名の描画位置X
 	static constexpr int JOB_NAME_Y = 150;	//職業名の描画位置Y

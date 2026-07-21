@@ -46,7 +46,7 @@ void GameScene::Update(void)
 		}
 	}
 
-	if (turn_ == 16)
+	if (turn_ == MAX_TURN)
 	{
 		phase_ = QUEST_PHASE::PHASE_QUEST;
 	}
@@ -107,9 +107,9 @@ void GameScene::Draw(void)
 	else 
 	{
 		DrawGraph(0, 0, stageImg_, TRUE);
+		SetFontSize(20);
 		//メニュー画面の描画処理
-		DrawFormatString(0, 0, 0xFFFFFF, "Scene : Game 現在のターン %d", turn_);
-
+		DrawFormatString(350, 30, 0xFFFFFF, "現在のターン \n   %d / 16", turn_);
 		//現在のルートを文字列に変換して表示する
 		std::string routeName = "未選択";
 		switch (playerStatus_->currentRoute_)
@@ -120,7 +120,8 @@ void GameScene::Draw(void)
 		case PLAYER_ROUTE::SELFLESS:     routeName = "無欲"; break;
 		}
 		// ターンの少し下に黄色っぽく表示
-		DrawFormatString(0, 30, GetColor(255, 255,0), "現在のルート : %s", routeName.c_str());
+		DrawFormatString(200, 400, GetColor(255, 0,0), "現在のルート: %s", routeName.c_str());
+		SetFontSize(DEFAULT_FONT_SIZE);
 
 		if (SceneManager::GetInstance().IsTutorialEnabled())
 		{

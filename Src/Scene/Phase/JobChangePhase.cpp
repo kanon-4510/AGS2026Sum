@@ -138,7 +138,7 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
 
         int offset = 1;
         if (bonus.hp > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "HP    : +%d", bonus.hp);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, " HP   : +%d", bonus.hp);
             offset++;
         }
         if (bonus.power > 0) {
@@ -167,7 +167,7 @@ void JobChangePhase::DrawDetails(void)
 		return; // すでに詳細表示中なら何もしない
     }
 
-	//プレイヤーが持っている全職業リストを取得
+    // プレイヤーが持っている全職業リストを取得
     auto& jobList = playerStatus_->GetJobList();
 
     // 職業名
@@ -177,57 +177,49 @@ void JobChangePhase::DrawDetails(void)
     // 必要レベル
     DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y, Color::BLACK, "レベル: %d", jobList[selectedIndex_].status.reqLevel_);
 
-	//必要ステータスのラベルと値を決定する
-    const char* statusLabel = nullptr;
-    int statusValue = 0;
-
-	//必要ステータスのラベルと値を決定する
-    switch (selectedIndex_)
+    // ステータス描画用の初期Y座標
+    int currentY = JOB_STATUS_Y + JOB_LIST_SPACING;
+	if (selectedIndex_ == 13)   //大魔法使いの場合は全技能200と表示する
     {
-    case 0:  case 3:  case 9:
-        statusLabel = "魔法知識";
-        statusValue = jobList[selectedIndex_].status.reqMagicKnowledge_;
-        break;
-    case 1:
-        statusLabel = "薬学調合";
-        statusValue = jobList[selectedIndex_].status.reqPharmacy_;
-        break;
-    case 2:
-        statusLabel = "武術訓練";
-        statusValue = jobList[selectedIndex_].status.reqMartialArts_;
-        break;
-    case 4:  case 10:
-        statusLabel = "信仰";
-        statusValue = jobList[selectedIndex_].status.reqFaith_;
-        break;
-    case 5:  case 11:
-        statusLabel = "考古学";
-        statusValue = jobList[selectedIndex_].status.reqArchaeology_;
-        break;
-    case 6:  case 12:
-        statusLabel = "占星術";
-        statusValue = jobList[selectedIndex_].status.reqAstrology_;
-        break;
-    case 7:
-        statusLabel = "薬学";
-        statusValue = jobList[selectedIndex_].status.reqPharmacy_;
-        break;
-    case 8:
-        statusLabel = "武術";
-        statusValue = jobList[selectedIndex_].status.reqMartialArts_;
-        break;
-    case 13:
-        statusLabel = "全技能";
-        statusValue = 200;
-        break;
-    default:
-        break;
+        DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "全技能: 200");
     }
-
-	//必要ステータスのラベルと値を描画する
-    if (statusLabel != nullptr)
+    else
     {
-        DrawFormatString(JOB_STATUS_X, JOB_STATUS_Y + JOB_STATUS_SPACING, Color::BLACK, "%s: %d", statusLabel, statusValue);
+        if (jobList[selectedIndex_].status.reqPharmacy_ > 0)
+        {
+            DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "　薬学: %d", jobList[selectedIndex_].status.reqPharmacy_);
+            currentY += JOB_LIST_SPACING;
+        }
+        
+        if (jobList[selectedIndex_].status.reqMagicKnowledge_ > 0)
+        {
+            DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "魔法学: %d", jobList[selectedIndex_].status.reqMagicKnowledge_);
+            currentY += JOB_LIST_SPACING;
+        }
+
+        if (jobList[selectedIndex_].status.reqMartialArts_ > 0)
+        {
+            DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "　武術: %d", jobList[selectedIndex_].status.reqMartialArts_);
+            currentY += JOB_LIST_SPACING;
+        }
+
+        if (jobList[selectedIndex_].status.reqFaith_ > 0)
+        {
+            DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "　信仰: %d", jobList[selectedIndex_].status.reqFaith_);
+            currentY += JOB_LIST_SPACING;
+        }
+
+        if (jobList[selectedIndex_].status.reqArchaeology_ > 0)
+        {
+            DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "考古学: %d", jobList[selectedIndex_].status.reqArchaeology_);
+            currentY += JOB_LIST_SPACING;
+        }
+
+        if (jobList[selectedIndex_].status.reqAstrology_ > 0)
+        {
+            DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "占星術: %d", jobList[selectedIndex_].status.reqAstrology_);
+            currentY += JOB_LIST_SPACING;
+        }
     }
 }
 
