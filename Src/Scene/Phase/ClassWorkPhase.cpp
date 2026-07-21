@@ -95,7 +95,7 @@ void ClassWorkPhase::DrawSkillBonus(void)
 			, "古代魔術やルーンの解読、封印術\nの解呪など魔法がたどった歴史を\n学ぶ。\n受講すると獲得経験値が上昇する。"
 			, Color::WHITE);
 		effectName = "獲得経験値";
-		reqInterval = 5 - playerStatus_->archaeology_ % 5; //5ごとにアップ
+		reqInterval = 10 - playerStatus_->archaeology_ % 10; //10ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ASTROLOGY:
@@ -205,6 +205,5 @@ void ClassWorkPhase::DrawTutorial(void)
 		DrawString(0, 500
 			,"ここでは授業を選択することができます\n受ける授業によって得られるスキルが異なります\n今回は魔法知識を選択します"
 			, 0xFFFFFF);
-	}
-		
+	}	
 }

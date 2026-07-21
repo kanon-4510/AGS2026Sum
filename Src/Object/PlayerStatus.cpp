@@ -84,7 +84,7 @@ void PlayerStatus::DrawQuestImages()
 {
 	//敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255)）
 	unsigned int white = GetColor(255, 255, 255);
-	DrawString(PLAYER_POS_X, PLAYER_POS_Y - 40, name.c_str(), white);
+	DrawString(PLAYER_POS_X, PLAYER_POS_Y -37, name.c_str(), white);
 	DrawFormatString(PLAYER_POS_X, PLAYER_POS_Y - 20, white, "HP: %d / %d", hp_, GetMaxHp());
 
 	int barWidth = 100; //バーの最大幅
@@ -135,14 +135,14 @@ void PlayerStatus::InitJob()
 	jobList.push_back(JobData("呪術師"	,5,0,0,  0,  0,  0,  0,100,  0));
 	jobList.push_back(JobData("占い師"	,5,0,0,  0,  0,  0,  0,  0,100));
 
-	jobList.push_back(JobData("錬金術師",20,0,0,170,  0, 30,  0,100,  0));
-	jobList.push_back(JobData("聖騎士"	,20,0,0,  0,230,  0, 70,  0,  0));
-	jobList.push_back(JobData("賢者"	,20,0,0,  0,  0,200,  0, 50, 50));
-	jobList.push_back(JobData("悪魔祓い",20,0,0, 70, 30,  0,200,  0,  0));
-	jobList.push_back(JobData("死霊術師",20,0,0,  0,  0,100,  0,200,  0));
-	jobList.push_back(JobData("予言者"	,20,0,0, 30,  0,  0, 40,  0,230));
+	jobList.push_back(JobData("錬金術師",18,0,0,170,  0, 30,  0,100,  0));
+	jobList.push_back(JobData("聖騎士"	,18,0,0,  0,230,  0, 70,  0,  0));
+	jobList.push_back(JobData("賢者"	,18,0,0,  0,  0,200,  0, 50, 50));
+	jobList.push_back(JobData("悪魔祓い",18,0,0, 70, 30,  0,200,  0,  0));
+	jobList.push_back(JobData("死霊術師",18,0,0,  0,  0,100,  0,200,  0));
+	jobList.push_back(JobData("予言者"	,18,0,0, 30,  0,  0, 40,  0,230));
 
-	jobList.push_back(JobData("大魔法使い",40,0,0,200,200,200,200,200,200));
+	jobList.push_back(JobData("大魔法使い",35,0,0,200,200,200,200,200,200));
 
 	//ジョブチェンジした時用
 	hasStartDamage = false;
@@ -318,9 +318,9 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	}
 
 	case BonusType::ExpBonus:
-		//考古学10につき、獲得経験値を+2する（固定値追加）
-		//例：基本経験値10、考古学10 → 10 + (10 / 5) = 12
-		return baseValue + (archaeology_ / 5);
+		//考古学10につき、獲得経験値を+1する（固定値追加）
+		//例：基本経験値10、考古学10 → 20 + (20 / 10) = 12
+		return baseValue + (archaeology_ / 10);
 
 	case BonusType::LuckBonus:
 		//占星術5につき、回避率のステータスを+1する

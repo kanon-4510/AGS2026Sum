@@ -20,7 +20,7 @@ public:
 	};
 
 //最大ターン数
-	static constexpr int MAX_TURN = 16;	
+	static constexpr int MAX_TURN = 21;	
 
 	GameScene(void);		//デフォルトコンストラクタ
 	~GameScene(void);		//デストラクタ

@@ -52,12 +52,8 @@ void Enemy::ChangeAnim(int command)
     currentFrame_ = 0; // アニメーションを最初のコマにリセット
     animeTimer_ = 0;   // タイマーもリセット
 
-    if (currentAnim_ == ENEMY_ANIM::IDLE) {
-        isAnimFinished_ = true;
-    }
-    else {
-        isAnimFinished_ = false;
-    }
+    if (currentAnim_ == ENEMY_ANIM::IDLE)  isAnimFinished_ = true;
+    else isAnimFinished_ = false;
 }
 
 //技のランダム決定
@@ -156,8 +152,8 @@ void Enemy::Draw() const
 
     //敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255)）
     unsigned int white = GetColor(255, 255, 255);
-    DrawFormatString(x_, y_ - 40, white, "%s", name_.c_str());
-    DrawFormatString(x_, y_ - 20, white, "HP: %d / %d", currentHp_, maxHp_);
+    DrawFormatString(x_-50, y_ - 72, white, "%s", name_.c_str());
+    DrawFormatString(x_-50, y_ - 55, white, "HP: %d / %d", currentHp_, maxHp_);
 
     //簡易的なHPバー（緑色の矩形）を描画
     if (maxHp_ > 0) 
@@ -165,12 +161,10 @@ void Enemy::Draw() const
         int barWidth = 100; //バーの最大幅
         int currentBarWidth = barWidth * currentHp_ / maxHp_;
         //赤い背景
-        DrawBox(x_, y_ - 5, x_ + barWidth, y_, GetColor(255, 0, 0), TRUE);
+        DrawBox(x_-50, y_-40, x_ + barWidth-50, y_-35, GetColor(255, 0, 0), TRUE);
         //緑の現在値
-        DrawBox(x_, y_ - 5, x_ + currentBarWidth, y_, GetColor(0, 255, 0), TRUE);
+        DrawBox(x_-50, y_-40, x_ + currentBarWidth-50, y_-35, GetColor(0, 255, 0), TRUE);
     }
-
-    DrawFormatString(x_, y_ - 60, GetColor(255, 0, 0), "CurrentAnim: %d", static_cast<int>(currentAnim_));
 }
 
 void Enemy::InitAnimation(const std::vector<MotionConfig>& motionList)
@@ -207,15 +201,15 @@ Enemy* SpawnEnemyByTurn(int turn)
 {
     //画面中央付近に表示するための基準座標
     int spawnX = 300;
-    int spawnY = 300;
+    int spawnY = 270;
 
-    if (turn >= 16)
+    if (turn >= 21)
     {
         std::vector<MotionConfig> BossAnims;
         return new Enemy("魔王", 999, 50, 50, 50, 50, 0, "こうげき", "回復", "状態異常", BossAnims, spawnX, spawnY);
     }
-    //13〜15ターン目
-    else if (turn >= 13)
+    //17〜20ターン目
+    else if (turn >= 17)
     {
         int enemyType = GetRand(4);
         switch (enemyType)
@@ -228,7 +222,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Robot/Bulet/Attack_3.png",      3, 1, 128, 128 },
                 { "Data/Image/Enemy/Robot/Bulet/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Robot/Bulet/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("バレットマキナ", 150, 10, 10, 10, 10, 0, "こうげき", "砲撃", "電力チャージ", bulletMachinaAnims, spawnX, spawnY);
+            return new Enemy("バレットマキナ",150,9,30,18,39, 5, "こうげき", "砲撃", "電力チャージ", bulletMachinaAnims, spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> wraithAnims = {
                 { "Data/Image/Enemy/Ghost/Ghost_Onryo/Idle.png",          6, 1, 128, 128 },
@@ -237,7 +231,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Ghost/Ghost_Onryo/Attack_3.png",      7, 1, 128, 128 },
                 { "Data/Image/Enemy/Ghost/Ghost_Onryo/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Ghost/Ghost_Onryo/Dead.png",          6, 1, 128, 128 }};
-            return new Enemy("レイス", 150, 10, 10, 10, 10, 0, "こうげき", "呪われた包丁", "金縛り", wraithAnims, spawnX, spawnY);
+            return new Enemy("レイス",132,17,28, 10,34,2, "こうげき", "呪われた包丁", "金縛り", wraithAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> evilLightningWizardAnims = {
                 { "Data/Image/Enemy/Caster/Lightning/Idle.png",          7, 1, 128, 128 },
@@ -246,7 +240,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Caster/Lightning/Attack_3.png",     13, 1, 128, 128 },
                 { "Data/Image/Enemy/Caster/Lightning/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Caster/Lightning/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("悪の雷魔術師", 150, 10, 10, 10, 10, 0, "こうげき", "電撃斬", "エレキビーム", evilLightningWizardAnims, spawnX, spawnY);
+            return new Enemy("悪の雷魔術師",142,19,23,25,25,3, "こうげき", "電撃斬", "エレキビーム", evilLightningWizardAnims, spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> nightKnightAnims = {
                 { "Data/Image/Enemy/Knight/Night/Idle.png",          4, 1, 128, 128 },
@@ -255,7 +249,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Knight/Night/Attack_3.png",      5, 1, 128, 128 },
                 { "Data/Image/Enemy/Knight/Night/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Knight/Night/Dead.png",          6, 1, 128, 128 }};
-            return new Enemy("夜の騎士", 150, 10, 10, 10, 10, 0, "こうげき", "切断", "守りの構え", nightKnightAnims, spawnX, spawnY);
+            return new Enemy("夜の騎士",178,16,29,18,26,4, "こうげき", "切断", "守りの構え", nightKnightAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> darkGorgonAnims = {
                 { "Data/Image/Enemy/Gorgon/Dark/Idle.png",          7, 1, 128, 128 },
@@ -264,12 +258,12 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Gorgon/Dark/Attack_3.png",      5, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Dark/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Dark/Dead.png",          3, 1, 128, 128 }};
-            return new Enemy("ダークゴルゴン", 150, 10, 10, 10, 10, 0, "こうげき", "薙ぎ払い", "蛇にらみ", darkGorgonAnims, spawnX, spawnY);
+            return new Enemy("ダークゴルゴン",189,21,32,8,27,5, "こうげき", "薙ぎ払い", "蛇にらみ", darkGorgonAnims, spawnX, spawnY);
         }
         }
     }
-    //10〜12ターン目
-    else if (turn >= 10)
+    //13〜16ターン目
+    else if (turn >= 13)
     {
         int enemyType = GetRand(4);
         switch (enemyType)
@@ -282,7 +276,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Minotaur/Lesser/Attack.png",        5, 1, 128, 128 },
                 { "Data/Image/Enemy/Minotaur/Lesser/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Minotaur/Lesser/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("下級タウロス", 100, 10, 10, 10,20,13, "こうげき", "こうげき", "自己再生", lesserTaurosAnims, spawnX, spawnY);
+            return new Enemy("下級タウロス",127,15,15,10,20,9, "こうげき", "こうげき", "自己再生", lesserTaurosAnims, spawnX, spawnY);
         }case 1: {
             std::vector<MotionConfig> vampireAnims = {
                 { "Data/Image/Enemy/Vampire/Idle.png",          5, 1, 128, 128 },
@@ -291,7 +285,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Vampire/Attack_3.png",      6, 1, 128, 128 },
                 { "Data/Image/Enemy/Vampire/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Vampire/Dead.png",          8, 1, 128, 128 }};
-            return new Enemy("ヴァンパイア", 100, 10, 10, 10,20, 0, "こうげき", "血槍", "沈黙の呪い", vampireAnims, spawnX, spawnY);
+            return new Enemy("ヴァンパイア",98,10,18,5,22,8, "こうげき", "血槍", "沈黙の呪い", vampireAnims, spawnX, spawnY);
         }case 2: {
             std::vector<MotionConfig> crowTenguAnims = {
                 { "Data/Image/Enemy/Tengu/Karasu/Idle.png",          6, 1, 128, 128 },
@@ -300,7 +294,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Tengu/Karasu/Attack_3.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Tengu/Karasu/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Tengu/Karasu/Dead.png",          6, 1, 128, 128 }};
-            return new Enemy("カラス天狗", 100, 10, 10, 10,25, 0, "こうげき", "居合切り", "破魔空間", crowTenguAnims, spawnX, spawnY);
+            return new Enemy("カラス天狗",95,9,20,3,25,6, "こうげき", "居合切り", "破魔空間", crowTenguAnims, spawnX, spawnY);
         }case 3: {
             std::vector<MotionConfig> fireCasterAnims = {
                 { "Data/Image/Enemy/Caster/Fire/Idle.png",          7, 1, 128, 128 },
@@ -309,7 +303,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Caster/Fire/Attack_3.png",     14, 1, 128, 128 },
                 { "Data/Image/Enemy/Caster/Fire/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Caster/Fire/Dead.png",          6, 1, 128, 128 }};
-            return new Enemy("悪の炎魔術師", 100, 10, 10, 10, 10, 0, "こうげき", "ひのたま", "火炎放射", fireCasterAnims, spawnX, spawnY);
+            return new Enemy("悪の炎魔術師",80,13,15,19,16,7, "こうげき", "ひのたま", "火炎放射", fireCasterAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> gorgonAnims = {
                 { "Data/Image/Enemy/Gorgon/Nomal/Idle.png",          7, 1, 128, 128 },
@@ -318,11 +312,11 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Gorgon/Nomal/Attack_3.png",     16, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Nomal/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Nomal/Dead.png",          3, 1, 128, 128 }};
-            return new Enemy("ゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "かみつく", "薙ぎ払い", gorgonAnims, spawnX, spawnY);}
+            return new Enemy("ゴルゴン",103,10,16,22,24,10, "こうげき", "かみつく", "薙ぎ払い", gorgonAnims, spawnX, spawnY);}
         }
     }
-    //7〜9ターン目
-    else if (turn >= 7)
+    //9〜12ターン目
+    else if (turn >= 9)
     {
         int enemyType = GetRand(4);
         switch (enemyType)
@@ -375,8 +369,8 @@ Enemy* SpawnEnemyByTurn(int turn)
             return new Enemy("トレント",56,8,3,6,16,14, "こうげき", "毒の粉", "大地の恵み", trentAnims, spawnX, spawnY);}
         }
     }
-    //4〜6ターン目
-    else if (turn >= 4)
+    //5〜9ターン目
+    else if (turn >= 5)
     {
         int enemyType = GetRand(4);
         switch (enemyType)
@@ -428,7 +422,7 @@ Enemy* SpawnEnemyByTurn(int turn)
             return new Enemy("剣スケルトン",40,3,7,7,14,19, "こうげき", "ざんげき", "まもる", skeletonWarriorAnims, spawnX, spawnY);}
         }
     }
-    //1〜3ターン目
+    //1〜4ターン目
     else
     {
         int enemyType = GetRand(3);
@@ -479,8 +473,8 @@ Enemy* SpawnEnemyByTurn(int turn)
 
 Enemy* SpawnRushEnemy(int stage)
 {
-    int spawnX = 270;
-    int spawnY = 180;
+    int spawnX = 300;
+    int spawnY = 270;
 
     switch (stage)
     {
@@ -494,7 +488,7 @@ Enemy* SpawnRushEnemy(int stage)
                 { "Data/Image/Enemy/Minotaur/Ark/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Minotaur/Ark/Dead.png",          5, 1, 128, 128 }
         };
-        return new Enemy("ミノタウロス", 100, 10, 10, 10, 10, 0, "こうげき", "こうげき", "自己再生", minotaurAnims, spawnX, spawnY);
+        return new Enemy("ミノタウロス",200,25,25,20,30,0, "こうげき", "こうげき", "自己再生", minotaurAnims, spawnX, spawnY);
     }case 1: {
         std::vector<MotionConfig> swordMachinaAnims = {
                 { "Data/Image/Enemy/Robot/Sword/Idle.png",          5, 1, 128, 128 },
@@ -504,7 +498,7 @@ Enemy* SpawnRushEnemy(int stage)
                 { "Data/Image/Enemy/Robot/Sword/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Robot/Sword/Dead.png",          4, 1, 128, 128 }
         };
-        return new Enemy("ソードマキナ", 100, 10, 10, 10, 10, 0, "こうげき", "雷連撃", "電力チャージ", swordMachinaAnims, spawnX, spawnY);
+        return new Enemy("ソードマキナ",130,29,39,16,35,0, "こうげき", "雷連撃", "電力チャージ", swordMachinaAnims, spawnX, spawnY);
     }   case 2: {
         std::vector<MotionConfig> demonFoxAnims = {
                 { "Data/Image/Enemy/Youko/Idle.png",         14, 1, 128, 128 },
@@ -514,7 +508,7 @@ Enemy* SpawnRushEnemy(int stage)
                 { "Data/Image/Enemy/Youko/Hurt.png",          2, 1, 128, 128 },
                 { "Data/Image/Enemy/Youko/Dead.png",         10, 1, 128, 128 }
         };
-        return new Enemy("妖狐", 100, 10, 10, 10, 10, 0, "こうげき", "鬼火", "蒼炎", demonFoxAnims, spawnX, spawnY);
+        return new Enemy("妖狐",163,25,19,34,27,0, "こうげき", "鬼火", "蒼炎", demonFoxAnims, spawnX, spawnY);
     }case 3: {
         std::vector<MotionConfig> fallenWarriorAnims = {
                 { "Data/Image/Enemy/Ghost/Ghost_Samurai/Idle.png",          6, 1, 128, 128 },
@@ -524,7 +518,7 @@ Enemy* SpawnRushEnemy(int stage)
                 { "Data/Image/Enemy/Ghost/Ghost_Samurai/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Ghost/Ghost_Samurai/Dead.png",          6, 1, 128, 128 }
         };
-        return new Enemy("落武者", 100, 10, 10, 10, 10, 0, "こうげき", "切り裂く", "受流しの構え", fallenWarriorAnims, spawnX, spawnY);
+        return new Enemy("落武者",182,15,28,26,26,0, "こうげき", "切り裂く", "受流しの構え", fallenWarriorAnims, spawnX, spawnY);
     }case 4: {
         std::vector<MotionConfig> evilGorgonAnims = {
                 { "Data/Image/Enemy/Gorgon/Evil/Idle.png",          7, 1, 128, 128 },
@@ -533,7 +527,7 @@ Enemy* SpawnRushEnemy(int stage)
                 { "Data/Image/Enemy/Gorgon/Evil/Attack_3.png",      5, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Evil/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Gorgon/Evil/Dead.png",          3, 1, 128, 128 }};
-        return new Enemy("イビルゴルゴン", 100, 10, 10, 10, 10, 0, "こうげき", "毒牙", "石化の魔眼", evilGorgonAnims, spawnX, spawnY);}
+        return new Enemy("イビルゴルゴン",173,35,28,26,39,0,"こうげき", "毒牙", "石化の魔眼", evilGorgonAnims, spawnX, spawnY);}
     }
     return nullptr;
 }

@@ -125,18 +125,18 @@ public:
 	static constexpr int ENEMY_HP_MSG_Y = 140;
 
 	//コマンドの位置
-	static constexpr int COMMAND_MSG_X = 0;
-	static constexpr int COMMAND_MSG_Y = 210;
+	static constexpr int COMMAND_MSG_X = 400;
+	static constexpr int COMMAND_MSG_Y = 600;
 
 	//敵とプレイヤー行動を表示するメッセージの位置
-	static constexpr int BATTLE_MSG_X = 0;
-	static constexpr int BATTLE_MSG_Y = 170;
+	static constexpr int BATTLE_MSG_X = 350;
+	static constexpr int BATTLE_MSG_Y = 510;
 
 	//次に進むメッセージの位置
 	static constexpr int NEXT_MSG_X = 0;
 	static constexpr int NEXT_MSG_Y = 190;
 
-	static constexpr int MAX_DISPLAY = 6;//同時に画面に表示したい最大件数（枠のサイズ）
+	static constexpr int MAX_DISPLAY = 3;//同時に画面に表示したい最大件数（枠のサイズ）
 
 	//アニメーションナンバー
 	static constexpr int ANIM_ACT_1 = 0;
@@ -183,6 +183,7 @@ private:
 	QUEST_LOCATION location_;		//配列
 	std::string locationRewardMsg_;	//メッセージ用
 	int bgImageHandle_;				//背景画像
+	int bgImageBar_;
 	std::vector<std::string> locationMenu_;
 	std::vector<QUEST_LOCATION> selectableLocations_; //メニューに対応するenumを記憶する用
 	int difficultyCursor_ = 0;                //難易度選択用のカーソル

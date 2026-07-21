@@ -64,7 +64,6 @@ void ResourceManager::Init(void)
 	//------------------------------------
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Book/JobBook.png");
 	resourcesMap_.emplace(SRC::BOOK, std::move(res));
-
 }
 
 void ResourceManager::Release(void)
