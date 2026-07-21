@@ -27,54 +27,57 @@ void PlayerStatus::Update()
 
 void PlayerStatus::Draw()
 {
+	SetFontSize(20);
+	
 	//ステータスの描画処理
-	DrawFormatString(STATUS_X, 10, STATUS_COLOR, "Level: %d", level_);
-	DrawFormatString(STATUS_X, 30, STATUS_COLOR, "HP: %d/%d", hp_, GetMaxHp());
-	DrawFormatString(STATUS_X, 50, STATUS_COLOR, "Physical: %d", Attack());
-	DrawFormatString(STATUS_X, 70, STATUS_COLOR, "Magical: %d", MagicAttack());
-	DrawFormatString(STATUS_X, 90, STATUS_COLOR, "Speed: %d", speed_);
+	DrawFormatString(STATUS_X, 120, STATUS_COLOR, "レベル: %d", level_);
+	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "体力: %d", GetMaxHp());
+	DrawFormatString(STATUS_X, 180, STATUS_COLOR, "筋力: %d", Attack());
+	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "魔力: %d", MagicAttack());
+	DrawFormatString(STATUS_X, 240, STATUS_COLOR, "速力: %d", speed_);
+	DrawFormatString(STATUS_X, 270, STATUS_COLOR, "職業: %s", job.c_str());
 
-	DrawFormatString(STATUS_X, 130, STATUS_COLOR, "Job: %s", job.c_str());
-	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "薬: %d", pharmacy_);
-	DrawFormatString(STATUS_X, 170, STATUS_COLOR, "武: %d", martialArts_);
-	DrawFormatString(STATUS_X, 190, STATUS_COLOR, "魔: %d", magicKnowledge_);
-	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "信: %d", faith_);
-	DrawFormatString(STATUS_X, 230, STATUS_COLOR, "古: %d", archaeology_);
-	DrawFormatString(STATUS_X, 250, STATUS_COLOR, "星: %d", astrology_);
+	DrawFormatString(STATUS_X, 310, STATUS_COLOR, "薬学: %d", pharmacy_);
+	DrawFormatString(STATUS_X, 340, STATUS_COLOR, "武術: %d", martialArts_);
+	DrawFormatString(STATUS_X, 370, STATUS_COLOR, "魔法: %d", magicKnowledge_);
+	DrawFormatString(STATUS_X, 400, STATUS_COLOR, "信仰: %d", faith_);
+	DrawFormatString(STATUS_X, 430, STATUS_COLOR, "考古: %d", archaeology_);
+	DrawFormatString(STATUS_X, 460, STATUS_COLOR, "占星: %d", astrology_);
 
 	//技能ステータスのボーナス分を描画
 	unsigned int GREEN = STATUS_BONUS_COLOR;
 
 	int itemBonus = SkillBonus(BonusType::ItemBonus, 0);
-	if (itemBonus > 0) DrawFormatString(STATUS_BONUS_X, 150, GREEN, "(回復+%d)", itemBonus);
+	if (itemBonus > 0) DrawFormatString(STATUS_BONUS_X, 310, GREEN, "(治癒力+%d)", itemBonus);
 
 	int atkBonus = SkillBonus(BonusType::AttackBonus, 0); //基準値0で呼ぶとボーナス量だけが返る
-	if (atkBonus > 0) DrawFormatString(STATUS_BONUS_X, 170, GREEN, "(会心率+%d)", atkBonus);
+	if (atkBonus > 0) DrawFormatString(STATUS_BONUS_X, 340, GREEN, "(会心率+%d)", atkBonus);
 
 	int magBonus = SkillBonus(BonusType::MagicBonus, 0);
-	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 190, GREEN, "(魔法+%d)", magBonus);
+	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 370, GREEN, "(魔法+%d)", magBonus);
 
 	int defBonus = (faith_ / 15); //軽減するダメージ量
-	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 210, GREEN, "(防御+%d)", defBonus);
+	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 400, GREEN, "(守備力+%d)", defBonus);
 
 	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
-	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 230, GREEN, "(経験値+%d)", expBonus);
+	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 430, GREEN, "(経験値+%d)", expBonus);
 
 	int luckBonus = SkillBonus(BonusType::LuckBonus, 0);
-	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 250, GREEN, "(回避率+%d)", luckBonus);
+	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 460, GREEN, "(回避率+%d)", luckBonus);
 
 	//職業ボーナスの描画
 	int jobHpBonus = GetJobBonus().hp; //職業ボーナスも表示
-	if (jobHpBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 30, GREEN, "(職業ボーナス+%d)", jobHpBonus);
+	if (jobHpBonus > 0) DrawFormatString(STATUS_X + 100, 150, GREEN, "(+%d)", jobHpBonus);
 
 	int jobAtkBonus = GetJobBonus().power; //職業ボーナスも表示
-	if (jobAtkBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 50, GREEN, "(職業ボーナス+%d)", jobAtkBonus);
+	if (jobAtkBonus > 0) DrawFormatString(STATUS_X + 100, 180, GREEN, "(+%d)", jobAtkBonus);
 
 	int jobMagBonus = GetJobBonus().magic;
-	if (jobMagBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 70, GREEN, "(職業ボーナス+%d)", jobMagBonus);
+	if (jobMagBonus > 0) DrawFormatString(STATUS_X + 100, 210, GREEN, "(+%d)", jobMagBonus);
 
 	int jobSpeedBonus = GetJobBonus().speed;
-	if (jobSpeedBonus > 0) DrawFormatString(STATUS_BONUS_X + 80, 90, GREEN, "(職業ボーナス+%d)", jobSpeedBonus);
+	if (jobSpeedBonus > 0) DrawFormatString(STATUS_X + 100, 240, GREEN, "(+%d)", jobSpeedBonus);
+	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void PlayerStatus::DrawQuestImages()

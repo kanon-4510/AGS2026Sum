@@ -10,6 +10,7 @@
 ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus, GameScene& gameScene):playerStatus_(playerstatus), gameScene_(gameScene)
 {
 	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
+	playerImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER).handleId_;
 }
 
 ClassWorkPhase::~ClassWorkPhase(void)
@@ -30,6 +31,7 @@ void ClassWorkPhase::Draw(void)
 {
 	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
 	DrawGraph(0, 0, bgImg_, true);
+	DrawGraph(700, 200, playerImg_, true);
 	DrawTutorial();
 
 	SetFontSize(24);

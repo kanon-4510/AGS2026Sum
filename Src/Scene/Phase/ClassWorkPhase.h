@@ -42,6 +42,7 @@ private:
 	InputManager& ins_ = InputManager::GetInstance();
 	int timer_ = 0; //フェーズの経過時間を管理するタイマー
 	int bgImg_ = -1; //背景画像のハンドル
+	int playerImg_ = -1; //プレイヤーの画像ハンドル
 
 	bool isFinished_ = false; // フェーズが終了したかどうかを管理するフラグ
 
