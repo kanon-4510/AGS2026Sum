@@ -5,6 +5,13 @@
 class OverScene : public SceneBase
 {
 public:
+	static constexpr int OVER_MESSAGE_X = (Application::SCREEN_SIZE_X - 120) / 2;	//メッセージ
+	static constexpr int OVER_MESSAGE_Y = Application::SCREEN_SIZE_Y - 200;			//メッセージ
+
+	static constexpr int ARROW_X = OVER_MESSAGE_X - 20;		//矢印の表示位置X
+	static constexpr int ARROW_Y = OVER_MESSAGE_Y;			//矢印の表示位置Y
+	static constexpr int EXIT_ARROW_X = 500;				//ゲーム終了確認メッセージ
+
 	//OverScene(void);		//デフォルトコンストラクタ
 	//~OverScene(void);		//デストラクタ
 
@@ -14,5 +21,11 @@ public:
 	void Release(void) override;	//解放処理
 
 private:
-	int gameOverImage_;				//ゲームオーバー画像格納領域
+	InputManager& ins_ = InputManager::GetInstance();//inputManagerのインスタンスを取得
+
+	int selectIndex_ = 0;	//選択肢のインデックス
+	int gameOverImage_;		//ゲームオーバー画像格納領域
+
+	//矢印のオフセット値
+	int normalOffset_ = 0;
 };

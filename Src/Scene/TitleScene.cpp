@@ -26,11 +26,11 @@ void TitleScene::Init(void)
 //更新処理
 void TitleScene::Update(void)
 {
-	/*if (ins_.IsMouseMoved())
-	{*/
+	if (ins_.IsMouseMoved())
+	{
 		ProcessMouseSelection();
-	/*}*/
-	ProcessMouseDecision();
+	}
+	ProcessMouseDecision(nextMode);
 
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
@@ -118,8 +118,6 @@ void TitleScene::ProcessTitleDecision(void)
 		case TitleScene::START_GAME:
 			mode_ = TITLE_MODE::TUTORIAL;
 			break;
-		/*case TitleScene::TUTORIAL:
-			break;*/
 		case TitleScene::EXIT_GAME:
 			mode_ = TITLE_MODE::EXIT;
 			break;
@@ -133,75 +131,77 @@ void TitleScene::ProcessTitleDecision(void)
 
 void TitleScene::ProcessMouseSelection(void)
 {
-	//シングルトンからインスタンスを引っ張ってくる
-	auto& input = InputManager::GetInstance();
-
-	MODE_SELECTION hoveredItem = MODE_SELECTION::NONE;
-
+	nextMode = MODE_SELECTION::NONE;
 	//タイトルの選択肢をマウスで選択する処理
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
-		if (input.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y - 5, 90, 20))
+		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y - 5, 90, 20))
 		{
 			normalOffset_ = 0; //矢印のオフセット値を更新
-			if (input.IsTrgMouseLeft())
-			{
-				mode_ = TITLE_MODE::TUTORIAL;
-			}
+			nextMode = MODE_SELECTION::NORMAL_TUTORIAL;
 		}
-		else if (input.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y + 35, 90, 20))
+		else if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y + 35, 90, 20))
 		{
 			normalOffset_ = 40; //矢印のオフセット値を更新
-			if (input.IsTrgMouseLeft())
-			{
-				mode_ = TITLE_MODE::EXIT;
-			}
+			nextMode = MODE_SELECTION::NORMAL_EXIT;
 		}
 	}
 	else if (mode_ == TITLE_MODE::TUTORIAL)
 	{
-		if (input.IsMouseOverRect(TITLE_MESSAGE_X - 55, TITLE_MESSAGE_Y - 55, 215, 25))
+		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X - 55, TITLE_MESSAGE_Y - 55, 215, 25))
 		{
 			tutorialOffset_ = 0;
-			if (input.IsTrgMouseLeft())
-			{
-				SceneManager::GetInstance().ToggleTutorial(); //ON,OFFを切り替える
-			}
+			nextMode = MODE_SELECTION::TUTORIAL_CHANGE;
 		}
-		else if (input.IsMouseOverRect(515, 515, 95, 25))
+		else if (ins_.IsMouseOverRect(515, 515, 95, 25))
 		{
 			tutorialOffset_ = 50;
-			if (input.IsTrgMouseLeft())
-			{
-				//ゲームシーンへ遷移
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
-			}
+			nextMode = MODE_SELECTION::TUTORIAL_NEXT;
 		}
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
 	{
-		if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
+		if (ins_.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
 		{
 			exitOffset_ = 0;
-			if (input.IsTrgMouseLeft())
-			{
-				mode_ = TITLE_MODE::NORMAL; //通常メニューに戻る
-			}
+			nextMode = MODE_SELECTION::EXIT_NO;
 		}
-		else if (input.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, 30, 20))
+		else if (ins_.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, 30, 20))
 		{
 			exitOffset_ = -130;
-			if (input.IsTrgMouseLeft())
-			{
-				Application::isRunning_ = false; //ゲームを終了
-			}
+			nextMode = MODE_SELECTION::EXIT_YES;
 		}
 	}
 }
 
-void TitleScene::ProcessMouseDecision(void)
+void TitleScene::ProcessMouseDecision(MODE_SELECTION nextMode)
 {
+	if (!ins_.IsTrgMouseLeft() || nextMode == MODE_SELECTION::NONE) return;
 
+	if (ins_.IsTrgMouseLeft())
+	{
+		switch (nextMode)
+		{
+		case MODE_SELECTION::NORMAL_TUTORIAL:
+			mode_ = TITLE_MODE::TUTORIAL;
+			break;
+		case MODE_SELECTION::NORMAL_EXIT:
+			mode_ = TITLE_MODE::EXIT;
+			break;
+		case MODE_SELECTION::TUTORIAL_CHANGE:
+			SceneManager::GetInstance().ToggleTutorial(); //ON,OFFを切り替える
+			break;
+		case MODE_SELECTION::TUTORIAL_NEXT:
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);//ゲームシーンへ遷移
+			break;
+		case MODE_SELECTION::EXIT_YES:
+			Application::isRunning_ = false; //ゲームを終了
+			break;
+		case MODE_SELECTION::EXIT_NO:
+			mode_ = TITLE_MODE::NORMAL; //通常メニューに戻る
+			break;
+		}
+	}
 }
 
 void TitleScene::Tutorial(void)
@@ -228,6 +228,11 @@ void TitleScene::Tutorial(void)
 			//ゲームシーンへ遷移
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 		}
+	}
+	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
+	{
+		mode_ = TITLE_MODE::NORMAL;
 	}
 }
 
