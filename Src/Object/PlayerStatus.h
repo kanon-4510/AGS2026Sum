@@ -6,7 +6,7 @@
 	//ルート
 enum class PLAYER_ROUTE
 {
-	NONE,           //未選択（1?3ターン）
+	NONE,           //未選択（3ターン）
 	BREAKTHROUGH,   //打破
 	SALVATION,      //救世
 	TRUTH,          //真理
@@ -27,7 +27,7 @@ public:
 	constexpr static int SKILL_UP_RATE = 70;	//ステータスアップの確率
 
 	constexpr static int PLAYER_POS_X = 900;	//プレイヤーの描画位置X
-	constexpr static int PLAYER_POS_Y = 300;	//プレイヤーの描画位置Y
+	constexpr static int PLAYER_POS_Y = 240;	//プレイヤーの描画位置Y
 
 	constexpr static int ANIM_COUNT_ATTACK = 5;	//アニメーションのフレーム数
 	constexpr static int ANIM_COUNT_DAMAGE = 10;	//アニメーションのフレーム数
@@ -127,7 +127,7 @@ public:
 	JobBonus GetJobBonus();//現在の職業に応じたステータスボーナスを計算する関数
 	void SetJob(std::string newJobName) { job = newJobName; }//職業名を書き換える
 	//ユニークスキル用のフラグ
-	bool hasStartDamage = false;   //開幕固定ダメ
+	bool hasStartDamage = false;  //開幕固定ダメ
 	bool hasFirstHitNull = false; //初撃無効
 	bool hasMagicUnlock = false;  //魔法制限なし
 	bool hasCritBoost = false;    //クリティカル倍率上昇

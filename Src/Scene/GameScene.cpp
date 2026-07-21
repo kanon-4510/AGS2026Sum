@@ -46,7 +46,7 @@ void GameScene::Update(void)
 		}
 	}
 
-	if (turn_ == 16)
+	if (turn_ == 21)
 	{
 		phase_ = QUEST_PHASE::PHASE_QUEST;
 	}

@@ -52,15 +52,10 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::PLAYER, std::move(res));
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "/Player/Battle_Playe1.png");
 	resourcesMap_.emplace(SRC::BATTLE_PLAYER, std::move(res));
-	//ステージ
-	//------------------------------------
-	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Stage_1.png");
-	resourcesMap_.emplace(SRC::STAGE, std::move(res));
 	//本
 	//------------------------------------
 	res = std::make_unique<RES>(RES_T::IMG, PATH_IMG + "Book/JobBook.png");
 	resourcesMap_.emplace(SRC::BOOK, std::move(res));
-
 }
 
 void ResourceManager::Release(void)

@@ -72,12 +72,12 @@ void ClassWorkPhase::DrawSkillBonus(void)
 
 	case CLASSWORK_SELECT::FAITH:
 		effectName = "被ダメージ軽減";
-		reqInterval = 10; //10ごとにアップ
+		reqInterval = 15; //15ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ARCHAEOLOGY:
 		effectName = "獲得経験値";
-		reqInterval = 5; //5ごとにアップ
+		reqInterval = 10; //10ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ASTROLOGY:
@@ -183,6 +183,5 @@ void ClassWorkPhase::DrawTutorial(void)
 		DrawString(0, 500
 			,"ここでは授業を選択することができます\n受ける授業によって得られるスキルが異なります\n今回は魔法知識を選択します"
 			, 0xFFFFFF);
-	}
-		
+	}	
 }
