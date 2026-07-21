@@ -17,6 +17,8 @@ class JobChangePhase : public PhaseBase
 {
 public:
 
+	static constexpr int FONT_SIZE= 24; //フォントサイズ
+
 	static constexpr int COUNT_MAX = 180; //メッセージ表示のカウントの最大値
 
 	static constexpr int jobListX = Application::SCREEN_HALFSIZE_X - 390;	//職業リストの描画位置X

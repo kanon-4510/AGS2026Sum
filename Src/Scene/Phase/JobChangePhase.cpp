@@ -48,8 +48,7 @@ void JobChangePhase::Draw(void)
         timer_++; //メッセージ表示のカウントを増やす
 	}
 
-
-    SetFontSize(24);
+    SetFontSize(FONT_SIZE);
     if (!isShowingDetails_)
     {
         DrawString(430, 150, "目 次", Color::BROWN);
@@ -106,7 +105,6 @@ void JobChangePhase::Draw(void)
         DrawAnimation();
     }
     
-   
     SetFontSize(DEFAULT_FONT_SIZE);
 }
 
@@ -425,5 +423,4 @@ void JobChangePhase::DrawTutorial(void)
             , "ここでは職業を選択することができます\n選ぶ職業によって得られる恩恵が変わります\n今回は一般魔法使いを選択します"
             , Color::WHITE);
     }
-	
 }

@@ -31,9 +31,9 @@ void PlayerStatus::Draw()
 	
 	//ステータスの描画処理
 	DrawFormatString(STATUS_X, 120, STATUS_COLOR, "レベル: %d", level_);
-	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "体力: %d", GetMaxHp());
-	DrawFormatString(STATUS_X, 180, STATUS_COLOR, "筋力: %d", Attack());
-	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "魔力: %d", MagicAttack());
+	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "体力: %d", hp_);
+	DrawFormatString(STATUS_X, 180, STATUS_COLOR, "筋力: %d", power_);
+	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "魔力: %d", magic_);
 	DrawFormatString(STATUS_X, 240, STATUS_COLOR, "速力: %d", speed_);
 	DrawFormatString(STATUS_X, 270, STATUS_COLOR, "職業: %s", job.c_str());
 
@@ -67,16 +67,16 @@ void PlayerStatus::Draw()
 
 	//職業ボーナスの描画
 	int jobHpBonus = GetJobBonus().hp; //職業ボーナスも表示
-	if (jobHpBonus > 0) DrawFormatString(STATUS_X + 100, 150, GREEN, "(+%d)", jobHpBonus);
+	if (jobHpBonus > 0) DrawFormatString(STATUS_X + 100, 150, GREEN, "+%d (%d)", jobHpBonus, GetMaxHp());
 
 	int jobAtkBonus = GetJobBonus().power; //職業ボーナスも表示
-	if (jobAtkBonus > 0) DrawFormatString(STATUS_X + 100, 180, GREEN, "(+%d)", jobAtkBonus);
+	if (jobAtkBonus > 0) DrawFormatString(STATUS_X + 100, 180, GREEN, "+%d (%d)", jobAtkBonus, Attack());
 
 	int jobMagBonus = GetJobBonus().magic;
-	if (jobMagBonus > 0) DrawFormatString(STATUS_X + 100, 210, GREEN, "(+%d)", jobMagBonus);
+	if (jobMagBonus > 0) DrawFormatString(STATUS_X + 100, 210, GREEN, "+%d (%d)", jobMagBonus, MagicAttack());
 
 	int jobSpeedBonus = GetJobBonus().speed;
-	if (jobSpeedBonus > 0) DrawFormatString(STATUS_X + 100, 240, GREEN, "(+%d)", jobSpeedBonus);
+	if (jobSpeedBonus > 0) DrawFormatString(STATUS_X + 100, 240, GREEN, "+%d (%d)", jobSpeedBonus, GetSpeed());
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
 

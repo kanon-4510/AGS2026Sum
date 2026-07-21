@@ -104,12 +104,12 @@ void GameScene::Draw(void)
 		//ここが呼ばれていないと、どれだけ切り替わっても画面は変変わらない
 		currentPhase_->Draw();
 	}
-	else 
+	else
 	{
 		DrawGraph(0, 0, stageImg_, TRUE);
 		SetFontSize(20);
 		//メニュー画面の描画処理
-		DrawFormatString(350, 30, 0xFFFFFF, "現在のターン \n   %d / 16", turn_);
+		DrawFormatString(350, 30, 0xFFFFFF, "現在のターン \n   %d / %d", turn_, MAX_TURN);
 		//現在のルートを文字列に変換して表示する
 		std::string routeName = "未選択";
 		switch (playerStatus_->currentRoute_)
@@ -120,14 +120,14 @@ void GameScene::Draw(void)
 		case PLAYER_ROUTE::SELFLESS:     routeName = "無欲"; break;
 		}
 		// ターンの少し下に黄色っぽく表示
-		DrawFormatString(200, 400, GetColor(255, 0,0), "現在のルート: %s", routeName.c_str());
+		DrawFormatString(200, 400, GetColor(255, 0, 0), "現在のルート: %s", routeName.c_str());
 		SetFontSize(DEFAULT_FONT_SIZE);
 
 		if (SceneManager::GetInstance().IsTutorialEnabled())
 		{
 			DrawTutorial();
 		}
-		
+
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
 		SetFontSize(32);
@@ -139,8 +139,8 @@ void GameScene::Draw(void)
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();
 	}
-	
 }
+
 
 //解放処理
 void GameScene::Release(void)

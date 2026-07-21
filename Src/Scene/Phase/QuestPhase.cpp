@@ -309,7 +309,7 @@ void QuestPhase::DetermineActionOrder(void)
 	actionOrder_.clear();
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
-	actionOrder_.push_back({ playerStatus_->GetName().c_str(), playerStatus_->speed_, true, 0, (int)command_, 0 });
+	actionOrder_.push_back({ playerStatus_->GetName().c_str(), playerStatus_->GetSpeed(), true, 0, (int)command_, 0});
 	if (command_ == COMMAND::ATTACK)
 	{
 		actionOrder_.back().skillName = "単体攻撃";
