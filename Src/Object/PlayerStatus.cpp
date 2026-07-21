@@ -31,7 +31,7 @@ void PlayerStatus::Draw()
 	
 	//ステータスの描画処理
 	DrawFormatString(STATUS_X, 120, STATUS_COLOR, "レベル: %d", level_);
-	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "体力: %d", hp_);
+	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "体力: %d", hp_ - GetJobBonus().hp);
 	DrawFormatString(STATUS_X, 180, STATUS_COLOR, "筋力: %d", power_);
 	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "魔力: %d", magic_);
 	DrawFormatString(STATUS_X, 240, STATUS_COLOR, "速力: %d", speed_);
