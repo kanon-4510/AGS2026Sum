@@ -1,8 +1,9 @@
 #include <DxLib.h>
 #include <algorithm>
 #include "../../Application.h"
-#include "../../Manager/ResourceManager.h"
+#include "../../Common/Color.h"
 #include "../../Manager/SceneManager.h"
+#include "../../Manager/ResourceManager.h"
 #include "../../Manager/InputManager.h"
 #include "../../Utility/AsoUtility.h"
 #include "../GameScene.h"
@@ -57,6 +58,8 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	bgImageBar_ = LoadGraph("Data/Image/Stage/BattleBar.png");
 	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
 	playerImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER).handleId_;
+
+	messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
 
 	//クエスト開始時は一旦通常の敵を生成しておく
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
@@ -1223,34 +1226,42 @@ void QuestPhase::DrawTutorial(void)
 
 	tutorialMessage_ = "";
 
+	SetFontSize(20);
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
-		tutorialMessage_ = "チュートリアル\nここではステージを選択できます\n好きなステージを選んで下さい\nEnterキーを押してみましょう";
+		DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, true);
+		DrawString(TUTORIAL_X, TUTORIAL_Y
+			, "ステージを選択できます\n選ぶステージによって上昇\nする技能が異なります。"
+			, Color::BLACK);
+		SetFontSize(DEFAULT_FONT_SIZE);
 	}
 	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 1)
 	{
-		tutorialMessage_ = "チュートリアル\n攻撃を選びましょう！\n攻撃を選んでEnterキーを押してみましょう";
+		tutorialMessage_ = "攻撃を選びましょう！\n攻撃を選んだ状態で、決定\nボタンを押しましょう";
 	}
 	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 2)
 	{
-		tutorialMessage_ = "チュートリアル\n次は魔法で攻撃をしましょう\n魔法を選んでEnterキーを押してみましょう";
+		tutorialMessage_ = "次は魔法を選びましょう！\n魔法を選んで好きな行動を\n選びましょう\nキャンセルで戻る";
 	}
 	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 3)
 	{
-		tutorialMessage_ = "チュートリアル\n魔法を使うと１ターンの休憩が必要です\n攻撃を選んでEnterキーを押してみましょう";
+		tutorialMessage_ = "魔法を使うと次のターンは\n使えなくなります\n攻撃を選びましょう";
 	}
 	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
 		&& battleTurn_ == 4)
 	{
-		tutorialMessage_ = "チュートリアル\nあとは好きなように戦いましょう";
+		tutorialMessage_ = "あとは考えながら\n好きなように戦いましょう";
 	}
 	//チュートリアルの内容をここに書く
 	//例：最初のターンだけ特別な説明を表示するなど
-	if (gameScene_.GetTurn() == 1)
+	if (gameScene_.GetTurn() == 1 && battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
+		&& battleTurn_ <= 4)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, tutorialMessage_.c_str());
+		DrawGraph(10, 35, messageBoxImg_, true);
+		DrawFormatString(25, 65, Color::BLACK, tutorialMessage_.c_str());
 	}
+	SetFontSize(DEFAULT_FONT_SIZE);
 }

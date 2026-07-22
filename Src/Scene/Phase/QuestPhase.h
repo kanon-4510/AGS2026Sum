@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "PhaseBase.h"
-#include "../../Scene/GameScene.h"
 #include "../../Object/PlayerStatus.h"
 #include <vector>
 #include <string>
@@ -104,6 +103,14 @@ public:
 	//------定数---------
 	//メッセージの表示位置
 
+	//メッセージボックスの表示位置
+	static constexpr int MESSAGE_BOX_X = 900;
+	static constexpr int MESSAGE_BOX_Y = 80;
+
+	//チュートリアルの表示位置
+	static constexpr int TUTORIAL_X = MESSAGE_BOX_X + 15;
+	static constexpr int TUTORIAL_Y = MESSAGE_BOX_Y + 30;
+
 	//難易度選択のメッセージの位置
 	static constexpr int DIFFICULTY_MSG_X = 0;
 	static constexpr int DIFFICULTY_MSG_Y = 40;
@@ -188,6 +195,8 @@ private:
 	std::vector<std::string> locationMenu_;
 	std::vector<QUEST_LOCATION> selectableLocations_; //メニューに対応するenumを記憶する用
 	int difficultyCursor_ = 0;                //難易度選択用のカーソル
+
+	int messageBoxImg_;	//メッセージボックスの画像ハンドル
 
 	//魔法
 	bool wasMagicUsedLastTurn_ = false;		 //前のターンに魔法を使ったか
