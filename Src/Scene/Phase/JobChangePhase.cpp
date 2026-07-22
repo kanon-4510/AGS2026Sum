@@ -181,7 +181,7 @@ void JobChangePhase::DrawDetails(void)
     int currentY = JOB_STATUS_Y + JOB_LIST_SPACING;
 	if (selectedIndex_ == 13)   //大魔法使いの場合は全技能200と表示する
     {
-        DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "全技能: 200");
+        DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "全技能: 100");
     }
     else
     {
