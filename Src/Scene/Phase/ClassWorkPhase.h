@@ -7,9 +7,13 @@ class GameScene;
 class ClassWorkPhase : public PhaseBase
 {
 public:
+	//メッセージボックスの表示位置
+	static constexpr int MESSAGE_BOX_X = 900;
+	static constexpr int MESSAGE_BOX_Y = 80;
+
 	//チュートリアルの表示位置
-	static constexpr int TUTORIAL_X = GameScene::MESSAGE_BOX_X + 15;
-	static constexpr int TUTORIAL_Y = GameScene::MESSAGE_BOX_Y + 20;
+	static constexpr int TUTORIAL_X = MESSAGE_BOX_X + 15;
+	static constexpr int TUTORIAL_Y = MESSAGE_BOX_Y + 20;
 
 	static constexpr int TEXT_POS_X = 150;	//授業のテキスト描画位置X
 	static constexpr int TEXT_POS_Y = 150;	//授業のテキスト描画位置Y
