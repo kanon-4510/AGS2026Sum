@@ -142,7 +142,7 @@ void PlayerStatus::InitJob()
 	jobList.push_back(JobData("死霊術師",18,0,0,  0,  0,100,  0,200,  0));
 	jobList.push_back(JobData("予言者"	,18,0,0, 30,  0,  0, 40,  0,230));
 
-	jobList.push_back(JobData("大魔法使い",35,0,0,200,200,200,200,200,200));
+	jobList.push_back(JobData("大魔法使い",35,0,0,100,100,100,100,100,100));
 
 	//ジョブチェンジした時用
 	hasStartDamage = false;
@@ -403,7 +403,7 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	{
 		bonus.hp = 27;
 		bonus.magic = 18;
-		hasGuts = true; //食いしばり
+		hasFirstHitNull = true; //初撃無効
 	}
 	if (this->job == "死霊術師")
 	{
@@ -416,7 +416,7 @@ PlayerStatus::JobBonus PlayerStatus::GetJobBonus()
 	{
 		bonus.magic = 20;
 		bonus.speed = 25;
-		hasFirstHitNull = true; //初撃無効
+		hasGuts = true; //食いしばり
 	}
 
 	if (this->job == "大魔法使い")

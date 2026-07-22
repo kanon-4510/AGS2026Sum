@@ -109,15 +109,23 @@ void QuestPhase::Draw(void)
 		DrawGraph(0, 0, bgImageBar_, true);
 		DrawFormatString( 230,590,0xffffff,"ルピナス");
 		DrawFormatString( 245,615,0xffffff,"レベル %2d",playerStatus_->level_);
-		DrawFormatString( 245,640,0xffffff,"　筋力 %d" ,playerStatus_->power_);
-		DrawFormatString( 245,665,0xffffff,"　魔力 %d" ,playerStatus_->magic_);
-		DrawFormatString( 245,690,0xffffff,"素早さ %d" ,playerStatus_->speed_);
+		DrawFormatString( 245,640,0xffffff,"　筋力 %d" ,playerStatus_->power_ + playerStatus_->GetJobBonus().power);
+		DrawFormatString( 245,665,0xffffff,"　魔力 %d" ,playerStatus_->MagicAttack());
+		DrawFormatString( 245,690,0xffffff,"素早さ %d" ,playerStatus_->GetSpeed());
 		DrawFormatString(1065,510,0xffffff,"　　治癒力:%+3d",playerStatus_->pharmacy_/10);
 		DrawFormatString(1065,545,0xffffff,"会心発生率:%3d%%",playerStatus_->martialArts_/5);
 		DrawFormatString(1065,580,0xffffff,"魔術ランク:%3d",(playerStatus_->magicKnowledge_/50)+1);
 		DrawFormatString(1065,615,0xffffff,"　　守備力:%3d",playerStatus_->faith_/15);
 		DrawFormatString(1065,650,0xffffff,"獲得経験値:%+3d",playerStatus_->archaeology_/10);
 		DrawFormatString(1065,685,0xffffff,"　　回避率:%3d%%",playerStatus_->astrology_/5);
+		DrawFormatString(900,590,0xffffff,"%s",playerStatus_->job.c_str());
+		DrawFormatString(900,640,0xffffff,"状態:");
+		if(statusEffect_==STATUS_EFFECT::NONE)   DrawFormatString(955,640,0xffffff,"なし");
+		if(statusEffect_==STATUS_EFFECT::POISON) DrawFormatString(955,640,0x00cc00,"どく");
+		if(statusEffect_==STATUS_EFFECT::FLASH)  DrawFormatString(955,640,0xffff00,"せんこう");
+		if(statusEffect_==STATUS_EFFECT::FREEZE) DrawFormatString(955,640,0x00cccc,"とうけつ");
+		if(statusEffect_==STATUS_EFFECT::CURSE)  DrawFormatString(955,640,0xcc00cc,"のろい");
+		if(statusEffect_==STATUS_EFFECT::SILENCE)DrawFormatString(955,640,0xdd0000,"ちんもく");
 		SetFontSize(16);
 	}
 #pragma endregion
@@ -128,7 +136,9 @@ void QuestPhase::Draw(void)
 		activeEnemy_->Draw(); //敵の描画
 
 		int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;
-		DrawFormatString(0, 100, 0xFFFF00, "【 BATTLE %d / %d 】", currentWave_, maxWaves);//連戦（Wave）の表示
+		SetFontSize(32);
+		DrawFormatString(0,0, 0xFFFF00, "【WAVE %d / %d】", currentWave_, maxWaves);
+		SetFontSize(16);
 		playerStatus_->DrawQuestImages();	//プレイヤーの画像を描画
 	}
 
@@ -155,41 +165,134 @@ void QuestPhase::Draw(void)
 	else if (battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
 	{
 		//魔法の種類の描画
-		if (battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
+		//同時に画面に表示したい最大件数（枠のサイズ）
+		//リストが空の場合は描画しない
+		if (!magicTypeMessages_.empty())
 		{
-			//同時に画面に表示したい最大件数（枠のサイズ）
-			//リストが空の場合は描画しない
-			if (!magicTypeMessages_.empty())
+			//スクロールの開始位置（オフセット）を計算
+			int scrollOffset = 0;
+			if (magicMenuCursor_ >= MAX_DISPLAY)
 			{
-				//スクロールの開始位置（オフセット）を計算
-				int scrollOffset = 0;
-				if (magicMenuCursor_ >= MAX_DISPLAY)
-				{
-					//カーソルが画面の下端（6個目以降）に行ったら、表示範囲をズラす
-					scrollOffset = magicMenuCursor_ - MAX_DISPLAY + 1;
-				}
+				//カーソルが画面の下端（6個目以降）に行ったら、表示範囲をズラす
+				scrollOffset = magicMenuCursor_ - MAX_DISPLAY + 1;
+			}
 
-				//「今画面に見せるべき魔法」だけを詰め替える
-				std::vector<std::string> visibleMessages;
-				for (int i = scrollOffset; i < scrollOffset + MAX_DISPLAY && i < magicTypeMessages_.size(); ++i)
-				{
-					visibleMessages.push_back(magicTypeMessages_[i]);
-				}
+			//「今画面に見せるべき魔法」だけを詰め替える
+			std::vector<std::string> visibleMessages;
+			for (int i = scrollOffset; i < scrollOffset + MAX_DISPLAY && i < magicTypeMessages_.size(); ++i)
+			{
+				visibleMessages.push_back(magicTypeMessages_[i]);
+			}
 
-				//切り出したリストと、枠内での相対カーソル位置を渡して描画
-				int relativeCursor = magicMenuCursor_ - scrollOffset;
-				Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, visibleMessages, relativeCursor);
+			//切り出したリストと、枠内での相対カーソル位置を渡して描画
+			int relativeCursor = magicMenuCursor_ - scrollOffset;
+			Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, visibleMessages, relativeCursor);
 
-				//上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
-				//※ 座標(180, 200など)はゲームの画面に合わせて微調整
-				if (scrollOffset > 0)
+			//上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
+			if (scrollOffset > 0)
+			{
+				DrawFormatString(COMMAND_MSG_X + 50, COMMAND_MSG_Y - 20, 0xFFFFFF, "▲"); // 上にスクロールできる
+			}
+			if (scrollOffset + MAX_DISPLAY < magicTypeMessages_.size())
+			{
+				//1行の高さが仮に30ピクセルだとした場合の計算
+				DrawFormatString(COMMAND_MSG_X + 50, COMMAND_MSG_Y + (visibleMessages.size() * 30) + 10, 0xFFFFFF, "▼"); //下にスクロールできる
+			}
+
+			if (magicMenuCursor_ >= 0 && magicMenuCursor_ < availableMagics_.size())
+			{
+				const auto& hoverMagic = availableMagics_[magicMenuCursor_];
+
+				//説明を表示する座標（魔法リストの右側に表示する設定）
+				int descX = COMMAND_MSG_X + 170;
+				int descY = COMMAND_MSG_Y;
+
+				if (playerStatus_->magicKnowledge_ >= hoverMagic.reqMagicKnowledge)
 				{
-					DrawFormatString(COMMAND_MSG_X+50, COMMAND_MSG_Y-20, 0xFFFFFF, "▲"); // 上にスクロールできる
+					DrawString(descX, descY, "【魔法の効果】", 0xffffff); // タイトルを黄色に
+
+					//魔法のタイプごとに説明を出し分ける
+					switch (hoverMagic.id)
+					{
+					case 1:
+						DrawString(descX, descY + 25, "火を放ち敵を攻撃する魔法。\n威力は小さい。", 0xFFFFFF);
+						break;
+					case 2:
+						DrawString(descX, descY + 25, "炎で敵を攻撃する魔法。\n威力は中くらい。", 0xFFFFFF);
+						break;
+					case 3:
+						DrawString(descX, descY + 25, "灼熱で敵を焼き尽くす魔法。\n威力は大きい。", 0xFFFFFF);
+						break;
+					case 4:
+						DrawString(descX, descY + 25, "目の前の敵を影ごと消し去る魔法。\n威力は絶大。", 0xFFFFFF);
+						break;
+					case 5: 
+						DrawString(descX, descY + 25, "敵の生命力を奪い、\n自身の体力を回復する魔法。\n効果はまあまあ。", 0xFFFFFF);
+						break;
+					case 6:
+						DrawString(descX, descY + 25, "自分の体力を回復する魔法。\n効果はちょこっと。", 0xFFFFFF);
+						break;
+					case 7:
+						DrawString(descX, descY + 25, "自分の体力を回復する魔法。\n効果はなかなか。", 0xFFFFFF);
+						break;
+					case 8:
+						DrawString(descX, descY + 25, "自分の体力を回復する魔法。\n効果はけっこう。", 0xFFFFFF);
+						break;
+					case 9:
+						DrawString(descX, descY + 25, "自分の状態異常を治療する魔法。\n回復効果はない。", 0xFFFFFF);
+						break;
+					case 10:
+						DrawString(descX, descY + 25, "自分の体力を回復し、\nさらに状態も治す魔法。\n効果はぼちぼち。", 0xFFFFFF);
+						break;
+					case 11:
+						DrawString(descX, descY + 25, "毒の針で突き刺す魔法。\n確率で毒状態にする。\n威力と確率は低い。", 0xFFFFFF);
+						break;
+					case 12:
+						DrawString(descX, descY + 25, "毒の槍で貫く魔法。\n確率で毒状態にする。\n威力と確率は普通。", 0xFFFFFF);
+						break;
+					case 13:
+						DrawString(descX, descY + 25, "毒の巨戟で穿つ魔法。\n確率で毒状態にする。\n威力と確率は高い。", 0xFFFFFF);
+						break;
+					case 14:
+						DrawString(descX, descY + 25, "毒液を浴びせる魔法。\n必ず毒状態にする。\n威力はない。", 0xFFFFFF);
+						break;
+					case 15:
+						DrawString(descX, descY + 25, "冷たい風を吹かせる魔法。\n確率で凍結状態にする。\n威力と確率は低い。", 0xFFFFFF);
+						break;
+					case 16:
+						DrawString(descX, descY + 25, "凍える嵐を起こす魔法。\n確率で凍結状態にする。\n威力と確率は普通。", 0xFFFFFF);
+						break;
+					case 17:
+						DrawString(descX, descY + 25, "氷の爆風を作り出す魔法。\n確率で凍結状態にする。\n威力と確率は高い。", 0xFFFFFF);
+						break;
+					case 18:
+						DrawString(descX, descY + 25, "凍らせる魔法。\n必ず凍結状態にする。\n威力はない。", 0xFFFFFF);
+						break;
+					case 19:
+						DrawString(descX, descY + 25, "光る球をぶつける魔法。\n確率で閃光状態にする。\n威力と確率は低い。", 0xFFFFFF);
+						break;
+					case 20:
+						DrawString(descX, descY + 25, "輝く光線で攻撃する魔法。\n確率で閃光状態にする。\n威力と確率は普通。", 0xFFFFFF);
+						break;
+					case 21:
+						DrawString(descX, descY + 25, "煌めく雨を降らせる魔法。\n確率で閃光状態にする。\n威力と確率は高い。", 0xFFFFFF);
+						break;
+					case 22:
+						DrawString(descX, descY + 25, "閃光を発生させる魔法。\n必ず閃光状態にする。\n威力はない。", 0xFFFFFF);
+						break;
+					case 23:
+						DrawString(descX, descY + 25, "闇の爪で攻撃する魔法。\n超低確率で呪い状態にする。\n威力は普通。", 0xFFFFFF);
+						break;
+					case 24:
+						DrawString(descX, descY + 25, "命を刈り取る剣を呼び出す魔法。\n低確率で呪い状態にする。\n威力は高い。", 0xFFFFFF);
+						break;
+					}
 				}
-				if (scrollOffset + MAX_DISPLAY < magicTypeMessages_.size())
+				else
 				{
-					//1行の高さが仮に30ピクセルだとした場合の計算
-					DrawFormatString(COMMAND_MSG_X+50, COMMAND_MSG_Y + (visibleMessages.size() * 30)+10, 0xFFFFFF, "▼"); //下にスクロールできる
+					// 魔法知識が足りない場合は詳細を隠す
+					DrawString(descX, descY, "【魔法の効果】", 0xffffff);
+					DrawFormatString(descX, descY + 25, 0xffffff, "詳細不明", hoverMagic.reqMagicKnowledge);
 				}
 			}
 		}
@@ -449,7 +552,7 @@ void QuestPhase::ProcessActionLoop(void)
 					battleMessage_ += unit.name + "の" + selectedMagic_.name + "！";
 
 					//①ダメージ処理（威力が0より大きければダメージを与える）
-					if (selectedMagic_.powerMultiplier > 0 && selectedMagic_.type == MAGIC_TYPE::ATTACK)
+					if (selectedMagic_.powerMultiplier > 0 && (selectedMagic_.type == MAGIC_TYPE::ATTACK||selectedMagic_.type == MAGIC_TYPE::DEBUFF))
 					{
 						//魔力 × (魔法の威力) など、威力を反映させた計算式にする
 						int magicDamage = playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier;
@@ -473,6 +576,7 @@ void QuestPhase::ProcessActionLoop(void)
 						{
 							statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
 							statusTurns_ = 4;
+							poisonCnt_ = 0;
 							battleMessage_ += "\n状態異常が回復した！";
 						}
 						break;
@@ -572,7 +676,7 @@ void QuestPhase::ProcessActionLoop(void)
 						if (playerStatus_->hasFirstHitNull && !playerStatus_->isFirstHitUsed)
 						{
 							playerStatus_->isFirstHitUsed = true; //消費する
-							battleMessage_ += playerStatus_->GetName() + "クラススキル【未来視】\n攻撃を回避した！";
+							battleMessage_ += playerStatus_->GetName() + "クラススキル【神秘の護り】\n攻撃を防いだ！";
 							return; //ダメージ処理に行かずに関数を抜ける
 						}
 
@@ -721,7 +825,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ = activeEnemy_->GetName() + "は毒のダメージを受けた\n";
 			activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-			activeEnemy_->Damage(activeEnemy_->GetCurrentHp()/20);
+			activeEnemy_->Damage(activeEnemy_->GetCurrentHp()/16);
 			hasEffectMessage = true;
 		}
 		else if (enemyStatusEffect_ == STATUS_EFFECT::CURSE)
@@ -729,21 +833,31 @@ void QuestPhase::ProcessStatusEffect(void)
 			enemyCurs_--;
 			if (enemyCurs_ <= 0)
 			{
-				battleMessage_ = activeEnemy_->GetName()+"にかかった呪いが発動した……";
-				activeEnemy_->Damage(activeEnemy_->GetCurrentHp()-1); //殺す
+				//HPが2以上の時だけダメージを与える（HPがすでに1以下の時のバグ防止）
+				if (activeEnemy_->GetCurrentHp() > 1)
+				{
+					battleMessage_ = activeEnemy_->GetName() + "にかかった呪いが発動した……";
+					activeEnemy_->ChangeAnim(ANIM_DAMAGE); //ダメージアニメーション
+					activeEnemy_->Damage(activeEnemy_->GetCurrentHp() - 1); //HPを1にする
+				}
+				//発動後は呪い状態を解除する
+				enemyStatusEffect_ = STATUS_EFFECT::NONE;
+				enemyCurs_ = 6;
 			}
 			else
 			{
-				battleMessage_ = "呪いまで あと " + std::to_string(enemyCurs_) + "ターン";
+				battleMessage_ = "呪いまで あと" + std::to_string(enemyCurs_) + "ターン";
 			}
 			hasEffectMessage = true;
 		}
+
 		//定数ダメージ(poison)
 		if (statusEffect_ == STATUS_EFFECT::POISON)
 		{
+			poisonCnt_++;
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ += playerStatus_->GetName() + "は毒のダメージを受けた";
-			playerStatus_->Damage(playerStatus_->GetMaxHp()/10);
+			playerStatus_->Damage(playerStatus_->GetMaxHp()*(poisonCnt_/16));
 			hasEffectMessage = true;
 		}
 		//ターン経過で即死(curse)
@@ -961,7 +1075,6 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
 		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく
-		//例：chosenSubMenuIdx_ = subMenuCursor_; 
 		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡す
 
 		magicMenuCursor_ = 0;
