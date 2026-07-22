@@ -177,7 +177,8 @@ private:
 	STATUS_EFFECT statusEffect_;//状態異常を管理する変数
 	STATUS_EFFECT enemyStatusEffect_ = STATUS_EFFECT::NONE;	//敵の状態異常を管理する変数
 	int statusTurns_ = 4;		//状態異常の残りターン数
-	int enemyCurs_ = 6;			//敵の呪いカウント 
+	int enemyCurs_=6;
+	int poisonCnt_ = 0;			//毒の呪いカウント 
 
 	//クエスト場所系
 	QUEST_LOCATION location_;		//配列

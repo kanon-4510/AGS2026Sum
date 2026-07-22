@@ -357,7 +357,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Spirit/Attack_3.png",     13, 1, 128, 128 },
                 { "Data/Image/Enemy/Spirit/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Spirit/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("マジックボム",53,8,12,14,20,12, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
+            return new Enemy("マジックボム",43,8,12,14,20,12, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> trentAnims = {
                 { "Data/Image/Enemy/Plent/Idle.png",          5, 1, 128, 128 },
@@ -366,7 +366,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Plent/Attack_3.png",     15, 1, 128, 128 },
                 { "Data/Image/Enemy/Plent/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Plent/Dead.png",          2, 1, 128, 128 }};
-            return new Enemy("トレント",56,8,3,6,16,14, "こうげき", "毒の粉", "大地の恵み", trentAnims, spawnX, spawnY);}
+            return new Enemy("トレント",56,8,3,13,16,14, "こうげき", "毒の粉", "大地の恵み", trentAnims, spawnX, spawnY);}
         }
     }
     //5〜9ターン目
