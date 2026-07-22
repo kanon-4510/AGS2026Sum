@@ -207,12 +207,18 @@ Enemy* SpawnEnemyByTurn(int turn)
 {
     //画面中央付近に表示するための基準座標
     int spawnX = 300;
-    int spawnY = 300;
+    int spawnY = 270;
 
     if (turn >= 16)
     {
-        std::vector<MotionConfig> BossAnims;
-        return new Enemy("魔王", 999, 50, 50, 50, 50, 0, "こうげき", "回復", "状態異常", BossAnims, spawnX, spawnY);
+        std::vector<MotionConfig> BossAnims = {
+                { "Data/Image/Enemy/Boss/Idle.png",          4, 1, 72, 72 },
+                { "Data/Image/Enemy/Boss/Attack_1.png",      6, 1, 72, 72 },
+                { "Data/Image/Enemy/Boss/Attack_3.png",      6, 1, 72, 72 },
+                { "Data/Image/Enemy/Boss/Attack_2.png",      6, 1, 72, 72 },
+                { "Data/Image/Enemy/Boss/Hurt.png",          2, 1, 72, 72 },
+                { "Data/Image/Enemy/Boss/Dead.png",          4, 1, 72, 72 } };
+        return new Enemy("魔王", 999, 50, 50, 50, 50, 0, "こうげき", "状態異常", "回復", BossAnims, spawnX, spawnY);
     }
     //13〜15ターン目
     else if (turn >= 13)

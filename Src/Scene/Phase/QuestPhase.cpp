@@ -83,6 +83,11 @@ QuestPhase::~QuestPhase(void)
 //更新処理
 void QuestPhase::Update(void)
 {
+	if (activeEnemy_->GetName() == "魔王" && activeEnemy_->IsDead())
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+	}
+
 	ProcessTutorial();
 
 	//ターン管理関数
@@ -622,7 +627,8 @@ void QuestPhase::ProcessActionLoop(void)
 							else battleMessage_ += "しかしうまく決まらなかった";
 						}
 						else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
-							|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃")
+							|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃"
+							|| unit.skillName == "状態異常")
 						{
 							//プレイヤーを閃光状態にする
 							int damage = activeEnemy_->GetPower2();
