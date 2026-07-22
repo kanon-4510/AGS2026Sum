@@ -30,7 +30,6 @@ void ClassWorkPhase::Update(void)
 
 void ClassWorkPhase::Draw(void)
 {
-	DrawString(0, 0, "Scene : Class Work", 0xFFFFFF);
 	DrawGraph(0, 0, bgImg_, true);
 	DrawGraph(700, 200, playerImg_, true);
 	DrawTutorial();

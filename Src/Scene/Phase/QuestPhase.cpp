@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include <algorithm>
 #include "../../Application.h"
+#include "../../Manager/ResourceManager.h"
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/InputManager.h"
 #include "../../Utility/AsoUtility.h"
@@ -54,6 +55,8 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	, bgImageHandle_(-1)
 {
 	bgImageBar_ = LoadGraph("Data/Image/Stage/BattleBar.png");
+	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
+	playerImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER).handleId_;
 
 	//クエスト開始時は一旦通常の敵を生成しておく
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
@@ -144,6 +147,8 @@ void QuestPhase::Draw(void)
 
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)//難易度選択中はコマンドやHPを表示しない
 	{
+		DrawGraph(0, 0, bgImg_, true);
+		DrawGraph(700, 200, playerImg_, true);
 		DrawString(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y - 30, "どこに行く？", 0xFFFFFF);
 		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, locationMenu_, difficultyCursor_);
 	}
