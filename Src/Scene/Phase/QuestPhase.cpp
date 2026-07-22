@@ -91,11 +91,6 @@ QuestPhase::~QuestPhase(void)
 //更新処理
 void QuestPhase::Update(void)
 {
-	if (activeEnemy_->GetName() == "魔王" && activeEnemy_->IsDead())
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
-	}
-
 	ProcessTutorial();
 
 	//ターン管理関数
@@ -106,6 +101,11 @@ void QuestPhase::Update(void)
 	if (activeEnemy_ != nullptr)
 	{
 		activeEnemy_->Update(); //敵の更新処理
+	}
+
+	if (gameScene_.GetTurn() >= 21  && activeEnemy_ != nullptr && activeEnemy_->IsDead())
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
 }
 
