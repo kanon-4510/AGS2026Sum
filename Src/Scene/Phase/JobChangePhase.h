@@ -41,6 +41,9 @@ public:
 	static constexpr int JOB_BONUS_X = 730;	//職業ボーナスの描画位置X
 	static constexpr int JOB_BONUS_Y = 370;	//職業ボーナスの描画位置Y
 
+	static constexpr int MESSAGE_BOX_X = 30;	//メッセージボックスの描画位置X
+	static constexpr int MESSAGE_BOX_Y = 550;	//メッセージボックスの描画位置Y
+
 	JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ
 
@@ -63,8 +66,9 @@ private:
 	GameScene& gameScene_; //ゲームシーンへの参照
 	PlayerStatus* playerStatus_; //プレイヤーのステータスへのポインタ
 	InputManager& ins_ = InputManager::GetInstance();
-	int deskImg_; //背景画像のハンドル
-	int bookImg_; //背景画像のハンドル
+	int deskImg_; //背景画像(机)のハンドル
+	int bookImg_; //背景画像(本)のハンドル
+	int messageBoxImg_; //背景画像(メッセージ)のハンドル
 	//ページを左にめくる画像のハンドル
 	int pageLeftImg_[8];	//右から左
 	int pageRightImg_[8];	//左から右

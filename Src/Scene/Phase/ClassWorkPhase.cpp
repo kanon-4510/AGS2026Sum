@@ -11,6 +11,7 @@ ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus, GameScene& gameScene)
 {
 	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
 	playerImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER).handleId_;
+	messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
 }
 
 ClassWorkPhase::~ClassWorkPhase(void)
@@ -202,8 +203,12 @@ void ClassWorkPhase::DrawTutorial(void)
 	}
 	if (gameScene_.GetTurn() == 2)
 	{
-		DrawString(0, 500
-			,"ここでは授業を選択することができます\n受ける授業によって得られるスキルが異なります\n今回は魔法知識を選択します"
-			, 0xFFFFFF);
+		SetFontSize(20);
+		DrawGraph(GameScene::MESSAGE_BOX_X, GameScene::MESSAGE_BOX_Y, messageBoxImg_, true);
+
+		DrawString(TUTORIAL_X, TUTORIAL_Y
+			,"科目によって上昇する技能\nが異なります。\n技能は職業にかかわる大切\nな要素です。\n今回は魔法知識を選択します"
+			, Color::BLACK);
+		SetFontSize(DEFAULT_FONT_SIZE);
 	}	
 }

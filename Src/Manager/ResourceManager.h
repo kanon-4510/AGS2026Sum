@@ -27,6 +27,8 @@ public:
 		DESK,
 		//本
 		BOOK,
+		//メッセージボックス
+		MESSAGE_BOX,
 	};
 
 	// 明示的にインステンスを生成する

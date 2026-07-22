@@ -21,6 +21,13 @@ public:
 
 //最大ターン数
 	static constexpr int MAX_TURN = 21;	
+	//メッセージボックスの表示位置
+	static constexpr int MESSAGE_BOX_X = 900;
+	static constexpr int MESSAGE_BOX_Y = 80;
+	//チュートリアルの表示位置
+	static constexpr int TUTORIAL_X = MESSAGE_BOX_X + 20;
+	static constexpr int TUTORIAL_Y = MESSAGE_BOX_Y + 40;
+
 
 	GameScene(void);		//デフォルトコンストラクタ
 	~GameScene(void);		//デストラクタ
@@ -45,6 +52,7 @@ private:
 
 	int playerImg_; //プレイヤーの画像ハンドル
 	int stageImg_;  //ステージの画像ハンドル
+	int messageBoxImg_; //メッセージボックスの画像ハンドル
 
 	//メンバー変数の宣言
 	bool isInputBlocked_ = false; //入力ブロックフラグ

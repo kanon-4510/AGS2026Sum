@@ -11,6 +11,7 @@ JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene)
 {
     deskImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::DESK).handleId_;
     bookImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BOOK).handleId_;
+    messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
     LoadDivGraph("Data/Image/Book/ListBookRtoL.png",
         8,4,2,790,790, pageLeftImg_);
     LoadDivGraph("Data/Image/Book/ListBookLtoR.png",
@@ -105,14 +106,14 @@ void JobChangePhase::Draw(void)
         DrawAnimation();
     }
     
+    DrawTutorial();
+
     SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void JobChangePhase::DrawJobBonus(const JobData& job)
 {
     auto& jobList = playerStatus_->GetJobList();
-
-    DrawTutorial();
 
     if (!jobList.empty() && selectedIndex_ < jobList.size()) {
 
@@ -150,10 +151,6 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
         if (bonus.speed > 0) {
             DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "SPD   : +%d", bonus.speed);
             offset++;
-        }
-
-        if (offset == 1) {
-            DrawString(JOB_BONUS_X, JOB_BONUS_Y + 25, "ボーナスなし", GetColor(150, 150, 150));
         }
     }
 }
@@ -417,10 +414,22 @@ void JobChangePhase::DrawTutorial(void)
 {
     if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
 
+	DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, true);
+	SetFontSize(20);
 	if (gameScene_.GetTurn() == 3)
     {
-        DrawString(0, 500
-            , "ここでは職業を選択することができます\n選ぶ職業によって得られる恩恵が変わります\n今回は一般魔法使いを選択します"
-            , Color::WHITE);
+        if(isShowingDetails_)
+        {
+            DrawString(45, 570
+                , "転職に必要なステータスを\n確認できます。\n詳細画面で決定ボタンを押す\nと転職することができます。\nキャンセルで目次に戻ります"
+                , Color::BLACK);
+        }
+        else
+        {
+            DrawString(45, 570
+                , "転職が可能になると白く表示\nされます。\n決定キーを押すことで詳細\nを確認できます。\nキャンセルで選択に戻ります"
+                , Color::BLACK);
+		}
     }
+	SetFontSize(DEFAULT_FONT_SIZE);
 }

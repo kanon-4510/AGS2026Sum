@@ -1,5 +1,6 @@
 #include <DxLib.h>
 #include "../Application.h"
+#include "../Common/Color.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
@@ -32,6 +33,7 @@ void GameScene::Init(void)
 	phase_ = QUEST_PHASE::PHASE_QUEST;
 	playerImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::PLAYER).handleId_;
 	stageImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
+	messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
 }
 
 //更新処理
@@ -109,7 +111,7 @@ void GameScene::Draw(void)
 		DrawGraph(0, 0, stageImg_, TRUE);
 		SetFontSize(20);
 		//メニュー画面の描画処理
-		DrawFormatString(350, 30, 0xFFFFFF, "現在のターン \n   %d / %d", turn_, MAX_TURN);
+		DrawFormatString(350, 30, Color::WHITE, "現在のターン \n   %d / %d", turn_, MAX_TURN);
 		//現在のルートを文字列に変換して表示する
 		std::string routeName = "未選択";
 		switch (playerStatus_->currentRoute_)
@@ -120,10 +122,11 @@ void GameScene::Draw(void)
 		case PLAYER_ROUTE::SELFLESS:     routeName = "無欲"; break;
 		}
 		// ターンの少し下に黄色っぽく表示
-		DrawFormatString(200, 400, GetColor(255, 0, 0), "現在のルート: %s", routeName.c_str());
+		DrawFormatString(200, 400, Color::RED, "現在のルート: %s", routeName.c_str());
 		SetFontSize(DEFAULT_FONT_SIZE);
 
-		if (SceneManager::GetInstance().IsTutorialEnabled())
+		//チュートリアルが有効で、かつターンが3以下の場合にチュートリアルを描画する
+		if (SceneManager::GetInstance().IsTutorialEnabled() && turn_ <= 3)
 		{
 			DrawTutorial();
 		}
@@ -166,19 +169,25 @@ void GameScene::ProcessTutorial(void)
 
 void GameScene::DrawTutorial(void)
 {
+	DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, TRUE);
+
+	SetFontSize(20);
+	DrawString(TUTORIAL_X + 50, MESSAGE_BOX_Y + 15, "チュートリアル", Color::BLACK);
+
 	//チュートリアルの処理
 	if (turn_ == 1)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：クエストフェーズの説明\nここでは敵と戦って経験値を獲得します");
+		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, " クエストフェーズの説明\n\nここでは敵と戦って経験値\nを獲得します。");
 	}
 	else if (turn_ == 2)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：授業フェーズの説明\nここではスキルを学びます");
+		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, " 授業フェーズの説明\n\nここでは科目を選んで技能\nを学びます。");
 	}
 	else if (turn_ == 3)
 	{
-		DrawFormatString(0, 500, 0xFFFFFF, "チュートリアル：資格試験フェーズの説明\nここでは職業を選択できます");
+		DrawFormatString(TUTORIAL_X - 5, TUTORIAL_Y, Color::BLACK, " 資格試験フェーズの説明\n\nここでは職業を選択すること\nで恩恵を得られます。");
 	}
+	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void GameScene::ProcessPhaseSelection(void)

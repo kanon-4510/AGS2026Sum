@@ -7,6 +7,10 @@ class GameScene;
 class ClassWorkPhase : public PhaseBase
 {
 public:
+	//チュートリアルの表示位置
+	static constexpr int TUTORIAL_X = GameScene::MESSAGE_BOX_X + 15;
+	static constexpr int TUTORIAL_Y = GameScene::MESSAGE_BOX_Y + 20;
+
 	static constexpr int TEXT_POS_X = 150;	//授業のテキスト描画位置X
 	static constexpr int TEXT_POS_Y = 150;	//授業のテキスト描画位置Y
 	
@@ -43,6 +47,7 @@ private:
 	int timer_ = 0; //フェーズの経過時間を管理するタイマー
 	int bgImg_ = -1; //背景画像のハンドル
 	int playerImg_ = -1; //プレイヤーの画像ハンドル
+	int messageBoxImg_ = -1; //メッセージボックスの画像ハンドル
 
 	bool isFinished_ = false; // フェーズが終了したかどうかを管理するフラグ
 
