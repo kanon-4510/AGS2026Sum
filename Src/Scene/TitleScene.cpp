@@ -20,7 +20,7 @@
 //‰Šú‰»ˆ—
 void TitleScene::Init(void)
 {
-	titleImage_ = -1;
+	titleImage_ = LoadGraph("Data/Image/Title.png");
 }
 
 //XVˆ—
@@ -50,7 +50,7 @@ void TitleScene::Update(void)
 //•`‰æˆ—
 void TitleScene::Draw(void)
 {
-	DrawString(0, 0, "Scene : Title", 0xFFFFFF);
+	DrawGraph(0, 0, titleImage_, true);
 
 	if (mode_ == TITLE_MODE::NORMAL)
 	{

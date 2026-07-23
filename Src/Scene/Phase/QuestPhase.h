@@ -224,7 +224,8 @@ private:
 	int chosenMagicIdx_ = 0;		//選択した魔法の種類のインデックス
 
 	int bgImg_ = -1; //背景画像のハンドル
-	int playerImg_ = -1; //プレイヤーの画像ハンドル
+	int playerImg_ = -1; //プレイヤーの画像ハンドル	
+	int board_[8];
 
 	//------関数---------
 	//ターンを管理する関数
