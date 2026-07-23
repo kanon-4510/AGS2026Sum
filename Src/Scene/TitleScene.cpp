@@ -20,7 +20,8 @@
 //初期化処理
 void TitleScene::Init(void)
 {
-	titleImage_ = LoadGraph("Data/Image/Title.png");
+	titleImage_ = LoadGraph("Data/Image/title.png");
+	tutorialOffsetX_ = 0; //矢印のオフセット値を更新
 }
 
 //更新処理
@@ -52,25 +53,26 @@ void TitleScene::Draw(void)
 {
 	DrawGraph(0, 0, titleImage_, true);
 
+	SetFontSize(30);
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
-		DrawFormatString(ARROW_X, ARROW_Y + normalOffset_, Color::WHITE, "→");
+		DrawString(ARROW_X, ARROW_Y + normalOffset_, "→",Color::WHITE);
 
-		DrawFormatString(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, Color::WHITE, "ゲーム開始");
+		DrawString(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, "ゲーム開始", Color::WHITE);
 
-		DrawFormatString(TITLE_MESSAGE_X, Application::SCREEN_SIZE_Y - 160, Color::WHITE, "ゲーム終了");
+		DrawString(TITLE_MESSAGE_X, Application::SCREEN_SIZE_Y - 100, "ゲーム終了", Color::WHITE);
 	}
 	else if (mode_ == TITLE_MODE::TUTORIAL)
 	{
-		DrawFormatString(ARROW_X - 50, TUTORIAL_ARROW_Y + tutorialOffset_, Color::WHITE, "→");
+		DrawFormatString(ARROW_X - tutorialOffsetX_, ARROW_Y + tutorialOffsetY_, Color::WHITE, "→");
 
 		if (SceneManager::GetInstance().IsTutorialEnabled()) {
-			DrawString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 250, "チュートリアル：【 ON 】", Color::WHITE);
+			DrawString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 100, "チュートリアル：【 ON 】", Color::WHITE);
 		}
 		else {
-			DrawString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 250, "チュートリアル：【 OFF 】", Color::WHITE);
+			DrawString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 100, "チュートリアル：【 OFF 】", Color::WHITE);
 		}
-		DrawFormatString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 200, Color::WHITE, "ゲーム開始");
+		DrawString(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, "ゲーム開始", Color::WHITE);
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
 	{
@@ -81,6 +83,7 @@ void TitleScene::Draw(void)
 		DrawString((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, "はい", Color::WHITE);
 		DrawString((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "いいえ", Color::WHITE);
 	}
+	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 //解放処理
@@ -150,13 +153,15 @@ void TitleScene::ProcessMouseSelection(void)
 	{
 		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X - 55, TITLE_MESSAGE_Y - 55, 215, 25))
 		{
-			tutorialOffset_ = 0;
-			nextMode = MODE_SELECTION::TUTORIAL_CHANGE;
+			tutorialOffsetX_ = 0;
+			tutorialOffsetY_ = 40;
+			nextMode = MODE_SELECTION::TUTORIAL_NEXT;
 		}
 		else if (ins_.IsMouseOverRect(515, 515, 95, 25))
 		{
-			tutorialOffset_ = 50;
-			nextMode = MODE_SELECTION::TUTORIAL_NEXT;
+			tutorialOffsetX_ = 50;
+			tutorialOffsetY_ = 0;
+			nextMode = MODE_SELECTION::TUTORIAL_CHANGE;
 		}
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
@@ -212,14 +217,23 @@ void TitleScene::Tutorial(void)
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
 	{
 		tutorialIndex_ = 1 - tutorialIndex_;
-		tutorialOffset_ = tutorialIndex_ * 50; //矢印のオフセット値を更新
+		if (tutorialIndex_ == 0)
+		{
+			tutorialOffsetX_ = 0; //矢印のオフセット値を更新
+			tutorialOffsetY_ = tutorialIndex_ * 40; //矢印のオフセット値を更新
+		}
+		else
+		{
+			tutorialOffsetX_ = 40; //矢印のオフセット値を更新
+			tutorialOffsetY_ = tutorialIndex_ * 40; //矢印のオフセット値を更新
+		}
 	}
 
 	//最終決定
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
-		if (tutorialIndex_ == 0)
+		if (tutorialIndex_ == 1)
 		{
 			SceneManager::GetInstance().ToggleTutorial();
 		}

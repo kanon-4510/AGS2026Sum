@@ -7,10 +7,10 @@
 class TitleScene : public SceneBase
 {
 public:
-	static constexpr int TITLE_MESSAGE_X = (Application::SCREEN_SIZE_X - 120) / 2;	//タイトルメッセージ
-	static constexpr int TITLE_MESSAGE_Y = Application::SCREEN_SIZE_Y - 200;		//タイトルメッセージ
+	static constexpr int TITLE_MESSAGE_X = (Application::SCREEN_SIZE_X - 170) / 2;	//タイトルメッセージ
+	static constexpr int TITLE_MESSAGE_Y = Application::SCREEN_SIZE_Y - 140;		//タイトルメッセージ
 
-	static constexpr int ARROW_X = TITLE_MESSAGE_X - 20;	//矢印の表示位置X
+	static constexpr int ARROW_X = TITLE_MESSAGE_X - 40;	//矢印の表示位置X
 	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;			//矢印の表示位置Y
 
 	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ
@@ -61,7 +61,8 @@ private:
 
 	//矢印のオフセット値
 	int normalOffset_ = 0;
-	int tutorialOffset_ = 0;
+	int tutorialOffsetX_ = 0;
+	int tutorialOffsetY_ = 0;
 	int exitOffset_ = 0;
 
 	//メンバー変数
