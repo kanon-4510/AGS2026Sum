@@ -2,6 +2,7 @@
 #include <EffekseerForDXLib.h>
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
+#include "../Manager/SoundManager.h"
 
 PlayerStatus::PlayerStatus()
 {
@@ -219,6 +220,9 @@ void PlayerStatus::Damage(int damage)
 
 void PlayerStatus::Death()
 {
+	//クエストBGMを止める
+	SoundManager::GetInstance().Stop(SoundManager::SRC::QUEST_BGM);
+
 	SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::OVER);
 }
 
