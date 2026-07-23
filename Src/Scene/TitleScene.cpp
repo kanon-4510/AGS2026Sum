@@ -59,6 +59,7 @@ void TitleScene::Draw(void)
 	SetFontSize(30);
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
+		//ゲームをするか終了するか
 		DrawString(ARROW_X, ARROW_Y + normalOffset_, "→",Color::WHITE);
 
 		DrawString(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, "ゲーム開始", Color::WHITE);
@@ -67,6 +68,7 @@ void TitleScene::Draw(void)
 	}
 	else if (mode_ == TITLE_MODE::TUTORIAL)
 	{
+		//ゲームを始めるか、チュートリアルをON・OFFするか
 		DrawFormatString(ARROW_X - tutorialOffsetX_, ARROW_Y + tutorialOffsetY_, Color::WHITE, "→");
 
 		if (SceneManager::GetInstance().IsTutorialEnabled()) {
@@ -79,12 +81,13 @@ void TitleScene::Draw(void)
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
 	{
-		DrawFormatString(EXIT_ARROW_X - exitOffset_, 400, Color::WHITE, "→");
+		//ゲームを終了するか
+		DrawFormatString(EXIT_ARROW_X - exitOffset_, TITLE_MESSAGE_Y + 40, Color::WHITE, "→");
 
-		DrawFormatString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y / 2, Color::WHITE, "ゲームを終了しますか？");
+		DrawFormatString((Application::SCREEN_SIZE_X / 3) + 40, TITLE_MESSAGE_Y, Color::WHITE, "ゲームを終了しますか？");
 
-		DrawString((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, "はい", Color::WHITE);
-		DrawString((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "いいえ", Color::WHITE);
+		DrawString((Application::SCREEN_HALFSIZE_X) + 40, TITLE_MESSAGE_Y + 40, "はい", Color::WHITE);
+		DrawString((Application::SCREEN_HALFSIZE_X) - 130, TITLE_MESSAGE_Y + 40, "いいえ", Color::WHITE);
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
@@ -97,6 +100,7 @@ void TitleScene::Release(void)
 
 void TitleScene::ProcessTitleSelection(void)
 {
+	//ゲームを始めるか終了するかの操作処理
 	if (ins_.IsTrgDown(KEY_INPUT_UP) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP))
 	{
@@ -145,12 +149,12 @@ void TitleScene::ProcessMouseSelection(void)
 	//タイトルの選択肢をマウスで選択する処理
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
-		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y - 5, 90, 20))
+		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, 150, 30))
 		{
 			normalOffset_ = 0; //矢印のオフセット値を更新
 			nextMode = MODE_SELECTION::NORMAL_TUTORIAL;
 		}
-		else if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y + 35, 90, 20))
+		else if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y + 40, 150, 30))
 		{
 			normalOffset_ = 40; //矢印のオフセット値を更新
 			nextMode = MODE_SELECTION::NORMAL_EXIT;
@@ -158,21 +162,23 @@ void TitleScene::ProcessMouseSelection(void)
 	}
 	else if (mode_ == TITLE_MODE::TUTORIAL)
 	{
-		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X - 55, TITLE_MESSAGE_Y - 55, 215, 25))
+		//矢印のオフセットの位置を決める
+		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, 160, 30))
 		{
 			tutorialOffsetX_ = 0;
-			tutorialOffsetY_ = 40;
+			tutorialOffsetY_ = 0;
 			nextMode = MODE_SELECTION::TUTORIAL_NEXT;
 		}
-		else if (ins_.IsMouseOverRect(515, 515, 95, 25))
+		else if (ins_.IsMouseOverRect(520, 620, 220, 30))
 		{
-			tutorialOffsetX_ = 50;
-			tutorialOffsetY_ = 0;
+			tutorialOffsetX_ = 30;
+			tutorialOffsetY_ = 40;
 			nextMode = MODE_SELECTION::TUTORIAL_CHANGE;
 		}
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
 	{
+		//矢印のオフセットの位置を決める
 		if (ins_.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
 		{
 			exitOffset_ = 0;
@@ -223,6 +229,7 @@ void TitleScene::Tutorial(void)
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_UP) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
 	{
+		//矢印のオフセットの位置を決める
 		tutorialIndex_ = 1 - tutorialIndex_;
 		if (tutorialIndex_ == 0)
 		{
@@ -231,7 +238,7 @@ void TitleScene::Tutorial(void)
 		}
 		else
 		{
-			tutorialOffsetX_ = 40; //矢印のオフセット値を更新
+			tutorialOffsetX_ = 30; //矢印のオフセット値を更新
 			tutorialOffsetY_ = tutorialIndex_ * 40; //矢印のオフセット値を更新
 		}
 	}
@@ -242,12 +249,12 @@ void TitleScene::Tutorial(void)
 	{
 		if (tutorialIndex_ == 0)
 		{
-			SceneManager::GetInstance().ToggleTutorial();
+			//ゲームシーンへ遷移
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 		}
 		else
 		{
-			//ゲームシーンへ遷移
-			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+			SceneManager::GetInstance().ToggleTutorial();
 		}
 	}
 	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
@@ -264,8 +271,9 @@ void TitleScene::ExitGame(void)
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_LEFT) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT))
 	{
+		//矢印のオフセットの位置を決める
 		confirmIndex_ = 1 - confirmIndex_;	//0と1を反転させる
-		exitOffset_ = confirmIndex_ * -130; //矢印のオフセット値を更新
+		exitOffset_ = confirmIndex_ * -180; //矢印のオフセット値を更新
 	}
 
 	//最終決定

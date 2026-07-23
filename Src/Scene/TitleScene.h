@@ -14,7 +14,7 @@ public:
 	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;			//矢印の表示位置Y
 
 	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ
-	static constexpr int EXIT_ARROW_X = 500;			//ゲーム終了確認メッセージ
+	static constexpr int EXIT_ARROW_X = Application::SCREEN_HALFSIZE_X - 180;			//ゲーム終了確認メッセージ
 
 	enum TITLE_SELECTION
 	{
