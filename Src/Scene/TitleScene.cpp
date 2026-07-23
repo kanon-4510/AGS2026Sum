@@ -2,6 +2,7 @@
 #include "../Application.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/SoundManager.h"
 #include "../Common/Color.h"
 #include "TitleScene.h"
 
@@ -20,6 +21,9 @@
 //初期化処理
 void TitleScene::Init(void)
 {
+	//音楽
+	SoundManager::GetInstance().Play(SoundManager::SRC::TITLE_BGM, Sound::TIMES::LOOP);
+
 	titleImage_ = -1;
 }
 
@@ -86,6 +90,7 @@ void TitleScene::Draw(void)
 //解放処理
 void TitleScene::Release(void)
 {
+	SoundManager::GetInstance().Stop(SoundManager::SRC::TITLE_BGM);
 }
 
 void TitleScene::ProcessTitleSelection(void)
@@ -113,6 +118,9 @@ void TitleScene::ProcessTitleDecision(void)
 	if(ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		//選択音
+		SoundManager::GetInstance().Play(SoundManager::SRC::SELECT_SE, Sound::TIMES::ONCE);
+
 		switch (titleSelection_)
 		{
 		case TitleScene::START_GAME:
@@ -219,6 +227,9 @@ void TitleScene::Tutorial(void)
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		//選択音
+		SoundManager::GetInstance().Play(SoundManager::SRC::SELECT_SE, Sound::TIMES::ONCE);
+
 		if (tutorialIndex_ == 0)
 		{
 			SceneManager::GetInstance().ToggleTutorial();
@@ -251,6 +262,9 @@ void TitleScene::ExitGame(void)
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		//選択音
+		SoundManager::GetInstance().Play(SoundManager::SRC::SELECT_SE, Sound::TIMES::ONCE);
+
 		if (confirmIndex_ == 0)
 		{
 			//「いいえ」なら通常メニューモードに戻る

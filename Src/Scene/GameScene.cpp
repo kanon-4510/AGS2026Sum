@@ -4,6 +4,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/SoundManager.h"
 #include "../Utility/AsoUtility.h"
 #include "Phase/QuestPhase.h"
 #include "Phase/ClassWorkPhase.h"
@@ -96,6 +97,9 @@ void GameScene::Update(void)
 	{
 		ProcessPhaseSelection();
 		ProcessPhaseDecision();
+
+		//BGMçƒê∂
+		SoundManager::GetInstance().Play(SoundManager::SRC::GAME_BGM, Sound::TIMES::LOOP);
 	}
 }
 
@@ -148,6 +152,7 @@ void GameScene::Draw(void)
 //âï˙èàóù
 void GameScene::Release(void)
 {
+	SoundManager::GetInstance().Stop(SoundManager::SRC::GAME_BGM);
 }
 
 void GameScene::ProcessTutorial(void)
@@ -208,6 +213,9 @@ void GameScene::ProcessPhaseDecision()
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		//ëIëâπ
+		SoundManager::GetInstance().Play(SoundManager::SRC::SELECT_SE, Sound::TIMES::ONCE);
+
 		switch (phase_) 
 		{
 		case QUEST_PHASE::PHASE_QUEST:

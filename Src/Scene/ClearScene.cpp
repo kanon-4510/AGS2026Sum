@@ -37,7 +37,10 @@ void ClearScene::Update(void)
 	//入力受付（アニメーション後）
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN)||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN)) {
-		
+
+		//選択音
+		SoundManager::GetInstance().Play(SoundManager::SRC::SELECT_SE, Sound::TIMES::ONCE);
+
 		if(selectIndex_ == 0)
 		{
 			//リトライ
