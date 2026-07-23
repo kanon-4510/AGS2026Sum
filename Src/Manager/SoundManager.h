@@ -8,24 +8,16 @@ public:
 	//リソース名
 	enum class SRC
 	{
-		TITEL_BGM,
-		//ゲームシーン
+		//BGM
+		TITLE_BGM,
 		GAME_BGM,
-		TRANING_BGM,
-		ATTACK_SE,
-		HIT_SE,
-		DEFENSE_SE,
-		DAMAGE_SE,
-		AVOID_SE,
-		SHOT_SE,
-		DOWN_SE,
-		//ゲームオーバー
-		GAMEOVER_BGM,
-		//クリアシーン
+		QUEST_BGM,
 		GAMECLEAR_BGM,
-		//共通
+		GAMEOVER_BGM,
+		//SE
 		SELECT_SE,
-		POSE_SE
+		DAMAGE_SE,
+		ATTACK_SE,
 	};
 
 	// 明示的にインステンスを生成する

@@ -5,6 +5,7 @@
 #include "../../Manager/SceneManager.h"
 #include "../../Manager/ResourceManager.h"
 #include "../../Manager/InputManager.h"
+#include "../../Manager/SoundManager.h"
 #include "../../Utility/AsoUtility.h"
 #include "../GameScene.h"
 #include "../../Object/Enemy.h"
@@ -112,6 +113,9 @@ void QuestPhase::Update(void)
 
 	if (gameScene_.GetTurn() >= 21  && activeEnemy_ != nullptr && activeEnemy_->IsDead())
 	{
+		//クエストBGMを止める
+		SoundManager::GetInstance().Stop(SoundManager::SRC::QUEST_BGM);
+
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
 }
@@ -557,12 +561,18 @@ void QuestPhase::ProcessActionLoop(void)
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						if (playerStatus_->hasCritBoost)battleMessage_ += "\n【極聖光】会心倍率が上がった！";
 						activeEnemy_->Damage(attackPow * critMultiplier);
+
+						//ダメージSE
+						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
 					}
 					else
 					{
 						playerStatus_->AttackAnimation();
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						activeEnemy_->Damage(attackPow);
+
+						//攻撃SE
+						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
 					}
 				}
 				else if (command_ == COMMAND::MAGIC)
@@ -576,6 +586,9 @@ void QuestPhase::ProcessActionLoop(void)
 						//魔力 × (魔法の威力) など、威力を反映させた計算式にする
 						int magicDamage = playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier;
 						activeEnemy_->Damage(magicDamage);
+
+						//攻撃SE
+						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
 					}
 
 					//②カテゴリ別の特殊処理（回復や状態異常）
@@ -795,6 +808,9 @@ void QuestPhase::ProcessActionLoop(void)
 							//回避失敗 通常通りダメージを受ける
 							playerStatus_->DamageAnimation();
 							playerStatus_->Damage(damage);
+
+							//ダメージSE
+							SoundManager::GetInstance().Play(SoundManager::SRC::DAMAGE_SE, Sound::TIMES::ONCE);
 						}
 					}
 				}
@@ -1024,6 +1040,7 @@ void QuestPhase::CheckEnemyDeath(void)
 		battleStep_ = BATTLE_STEP::RESULT;
 		statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
 		enemyStatusEffect_ = STATUS_EFFECT::NONE;
+		SoundManager::GetInstance().Stop(SoundManager::SRC::QUEST_BGM);
 		return;
 	}
 }
@@ -1045,6 +1062,12 @@ void QuestPhase::ProcessPlayerAction()
 	int commandIndex = static_cast<int>(command_); //enum class を int に変換して操作する
 	int maxItems = static_cast<int>(COMMAND::MAX);
 
+	//BGMの切り替え
+	//ゲームBGMを止める
+	SoundManager::GetInstance().Stop(SoundManager::SRC::GAME_BGM);
+
+	//クエストBGM再生
+	SoundManager::GetInstance().Play(SoundManager::SRC::QUEST_BGM, Sound::TIMES::LOOP);
 
 	//カーソル移動
 	Utility::ProcessCommandMenuSelection(commandIndex, maxItems);

@@ -2,6 +2,7 @@
 #include "../Application.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/SoundManager.h"
 #include "../Common/Color.h"
 #include "OverScene.h"
 
@@ -20,6 +21,8 @@
 //初期化処理
 void OverScene::Init(void)
 {
+	//音楽
+	SoundManager::GetInstance().Play(SoundManager::SRC::GAMEOVER_BGM, Sound::TIMES::LOOP);
 }
 
 //更新処理
@@ -36,6 +39,9 @@ void OverScene::Update(void)
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
+		//選択音
+		SoundManager::GetInstance().Play(SoundManager::SRC::SELECT_SE, Sound::TIMES::ONCE);
+
 		if (selectIndex_ == 0)
 		{
 			//リトライ
@@ -71,4 +77,5 @@ void OverScene::Draw(void)
 //解放処理
 void OverScene::Release(void)
 {
+	SoundManager::GetInstance().Stop(SoundManager::SRC::GAMEOVER_BGM);
 }
