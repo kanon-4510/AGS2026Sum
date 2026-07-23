@@ -40,6 +40,12 @@ void OverScene::Update(void)
 		{
 			//リトライ
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+			//リトライの選択時、チュートリアルが有効なら無効にする
+			if (SceneManager::GetInstance().IsTutorialEnabled() == true)
+			{
+				SceneManager::GetInstance().ToggleTutorial();
+			}
+
 		}
 		else
 		{

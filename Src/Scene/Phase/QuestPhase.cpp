@@ -654,12 +654,21 @@ void QuestPhase::ProcessActionLoop(void)
 
 				//技の名前によって特別な効果を発動させる
 				if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
-					|| unit.skillName == "自己再生" || unit.skillName == "回復")
+					|| unit.skillName == "自己再生")
 				{
 					//Power分回復
 					int healAmount = activeEnemy_->GetPower3();
 					activeEnemy_->Heal(healAmount);
 					battleMessage_ += "\n" + unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
+				}
+				else if(unit.skillName == "遡行")
+				{
+					//Power分回復
+					int healAmount = activeEnemy_->GetPower3();
+					activeEnemy_->Heal(healAmount);
+					enemyStatusEffect_ = STATUS_EFFECT::NONE; //状態異常を治す
+					enemyCurs_ = ENEMY_CURS_TURN;
+					battleMessage_ += "\n" + unit.name + "の肉体が巻き戻る";
 				}
 				else if (unit.skillName == "まもる" || unit.skillName == "守る"
 					|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
@@ -743,7 +752,7 @@ void QuestPhase::ProcessActionLoop(void)
 						}
 						else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
 							|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃"
-							|| unit.skillName == "状態異常")
+							|| unit.skillName == "魔の威光")
 						{
 							//プレイヤーを閃光状態にする
 							int damage = activeEnemy_->GetPower2();
@@ -856,7 +865,7 @@ void QuestPhase::ProcessStatusEffect(void)
 				}
 				//発動後は呪い状態を解除する
 				enemyStatusEffect_ = STATUS_EFFECT::NONE;
-				enemyCurs_ = 6;
+				enemyCurs_ = ENEMY_CURS_TURN;
 			}
 			else
 			{
@@ -1047,8 +1056,12 @@ void QuestPhase::ProcessPlayerAction()
 			battleMessage_ = "魔法を唱えられない";
 			return; //決定処理を中断
 		}
-		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_ && !playerStatus_->hasMagicUnlock)return; //魔法の連続使用制限
-
+		//魔法連続で使おうとしたとき
+		if (command_ == COMMAND::MAGIC && wasMagicUsedLastTurn_ && !playerStatus_->hasMagicUnlock)
+		{
+			battleMessage_ = "魔法詠唱中...";
+			return; //魔法の連続使用制限
+		}
 		if (command_ == COMMAND::MAGIC) magicUsedThisTurn_ = true;
 		else magicUsedThisTurn_ = false;
 

@@ -152,6 +152,9 @@ public:
 	static constexpr int ANIM_DAMAGE = 3;
 	static constexpr int ANIM_DEAD = 4;
 
+	//呪いのターンを６に戻す
+	static constexpr int ENEMY_CURS_TURN = 6;
+
 	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest = false);//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
 

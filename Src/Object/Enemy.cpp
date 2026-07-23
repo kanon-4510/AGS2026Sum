@@ -212,7 +212,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Boss/Attack_2.png",      6, 1, 72, 72 },
                 { "Data/Image/Enemy/Boss/Hurt.png",          2, 1, 72, 72 },
                 { "Data/Image/Enemy/Boss/Dead.png",          4, 1, 72, 72 } };
-        return new Enemy("魔王", 999, 50, 50, 50, 50, 0, "こうげき", "状態異常", "回復", BossAnims, spawnX, spawnY);
+        return new Enemy("魔王", 999, 43, 37, 30, 50, 0, "こうげき", "魔の威光", "遡行", BossAnims, spawnX, spawnY);
     }
     //17〜20ターン目
     else if (turn >= 17)
