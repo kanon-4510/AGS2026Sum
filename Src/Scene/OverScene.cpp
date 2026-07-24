@@ -21,6 +21,8 @@
 //初期化処理
 void OverScene::Init(void)
 {
+	normalOffsetX_ = 0;
+
 	//音楽
 	SoundManager::GetInstance().Play(SoundManager::SRC::GAMEOVER_BGM, Sound::TIMES::LOOP);
 }
@@ -33,7 +35,16 @@ void OverScene::Update(void)
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
 	{
 		selectIndex_ = 1 - selectIndex_;	//0と1を反転させる
-		normalOffset_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+		if (selectIndex_ == 0)
+		{
+			normalOffsetX_ = 0;	//矢印のオフセット値を更新
+			normalOffsetY_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+		}
+		else
+		{
+			normalOffsetX_ = selectIndex_ * 15;	//矢印のオフセット値を更新
+			normalOffsetY_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+		}
 	}
 
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
@@ -64,14 +75,16 @@ void OverScene::Update(void)
 //描画処理
 void OverScene::Draw(void)
 {
-	DrawString(0, 0, "Scene : GameOver", 0xFFFFFF);
+	SetFontSize(70);
+	DrawString(GAMEOVER_MESSAGE_X, GAMEOVER_MESSAGE_Y, "世界を守れなかった...", Color::RED);
 
+	SetFontSize(30);
+	DrawFormatString(ARROW_X - normalOffsetX_, ARROW_Y + normalOffsetY_, Color::WHITE, "→");
 
-	DrawFormatString(ARROW_X, ARROW_Y + normalOffset_, Color::WHITE, "→");
+	DrawFormatString(OVER_MESSAGE_X, OVER_MESSAGE_Y, Color::WHITE, "別の道へ");
 
-	DrawFormatString(OVER_MESSAGE_X, OVER_MESSAGE_Y, Color::WHITE, "リトライ");
-
-	DrawFormatString(OVER_MESSAGE_X, Application::SCREEN_SIZE_Y - 160, Color::WHITE, "タイトル");
+	DrawFormatString(OVER_MESSAGE_X - 15, Application::SCREEN_SIZE_Y - 160, Color::WHITE, "受け入れる");
+	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 //解放処理

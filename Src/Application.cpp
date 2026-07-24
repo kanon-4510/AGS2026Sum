@@ -39,7 +39,7 @@ Application::Application(void)
 void Application::Init(void)
 {
 	// ウィンドウタイトル
-	SetWindowText("AGS2026");
+	SetWindowText("Which Witch");
 
 
 	// 画面サイズ設定
