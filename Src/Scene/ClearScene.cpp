@@ -70,8 +70,9 @@ void ClearScene::Draw(void)
 {
 	//メッセージ（下のテキスト）を表示
 	SetFontSize(70);
-	DrawString(GAMECLEAR_MESSAGE_X, GAMECLEAR_MESSAGE_Y, "世界一の魔法使いになった！", 0xFFFFFF);
-	SetFontSize(DEFAULT_FONT_SIZE);
+	std::string str = "世界一の魔法使いになった！";
+	int width = GetDrawStringWidth(str.c_str(), str.size());
+	DrawString(GAMECLEAR_MESSAGE_X, GAMECLEAR_MESSAGE_Y,str.c_str(), 0xFFFFFF);
 
 	SetFontSize(30);
 	if (!isFinishCheck_)

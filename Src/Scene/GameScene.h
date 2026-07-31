@@ -22,11 +22,11 @@ public:
 //最大ターン数
 	static constexpr int MAX_TURN = 21;	
 	//メッセージボックスの表示位置
-	static constexpr int MESSAGE_BOX_X = 900;
-	static constexpr int MESSAGE_BOX_Y = 80;
+	static constexpr int MESSAGE_BOX_X = 950;
+	static constexpr int MESSAGE_BOX_Y = 50;
 	//チュートリアルの表示位置
-	static constexpr int TUTORIAL_X = MESSAGE_BOX_X + 20;
-	static constexpr int TUTORIAL_Y = MESSAGE_BOX_Y + 40;
+	static constexpr int TUTORIAL_X = MESSAGE_BOX_X + 15;
+	static constexpr int TUTORIAL_Y = MESSAGE_BOX_Y + 20;
 
 
 	GameScene(void);		//デフォルトコンストラクタ

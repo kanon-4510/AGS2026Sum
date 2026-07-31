@@ -103,13 +103,6 @@ public:
 	//------定数---------
 	//メッセージの表示位置
 
-	//メッセージボックスの表示位置
-	static constexpr int MESSAGE_BOX_X = 900;
-	static constexpr int MESSAGE_BOX_Y = 80;
-
-	//チュートリアルの表示位置
-	static constexpr int TUTORIAL_X = MESSAGE_BOX_X + 15;
-	static constexpr int TUTORIAL_Y = MESSAGE_BOX_Y + 30;
 
 	//難易度選択のメッセージの位置
 	static constexpr int DIFFICULTY_MSG_X = 0;

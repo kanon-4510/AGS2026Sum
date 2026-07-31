@@ -19,34 +19,32 @@ extern Enemy* SpawnRushEnemy(int stage); //ラッシュ専用の敵生成関数
 const std::vector<MagicData> MAGIC_DATABASE = 
 {
 	//【攻撃魔法】
-	{1,"ファイア",    MAGIC_TYPE::ATTACK,1.5f,STATUS_EFFECT::NONE,0,0},
-	{2,"フレイム",    MAGIC_TYPE::ATTACK,2.0f,STATUS_EFFECT::NONE,0,100},
-	{3,"プロミネンス",MAGIC_TYPE::ATTACK,4.0f,STATUS_EFFECT::NONE,0,350},
-	{4,"ビッグバン",  MAGIC_TYPE::ATTACK,10.0f,STATUS_EFFECT::NONE,0,999},
-
+	{1,"ファイア",		   MAGIC_TYPE::ATTACK, 1.5f,STATUS_EFFECT::NONE,    0,  0},
+	{2,"フレイム",		   MAGIC_TYPE::ATTACK, 2.0f,STATUS_EFFECT::NONE,    0, 80},
+	{3,"プロミネンス",	   MAGIC_TYPE::ATTACK, 4.0f,STATUS_EFFECT::NONE,    0,330},
+	{4,"ビッグバン",	   MAGIC_TYPE::ATTACK,10.0f,STATUS_EFFECT::NONE,    0,500},
 	//【回復魔法】高中低、状態異常回復＋回復
-	{5, "ドレイン",  MAGIC_TYPE::HEAL,0.7f,STATUS_EFFECT::NONE,0,230,true,false},
-	{6, "ヒール",    MAGIC_TYPE::HEAL,0.3f,STATUS_EFFECT::NONE,0,0},
-	{7, "ハイヒール",MAGIC_TYPE::HEAL,0.5f,STATUS_EFFECT::NONE,0,100},
-	{8, "メガヒール",MAGIC_TYPE::HEAL,1.0f,STATUS_EFFECT::NONE,0,360},
-	{9, "キュア",    MAGIC_TYPE::HEAL,0.0f,STATUS_EFFECT::NONE,0,60,false,true},
-	{10,"レスキュー",MAGIC_TYPE::HEAL,0.5f,STATUS_EFFECT::NONE,0,250,false,true},
-
+	{5, "ドレイン",		   MAGIC_TYPE::HEAL,   0.7f,STATUS_EFFECT::NONE,    0,190,true,false},
+	{6, "ヒール",		   MAGIC_TYPE::HEAL,   0.3f,STATUS_EFFECT::NONE,    0,  0},
+	{7, "ハイヒール",	   MAGIC_TYPE::HEAL,   0.5f,STATUS_EFFECT::NONE,    0, 80},
+	{8, "メガヒール",	   MAGIC_TYPE::HEAL,   1.0f,STATUS_EFFECT::NONE,    0,350},
+	{9, "キュア",		   MAGIC_TYPE::HEAL,   0.0f,STATUS_EFFECT::NONE,    0, 50,false,true},
+	{10,"レスキュー",	   MAGIC_TYPE::HEAL,   0.5f,STATUS_EFFECT::NONE,    0,240,false,true},
 	//【状態異常攻撃】高中低（確率は低30%, 中50%, 高70%,100%）
-	{11,"アシッドニードル",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::POISON,30,50},
-	{12,"ヴェノムスピア",  MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::POISON,50,120},
-	{13,"トキシックランス",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::POISON,70,320},
-	{14,"ポイズン",		   MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::POISON,100,220},
-	{15,"コールドブレス",  MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FREEZE,30,50},
-	{16,"スノーテンペスト",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FREEZE,50,120},
-	{17,"アイシクルノヴァ",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FREEZE,70,320},
-	{18,"フリーズ",		   MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FREEZE,100,220},
-	{19,"フォトンシュート",MAGIC_TYPE::DEBUFF,1.0f,STATUS_EFFECT::FLASH,30,50},
-	{20,"プリズムレーザー",MAGIC_TYPE::DEBUFF,2.5f,STATUS_EFFECT::FLASH,50,120},
-	{21,"ミラージュレイン",MAGIC_TYPE::DEBUFF,4.0f,STATUS_EFFECT::FLASH,70,320},
-	{22,"フラッシュ",	   MAGIC_TYPE::DEBUFF,0.0f,STATUS_EFFECT::FLASH,100,220},
-	{23,"リーサルクロー",  MAGIC_TYPE::DEBUFF,3.0f,STATUS_EFFECT::CURSE,5,180},
-	{24,"フェイタルソード",MAGIC_TYPE::DEBUFF,4.5f,STATUS_EFFECT::CURSE,10,400},
+	{11,"アシッドニードル",MAGIC_TYPE::DEBUFF, 1.0f,STATUS_EFFECT::POISON, 30, 30},
+	{12,"ヴェノムスピア",  MAGIC_TYPE::DEBUFF, 2.5f,STATUS_EFFECT::POISON, 50,100},
+	{13,"トキシックランス",MAGIC_TYPE::DEBUFF, 4.0f,STATUS_EFFECT::POISON, 70,290},
+	{14,"ポイズン",		   MAGIC_TYPE::DEBUFF, 0.0f,STATUS_EFFECT::POISON,100,160},
+	{15,"コールドブレス",  MAGIC_TYPE::DEBUFF, 1.0f,STATUS_EFFECT::FREEZE, 30, 30},
+	{16,"スノーテンペスト",MAGIC_TYPE::DEBUFF, 2.5f,STATUS_EFFECT::FREEZE, 50,100},
+	{17,"アイシクルノヴァ",MAGIC_TYPE::DEBUFF, 4.0f,STATUS_EFFECT::FREEZE, 70,290},
+	{18,"フリーズ",		   MAGIC_TYPE::DEBUFF, 0.0f,STATUS_EFFECT::FREEZE,100,160},
+	{19,"フォトンシュート",MAGIC_TYPE::DEBUFF, 1.0f,STATUS_EFFECT::FLASH,  30, 30},
+	{20,"プリズムレーザー",MAGIC_TYPE::DEBUFF, 2.5f,STATUS_EFFECT::FLASH,  50,100},
+	{21,"ミラージュレイン",MAGIC_TYPE::DEBUFF, 4.0f,STATUS_EFFECT::FLASH,  70,290},
+	{22,"フラッシュ",	   MAGIC_TYPE::DEBUFF, 0.0f,STATUS_EFFECT::FLASH, 100,160},
+	{23,"リーサルクロー",  MAGIC_TYPE::DEBUFF, 3.0f,STATUS_EFFECT::CURSE,   5,130},
+	{24,"フェイタルソード",MAGIC_TYPE::DEBUFF, 4.5f,STATUS_EFFECT::CURSE,  10,390},
 };
 
 //コンストラクタ
@@ -76,8 +74,8 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	locationMenu_ = { "平原","魔法の森","岩山の道場","魔大陸","壊れた聖堂","古代遺跡","星の丘" };	//ここで難易度メニューを動的に作成
 	selectableLocations_ = { QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL };
 
-	//13ターン目以降 かつ まだ一度も挑んでいないなら
-	if (gameScene_.GetTurn() >= 17 && !playerStatus_->hasChallengedHellQuest_)
+	//17ターン目以降 かつ まだ一度も挑んでいないなら
+	if (gameScene_.GetTurn() >= 17 && gameScene_.GetTurn() < 21 && !playerStatus_->hasChallengedHellQuest_)
 	{
 		locationMenu_.push_back("エクストラ");
 		selectableLocations_.push_back(QUEST_LOCATION::EXTRA);
@@ -99,7 +97,6 @@ QuestPhase::~QuestPhase(void)
 //更新処理
 void QuestPhase::Update(void)
 {
-	ProcessTutorial();
 
 	//ターン管理関数
 	ManageTurn();
@@ -134,11 +131,11 @@ void QuestPhase::Draw(void)
 		DrawFormatString( 245,640,0xffffff,"　筋力 %d" ,playerStatus_->power_ + playerStatus_->GetJobBonus().power);
 		DrawFormatString( 245,665,0xffffff,"　魔力 %d" ,playerStatus_->MagicAttack());
 		DrawFormatString( 245,690,0xffffff,"素早さ %d" ,playerStatus_->GetSpeed());
-		DrawFormatString(1065,510,0xffffff,"　　治癒力:%+3d",playerStatus_->pharmacy_/10);
+		DrawFormatString(1065,510,0xffffff,"　　治癒力:%+3d",playerStatus_->pharmacy_/7);
 		DrawFormatString(1065,545,0xffffff,"会心発生率:%3d%%",playerStatus_->martialArts_/5);
 		DrawFormatString(1065,580,0xffffff,"魔術ランク:%3d",(playerStatus_->magicKnowledge_/50)+1);
 		DrawFormatString(1065,615,0xffffff,"　　守備力:%3d",playerStatus_->faith_/15);
-		DrawFormatString(1065,650,0xffffff,"獲得経験値:%+3d",playerStatus_->archaeology_/10);
+		DrawFormatString(1065,650,0xffffff,"獲得経験値:%+3d",playerStatus_->archaeology_/8);
 		DrawFormatString(1065,685,0xffffff,"　　回避率:%3d%%",playerStatus_->astrology_/5);
 		DrawFormatString(900,590,0xffffff,"%s",playerStatus_->job.c_str());
 		DrawFormatString(900,640,0xffffff,"状態:");
@@ -151,7 +148,6 @@ void QuestPhase::Draw(void)
 		SetFontSize(16);
 	}
 #pragma endregion
-	DrawTutorial();
 
 	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
 	{
@@ -330,6 +326,7 @@ void QuestPhase::Draw(void)
 	{
 		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
 	}
+	DrawTutorial();
 }
 
 bool QuestPhase::IsFinished() const
@@ -556,7 +553,7 @@ void QuestPhase::ProcessActionLoop(void)
 					if (GetRand(99) < criticalChance)
 					{
 						battleMessage_ += "クリティカルヒット！";
-						int critMultiplier = playerStatus_->hasCritBoost ? 7.5 : 2.5;
+						int critMultiplier = playerStatus_->hasCritBoost ? 6.0 : 2.0;
 						playerStatus_->AttackAnimation();
 						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 						if (playerStatus_->hasCritBoost)battleMessage_ += "\n【極聖光】会心倍率が上がった！";
@@ -596,6 +593,18 @@ void QuestPhase::ProcessActionLoop(void)
 					{
 					case MAGIC_TYPE::HEAL:
 						//powerの数値を回復量として使う
+						//ドレイン（吸収）だった場合の処理
+						if (selectedMagic_.isDrain)
+						{
+							//敵にダメージを与える
+							int drainDamage = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
+							activeEnemy_->ChangeAnim(ANIM_DAMAGE); //ダメージアニメーション
+							activeEnemy_->Damage(drainDamage);
+
+							//プレイヤーの体力を回復する（与えたダメージ分）
+							playerStatus_->Heal(drainDamage);
+							battleMessage_ += "\n敵から体力を奪った！";
+						}
 						//通常の回復処理（威力が0より大きい場合だけ回復メッセージが出る）
 						if (!selectedMagic_.isDrain && selectedMagic_.powerMultiplier > 0.0f)
 						{
@@ -645,7 +654,7 @@ void QuestPhase::ProcessActionLoop(void)
 				}
 				else //確率を乗り越えたら解除してそのまま行動
 				{
-					battleMessage_ += unit.name + "は氷が溶けてうごけるようになった";
+					battleMessage_ += unit.name + "は氷が溶けてうごけるようになった\n";
 					enemyStatusEffect_ = STATUS_EFFECT::NONE;
 				}
 			}
@@ -1074,6 +1083,8 @@ void QuestPhase::ProcessPlayerAction()
 	//更新された intの値を、安全に元の enum class 型に戻して代入する
 	command_ = static_cast<COMMAND>(commandIndex);
 
+	ProcessTutorial();
+
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
@@ -1201,12 +1212,8 @@ void QuestPhase::MagicSelection()
 		if (playerStatus_->magicKnowledge_ >= chosenMagic.reqMagicKnowledge)
 		{
 			//【条件クリア】使える場合
-
-			//先ほどの ActionLoop (実際の行動処理) でダメージ計算などに使うため、
-			//選ばれた魔法のデータそのものを変数に記憶しておく
 			selectedMagic_ = chosenMagic;
 
-			//（※チームメイトのコードの他部分で idx が必要な場合のために残す）
 			chosenMagicIdx_ = magicMenuCursor_;
 
 			battleStep_ = BATTLE_STEP::DETERMINE;
@@ -1271,45 +1278,38 @@ void QuestPhase::ProcessTutorial(void)
 void QuestPhase::DrawTutorial(void)
 {
 	if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
+	if (gameScene_.GetTurn() != 1)return;
 
 	tutorialMessage_ = "";
 
 	SetFontSize(20);
 	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
 	{
-		DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, true);
-		DrawString(TUTORIAL_X, TUTORIAL_Y
-			, "ステージを選択できます\n選ぶステージによって上昇\nする技能が異なります。"
-			, Color::BLACK);
-		SetFontSize(DEFAULT_FONT_SIZE);
+		tutorialMessage_ = "受けるクエストを選ぼう。\n選ぶクエストによって\n上昇するステータスが変わるよ。";
 	}
-	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
-		&& battleTurn_ == 1)
+	else
 	{
-		tutorialMessage_ = "攻撃を選びましょう！\n攻撃を選んだ状態で、決定\nボタンを押しましょう";
+		switch (battleTurn_)
+		{
+		case 1:
+			tutorialMessage_ = "攻撃してみよう\n攻撃を選んだ状態で\n決定ボタンを押してみよう。\n威力は筋力を参照するよ。";
+			break;
+		case 2:
+			tutorialMessage_ = "魔法を使ってみよう\n好きな魔法を選んで\n使ってみよう。\n威力は魔法ごとに異なるよ。";
+			break;
+		case 3:
+			tutorialMessage_ = "魔法は一度使うと連続して\n使うことはできないよ。\n次は攻撃を選んでみよう。";
+			break;
+		case 4:
+			tutorialMessage_ = "あとは考えながら\n好きなように戦ってみよう。";
+			break;
+		default:
+			break;
+		}
 	}
-	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
-		&& battleTurn_ == 2)
-	{
-		tutorialMessage_ = "次は魔法を選びましょう！\n魔法を選んで好きな行動を\n選びましょう\nキャンセルで戻る";
-	}
-	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
-		&& battleTurn_ == 3)
-	{
-		tutorialMessage_ = "魔法を使うと次のターンは\n使えなくなります\n攻撃を選びましょう";
-	}
-	else if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
-		&& battleTurn_ == 4)
-	{
-		tutorialMessage_ = "あとは考えながら\n好きなように戦いましょう";
-	}
-	//チュートリアルの内容をここに書く
-	//例：最初のターンだけ特別な説明を表示するなど
-	if (gameScene_.GetTurn() == 1 && battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION
-		&& battleTurn_ <= 4)
-	{
-		DrawGraph(10, 35, messageBoxImg_, true);
-		DrawFormatString(25, 65, Color::BLACK, tutorialMessage_.c_str());
-	}
+	if (tutorialMessage_ == "")return;
+
+	DrawGraph(GameScene::MESSAGE_BOX_X, GameScene::MESSAGE_BOX_Y, messageBoxImg_, true);
+	DrawString(GameScene::TUTORIAL_X, GameScene::TUTORIAL_Y, tutorialMessage_.c_str(), Color::BLACK);
 	SetFontSize(DEFAULT_FONT_SIZE);
 }

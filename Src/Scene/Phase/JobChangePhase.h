@@ -19,7 +19,7 @@ public:
 
 	static constexpr int FONT_SIZE= 24; //フォントサイズ
 
-	static constexpr int COUNT_MAX = 180; //メッセージ表示のカウントの最大値
+	static constexpr int COUNT_MAX = 120; //メッセージ表示のカウントの最大値
 
 	static constexpr int jobListX = Application::SCREEN_HALFSIZE_X - 390;	//職業リストの描画位置X
 	static constexpr int jobListY = Application::SCREEN_HALFSIZE_Y - 280;	//職業リストの描画位置Y
@@ -30,7 +30,7 @@ public:
 	static constexpr int JOB_NAME_Y = 150;	//職業名の描画位置Y
 
 	static constexpr int JOB_DESC_X = 330;	//職業の説明を描画する位置X
-	static constexpr int JOB_DESC_Y = 200;	//職業の説明を描画する位置Y
+	static constexpr int JOB_DESC_Y = 180;	//職業の説明を描画する位置Y
 
 	static constexpr int JOB_STATUS_SPACING_X = 670;	//必要ステータス描画位置X
 	static constexpr int JOB_STATUS_SPACING_Y = 150;	//必要ステータス描画位置Y
@@ -40,9 +40,6 @@ public:
 
 	static constexpr int JOB_BONUS_X = 730;	//職業ボーナスの描画位置X
 	static constexpr int JOB_BONUS_Y = 370;	//職業ボーナスの描画位置Y
-
-	static constexpr int MESSAGE_BOX_X = 30;	//メッセージボックスの描画位置X
-	static constexpr int MESSAGE_BOX_Y = 550;	//メッセージボックスの描画位置Y
 
 	JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene);		//デフォルトコンストラクタ
 	//~QuestPhase(void);		//デストラクタ

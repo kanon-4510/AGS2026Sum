@@ -40,19 +40,6 @@ void GameScene::Init(void)
 //更新処理
 void GameScene::Update(void)
 {
-	//３ターン目までチュートリアルの処理
-	if (SceneManager::GetInstance().IsTutorialEnabled())
-	{
-		if (turn_ <= 3)
-		{
-			ProcessTutorial();
-		}
-	}
-
-	if (turn_ == 21)
-	{
-		phase_ = QUEST_PHASE::PHASE_QUEST;
-	}
 	
 	//まず現在のフェーズのUpdateを回す
 	if (currentPhase_) 
@@ -91,11 +78,26 @@ void GameScene::Update(void)
 		return;
 	}
 
+
 	//フェーズが実行中でない場合（メニュー選択）
 	//上のif文の中でreturnしていれば、最終ターン終了時はここは実行されない
 	if (!currentPhase_) 
 	{
 		ProcessPhaseSelection();
+		//３ターン目までチュートリアルの処理
+		if (SceneManager::GetInstance().IsTutorialEnabled())
+		{
+			if (turn_ <= 3)
+			{
+				ProcessTutorial();
+			}
+		}
+
+		if (turn_ == 21)
+		{
+			phase_ = QUEST_PHASE::PHASE_QUEST;
+		}
+
 		ProcessPhaseDecision();
 
 		//BGM再生
@@ -177,20 +179,20 @@ void GameScene::DrawTutorial(void)
 	DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, TRUE);
 
 	SetFontSize(20);
-	DrawString(TUTORIAL_X + 50, MESSAGE_BOX_Y + 15, "チュートリアル", Color::BLACK);
+	//DrawString(TUTORIAL_X + 50, MESSAGE_BOX_Y + 15, "チュートリアル", Color::BLACK);
 
 	//チュートリアルの処理
 	if (turn_ == 1)
 	{
-		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, " クエストフェーズの説明\n\nここでは敵と戦って経験値\nを獲得します。");
+		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, "まずはクエストに行こう。\nクエストで敵と戦って\n経験値を獲得しよう。");
 	}
 	else if (turn_ == 2)
 	{
-		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, " 授業フェーズの説明\n\nここでは科目を選んで技能\nを学びます。");
+		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, "次は授業を受けよう。\n好きな科目を選んで\n技能を伸ばそう。");
 	}
 	else if (turn_ == 3)
 	{
-		DrawFormatString(TUTORIAL_X - 5, TUTORIAL_Y, Color::BLACK, " 資格試験フェーズの説明\n\nここでは職業を選択すること\nで恩恵を得られます。");
+		DrawFormatString(TUTORIAL_X - 5, TUTORIAL_Y, Color::BLACK, "ここで職業を選択することで\n様々な恩恵を得られる。");
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
 }

@@ -76,7 +76,9 @@ void OverScene::Update(void)
 void OverScene::Draw(void)
 {
 	SetFontSize(70);
-	DrawString(GAMEOVER_MESSAGE_X, GAMEOVER_MESSAGE_Y, "ê¢äEÇéÁÇÍÇ»Ç©Ç¡ÇΩ...", Color::RED);
+	std::string str = "ê¢äEÇéÁÇÍÇ»Ç©Ç¡ÇΩ";
+	int width = GetDrawStringWidth(str.c_str(),str.size() );
+	DrawString(Application::SCREEN_HALFSIZE_X - width/2, GAMEOVER_MESSAGE_Y, str.c_str(), Color::RED);
 
 	SetFontSize(30);
 	DrawFormatString(ARROW_X - normalOffsetX_, ARROW_Y + normalOffsetY_, Color::WHITE, "Å®");

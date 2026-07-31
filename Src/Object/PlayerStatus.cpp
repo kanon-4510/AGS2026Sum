@@ -136,14 +136,14 @@ void PlayerStatus::InitJob()
 	jobList.push_back(JobData("呪術師"	,5,0,0,  0,  0,  0,  0,100,  0));
 	jobList.push_back(JobData("占い師"	,5,0,0,  0,  0,  0,  0,  0,100));
 
-	jobList.push_back(JobData("錬金術師",18,0,0,170,  0, 30,  0,100,  0));
-	jobList.push_back(JobData("聖騎士"	,18,0,0,  0,230,  0, 70,  0,  0));
-	jobList.push_back(JobData("賢者"	,18,0,0,  0,  0,200,  0, 50, 50));
-	jobList.push_back(JobData("悪魔祓い",18,0,0, 70, 30,  0,200,  0,  0));
-	jobList.push_back(JobData("死霊術師",18,0,0,  0,  0,100,  0,200,  0));
-	jobList.push_back(JobData("予言者"	,18,0,0, 30,  0,  0, 40,  0,230));
-
-	jobList.push_back(JobData("大魔法使い",35,0,0,100,100,100,100,100,100));
+	jobList.push_back(JobData("錬金術師",15,0,0,170,  0, 30,  0,100,  0));
+	jobList.push_back(JobData("聖騎士"	,15,0,0,  0,230,  0, 70,  0,  0));
+	jobList.push_back(JobData("賢者"	,15,0,0,  0,  0,200,  0, 50, 50));
+	jobList.push_back(JobData("悪魔祓い",15,0,0, 70, 30,  0,200,  0,  0));
+	jobList.push_back(JobData("死霊術師",15,0,0,  0,  0,100,  0,200,  0));
+	jobList.push_back(JobData("予言者"	,15,0,0, 30,  0,  0, 40,  0,230));
+										  
+	jobList.push_back(JobData("大魔法使い",30,0,0,100,100,100,100,100,100));
 
 	//ジョブチェンジした時用
 	hasStartDamage = false;
@@ -302,7 +302,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	case BonusType::ItemBonus:
 		//薬学10につき、アイテム回復量を+1する
 		//基本回復5、薬学30 → 5 + (30 / 10) = 8
-		return baseValue + (pharmacy_ / 10);
+		return baseValue + (pharmacy_ / 7);
 
 	case BonusType::AttackBonus:
 		//武術5につき、会心率を+1する
@@ -324,7 +324,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	case BonusType::ExpBonus:
 		//考古学10につき、獲得経験値を+1する（固定値追加）
 		//例：基本経験値10、考古学10 → 20 + (20 / 10) = 12
-		return baseValue + (archaeology_ / 10);
+		return baseValue + (archaeology_ / 8);
 
 	case BonusType::LuckBonus:
 		//占星術5につき、回避率のステータスを+1する
@@ -453,16 +453,16 @@ int PlayerStatus::AddSkillPoint(SkillType type, int baseAmount)
 	switch (currentRoute_)
 	{
 	case PLAYER_ROUTE::BREAKTHROUGH: //打破：武術と考古学
-		if (type == SkillType::MartialArts || type == SkillType::Archaeology) multiplier = 1.5f;
+		if (type == SkillType::MartialArts || type == SkillType::Archaeology) multiplier = 1.8f;
 		break;
 	case PLAYER_ROUTE::SALVATION:    //救世：信仰と薬学
-		if (type == SkillType::Faith || type == SkillType::Pharmacy) multiplier = 1.5f;
+		if (type == SkillType::Faith || type == SkillType::Pharmacy) multiplier = 1.8f;
 		break;
 	case PLAYER_ROUTE::TRUTH:        //真理：魔法知識と占星術
-		if (type == SkillType::MagicKnowledge || type == SkillType::Astrology) multiplier = 1.5f;
+		if (type == SkillType::MagicKnowledge || type == SkillType::Astrology) multiplier = 1.8f;
 		break;
 	case PLAYER_ROUTE::SELFLESS:     //無欲：すべてに少しボーナス
-		multiplier = 1.3f;
+		multiplier = 1.5f;
 		break;
 	}
 

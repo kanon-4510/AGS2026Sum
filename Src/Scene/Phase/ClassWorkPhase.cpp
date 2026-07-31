@@ -22,9 +22,9 @@ void ClassWorkPhase::Update(void)
 {
 	auto& ins = InputManager::GetInstance();
 
-	ProcessTutorial();
 
 	ProcessClassworkSelection();
+	ProcessTutorial();
 	ProcessClassworkDecision();
 }
 
@@ -63,7 +63,7 @@ void ClassWorkPhase::DrawSkillBonus(void)
 			, "魔法薬の調合だけでなく、魔石鑑\n定や魔道具の扱い方を学ぶ。\n受講すると回復魔法の効果が上昇\nする。"
 			, Color::WHITE);
 		effectName = "治癒力";
-		reqInterval = 10 - playerStatus_->pharmacy_ % 10; //10ごとにアップ
+		reqInterval = 7 - playerStatus_->pharmacy_ % 7; //7ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::MARTIALARTS:
@@ -95,7 +95,7 @@ void ClassWorkPhase::DrawSkillBonus(void)
 			, "古代魔術やルーンの解読、封印術\nの解呪など魔法がたどった歴史を\n学ぶ。\n受講すると獲得経験値が上昇する。"
 			, Color::WHITE);
 		effectName = "獲得経験値";
-		reqInterval = 10 - playerStatus_->archaeology_ % 10; //10ごとにアップ
+		reqInterval = 8 - playerStatus_->archaeology_ % 8; //8ごとにアップ
 		break;
 
 	case CLASSWORK_SELECT::ASTROLOGY:
@@ -205,8 +205,8 @@ void ClassWorkPhase::DrawTutorial(void)
 		SetFontSize(20);
 		DrawGraph(GameScene::MESSAGE_BOX_X, GameScene::MESSAGE_BOX_Y, messageBoxImg_, true);
 
-		DrawString(TUTORIAL_X, TUTORIAL_Y
-			,"科目によって上昇する技能\nが異なります。\n技能は職業にかかわる大切\nな要素です。\n今回は魔法知識を選択します"
+		DrawString(GameScene::TUTORIAL_X, GameScene::TUTORIAL_Y
+			,"6つの科目によって\n上昇する技能が異なる。\n技能は戦闘や職業に関わる\n大切な要素だ。\n魔法知識を履修してみよう。"
 			, Color::BLACK);
 		SetFontSize(DEFAULT_FONT_SIZE);
 	}	

@@ -363,7 +363,7 @@ Enemy* SpawnEnemyByTurn(int turn)
                 { "Data/Image/Enemy/Spirit/Attack_3.png",     13, 1, 128, 128 },
                 { "Data/Image/Enemy/Spirit/Hurt.png",          3, 1, 128, 128 },
                 { "Data/Image/Enemy/Spirit/Dead.png",          5, 1, 128, 128 }};
-            return new Enemy("マジックボム",43,8,12,14,20,12, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
+            return new Enemy("マジックボム",43,8,10,12,20,12, "こうげき", "ばくはつ", "放熱", magicBombAnims, spawnX, spawnY);
         }case 4: {
             std::vector<MotionConfig> trentAnims = {
                 { "Data/Image/Enemy/Plent/Idle.png",          5, 1, 128, 128 },

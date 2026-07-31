@@ -35,7 +35,6 @@ void JobChangePhase::Update(void)
 
 void JobChangePhase::Draw(void)
 {
-	DrawString(0, 0, "Scene : Job Change", 0xFFFFFF);
 	DrawGraph(0, 0, deskImg_, true);
 	DrawGraph(jobListX, jobListY, bookImg_, true);
     auto& jobList = playerStatus_->GetJobList();
@@ -45,7 +44,7 @@ void JobChangePhase::Draw(void)
 
     if(timer_ < COUNT_MAX)
     {
-        DrawString(100, 80, "現在の職業と同じ職業は選択できません！", Color::RED);
+        DrawString(480,650,"現在の職業と同じ職業は選択できません", Color::RED);
         timer_++; //メッセージ表示のカウントを増やす
 	}
 
@@ -105,10 +104,11 @@ void JobChangePhase::Draw(void)
         DrawJobBonus(jobList[selectedIndex_]);
         DrawAnimation();
     }
+
+    SetFontSize(DEFAULT_FONT_SIZE);
     
     DrawTutorial();
 
-    SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void JobChangePhase::DrawJobBonus(const JobData& job)
@@ -178,7 +178,7 @@ void JobChangePhase::DrawDetails(void)
     {
         DrawFormatString(JOB_DESC_X + 70, JOB_DESC_Y + 160, Color::BROWN, "%s", text.skillName);
         
-        DrawString(JOB_DESC_X, JOB_DESC_Y + 220, text.skillDesc, Color::BLACK);
+        DrawString(JOB_DESC_X, JOB_DESC_Y + 190, text.skillDesc, Color::BLACK);
     }
 
     //ヘッダーテキスト
@@ -240,9 +240,7 @@ void JobChangePhase::DrawAnimation(void)
         int animSpeed = 5;  // コマの切り替わる速さ（3フレームごとに1コマ進む）
         int currentFrame = pageAnimeTimer_ / animSpeed;
 
-        if (currentFrame > 7) {
-            currentFrame = 7; // 配列の範囲（0～7）を超えないようにガード
-        }
+        if (currentFrame > 7)currentFrame = 7; // 配列の範囲（0～7）を超えないようにガード
         if(ispageLR_)
         {
             //本のめくりアニメーションを描画（座標は画面に合わせて調整してください）
@@ -326,7 +324,7 @@ void JobChangePhase::ProcessDetailsListSelection(void)
         pageAnimeTimer_++;
         if (pageAnimeTimer_ >= 40)
         {
-            pageAnimeTimer_ = -1; // 24フレーム経ったら停止状態に戻す
+            pageAnimeTimer_ = -1; //24フレーム経ったら停止状態に戻す
         }
     }
     //プレイヤーが持っている全職業リストを取得
@@ -353,20 +351,19 @@ void JobChangePhase::ProcessDetailsListSelection(void)
         //現在の職業名を取得
         std::string Job = playerStatus_->GetJobName();
 
-        if (selectedJob.status.name == Job) {
+        if (selectedJob.status.name == Job) 
+        {
             //現在の職業と同じなら転職できない
             timer_ = 0; //メッセージ表示のカウントをリセット
         }
         //PlayerStatusのJobCheckを呼び出して判定
-        else if (playerStatus_->JobCheck(selectedJob)) {
+        else if (playerStatus_->JobCheck(selectedJob)) 
+        {
             //条件クリア！職業を変更する
             playerStatus_->SetJob(selectedJob.status.name);
             PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN; //次のターンへ
             //転職成功のSEなどを鳴らすと良い
             isFinished_ = true;
-        }
-        else {
-            //条件を満たしていない
         }
     }
     else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
@@ -396,16 +393,9 @@ JobText JobChangePhase::GetJobText(int index) const
         { "魔を浄めることに心血を\n注ぎ続けた者。人々を救\nうための瞳と光も、魔族\nには冷酷に映るだろう。", "神秘の護り", "死をも拒絶する神の護り。\n敵の最初の攻撃を防ぐ。" },
         { "死者の蘇生と魂の隷従、\n2つの禁忌の呪文を自在\nに操る恐ろしい魔法使い。\n歪な執着は倫理を超え命\nを支配する。", "ネクロマンス", "死者の軍勢は全てを呑み\n込む。\nWave開始時魔力に基づく\nダメージを与える。" },
         { "占いは人に留まらず星の\n未来まで見通すことが出\n来る。\n次に見えるのは吉祥かは\nたまた凶兆か。", "未来視", "未来を見通し勝利の運命\nを手繰る。\n死亡するような攻撃を1\n度だけ耐える。" },
-        { "全てを求めた先にあるの\nはかつての師の背中。\nそこから見える景色は虹\nと影のどちらに満ちてい\nるのだろうか。", "無詠唱魔術", "どの記録にもない師の教\nえ。魔法使用のクールタ\nイムを解除する。" },
-    };
-    // 配列の要素数を自動計算
+        { "全てを求めた先にあるの\nはかつての師の背中。\nそこから見える景色は虹\nと影のどちらに満ちてい\nるのだろうか。", "無詠唱魔術", "どの記録にもない師の教\nえ。魔法使用のクールタ\nイムを解除する。" },};
+    //配列の要素数を自動計算
     const int totalJobs = sizeof(JOB_TEXTS) / sizeof(JOB_TEXTS[0]);
-
-    // インデックスが範囲外の場合は空のデータを返す安全対策
-    if (index < 0 || index >= totalJobs)
-    {
-        return { "", nullptr, nullptr };
-    }
 
     return JOB_TEXTS[index];
 }
@@ -413,23 +403,19 @@ JobText JobChangePhase::GetJobText(int index) const
 void JobChangePhase::DrawTutorial(void)
 {
     if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
+    if (gameScene_.GetTurn() != 3)return;
 
-	DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, true);
-	SetFontSize(20);
-	if (gameScene_.GetTurn() == 3)
+    std::string drawString ="";
+    SetFontSize(20);
+    DrawGraph(GameScene::MESSAGE_BOX_X, GameScene::MESSAGE_BOX_Y, messageBoxImg_, true);
+    if (isShowingDetails_)
     {
-        if(isShowingDetails_)
-        {
-            DrawString(45, 570
-                , "転職に必要なステータスを\n確認できます。\n詳細画面で決定ボタンを押す\nと転職することができます。\nキャンセルで目次に戻ります"
-                , Color::BLACK);
-        }
-        else
-        {
-            DrawString(45, 570
-                , "転職が可能になると白く表示\nされます。\n決定キーを押すことで詳細\nを確認できます。\nキャンセルで選択に戻ります"
-                , Color::BLACK);
-		}
+        drawString = "転職に必要なステータスを\n確認できる。\n詳細画面で決定すると\n転職することができる。";
     }
-	SetFontSize(DEFAULT_FONT_SIZE);
+    else
+    {
+        drawString = "転職可能になると\n白く表示される。\n気になる職業の詳細を\n確認してみよう。";
+    }
+    DrawString(GameScene::TUTORIAL_X, GameScene::TUTORIAL_Y, drawString.c_str(), true);
+    SetFontSize(DEFAULT_FONT_SIZE);
 }
