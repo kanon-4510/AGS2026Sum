@@ -322,7 +322,7 @@ void QuestPhase::Draw(void)
 		DrawString(350,545, locationRewardMsg_.c_str(), 0xFFFF00);
 	}
 
-	if (activeEnemy_ != nullptr && !activeEnemy_->IsDead())
+	if (activeEnemy_ != nullptr)
 	{
 		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
 	}
@@ -830,7 +830,7 @@ void QuestPhase::ProcessActionLoop(void)
 		if (activeEnemy_->IsDead())
 		{
 			activeEnemy_->ChangeAnim(ANIM_DEAD);
-			battleMessage_ = activeEnemy_->GetName() + "‚ğ“|‚µ‚½I";
+			battleMessage_ += activeEnemy_->GetName() + "‚ğ“|‚µ‚½I";
 		}
 	}
 
