@@ -830,7 +830,8 @@ void QuestPhase::ProcessActionLoop(void)
 		if (activeEnemy_->IsDead())
 		{
 			activeEnemy_->ChangeAnim(ANIM_DEAD);
-			battleMessage_ += activeEnemy_->GetName() + "を倒した！";
+			//+=で追記することで、状態異常のメッセージと倒したメッセージを両方表示できる
+			battleMessage_ += "\n" +  activeEnemy_->GetName() + "を倒した！";
 		}
 	}
 
