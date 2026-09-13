@@ -1,6 +1,7 @@
-﻿#include "Enemy.h"
+﻿#include <DxLib.h>
 #include <cstdlib>
-#include <DxLib.h>
+#include "../Common/Color.h"
+#include "Enemy.h"
 
 //コンストラクタ
 Enemy::Enemy(std::string name, int hp, int power1, int power2,int power3, int speed, int exp,
@@ -32,7 +33,7 @@ Enemy::~Enemy()
     //DeleteGraph(gh_);
     for (int i = 0; i < ENEMY_ANIM::MAX; ++i)
     {
-        for (int j = 0; j < 16; ++j)
+        for (int j = 0; j < MAX_ANIM_FRAMES; ++j)
         {
             if (images_[i][j] > 0) DxLib::DeleteGraph(images_[i][j]);
         }
@@ -42,12 +43,22 @@ Enemy::~Enemy()
 void Enemy::ChangeAnim(int command)
 {
     // command (0:通常, 1:中技, 2:大技, 3:ダメージ, 4:死亡) に応じてアニメーションを強制固定
-    if (command == 0)      currentAnim_ = ENEMY_ANIM::ACT_1;
-    else if (command == 1) currentAnim_ = ENEMY_ANIM::ACT_2;
-    else if (command == 2) currentAnim_ = ENEMY_ANIM::ACT_3;
-    else if (command == 3) currentAnim_ = ENEMY_ANIM::DAMAGE;
-    else if (command == 4) currentAnim_ = ENEMY_ANIM::DEAD;
-    else                   currentAnim_ = ENEMY_ANIM::IDLE; // 想定外の数値は待機へ
+    //if (command == 0)      currentAnim_ = ENEMY_ANIM::ACT_1;
+    //else if (command == 1) currentAnim_ = ENEMY_ANIM::ACT_2;
+    //else if (command == 2) currentAnim_ = ENEMY_ANIM::ACT_3;
+    //else if (command == 3) currentAnim_ = ENEMY_ANIM::DAMAGE;
+    //else if (command == 4) currentAnim_ = ENEMY_ANIM::DEAD;
+    //else                   currentAnim_ = ENEMY_ANIM::IDLE; // 想定外の数値は待機へ
+
+    switch (command)
+    {
+    case 0:  currentAnim_ = ENEMY_ANIM::ACT_1; break;
+    case 1:  currentAnim_ = ENEMY_ANIM::ACT_2; break;
+    case 2:  currentAnim_ = ENEMY_ANIM::ACT_3; break;
+    case 3:  currentAnim_ = ENEMY_ANIM::DAMAGE; break;
+    case 4:  currentAnim_ = ENEMY_ANIM::DEAD; break;
+    default: currentAnim_ = ENEMY_ANIM::IDLE; break;
+    }
 
     currentFrame_ = 0; // アニメーションを最初のコマにリセット
     animeTimer_ = 0;   // タイマーもリセット
@@ -59,7 +70,7 @@ void Enemy::ChangeAnim(int command)
 //技のランダム決定
 EnemyActionInfo Enemy::DecideAction()const
 {
-    int chosenSkill = rand() % 3;
+    int chosenSkill = rand() % SKILL_SLOT_COUNT;
     return { name_, speed_, chosenSkill, skills_[chosenSkill] };
 }
 
@@ -89,13 +100,13 @@ void Enemy::Heal(int amount)
 std::string Enemy::GetSkill(int index) const
 {
     //配列の範囲外(0から2以外)を指定された場合は空の文字列を返す
-    if (index < 0 || index >= 3) return "";
+    if (index < 0 || index >= SKILL_SLOT_COUNT) return "";
     return skills_[index];
 }
 
 void Enemy::Update()
 {
-    if (++animeTimer_ < 6) return; // 6フレームごとに更新
+    if (++animeTimer_ < ANIM_FRAME_INTERVAL) return; // 6フレームごとに更新
     animeTimer_ = 0;
 
     int animIndex = static_cast<int>(currentAnim_);
@@ -147,30 +158,30 @@ void Enemy::Draw() const
     //敵の画像を描画
     if (images_[currentAnim_][currentFrame_] > 0)
     {
-        DrawRotaGraph(x_,y_,2.5,0,images_[currentAnim_][currentFrame_],true);
+        DrawRotaGraph(x_,y_, DEFAULT_SCALE,0,images_[currentAnim_][currentFrame_],true);
     }
 
     //敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255)）
-    unsigned int white = GetColor(255, 255, 255);
-    DrawFormatString(x_-50, y_ - 72, white, "%s", name_.c_str());
-    DrawFormatString(x_-50, y_ - 55, white, "HP: %d / %d", currentHp_, maxHp_);
+	unsigned int white = Color::WHITE;
+    DrawFormatString(x_- TEXT_OFFSET_X, y_ - NAME_OFFSET_Y, white, "%s", name_.c_str());
+    DrawFormatString(x_- TEXT_OFFSET_X, y_ - HP_TEXT_OFFSET_Y, white, "HP: %d / %d", currentHp_, maxHp_);
 
     //簡易的なHPバー（緑色の矩形）を描画
     if (maxHp_ > 0) 
     {
-        int barWidth = 100; //バーの最大幅
+        int barWidth = BAR_WIDTH; //バーの最大幅
         int currentBarWidth = barWidth * currentHp_ / maxHp_;
         //赤い背景
-        DrawBox(x_-50, y_-40, x_ + barWidth-50, y_-35, GetColor(255, 0, 0), TRUE);
+        DrawBox(x_ - TEXT_OFFSET_X, y_ - HP_BAR_OFFSET_Y, x_ + barWidth - TEXT_OFFSET_X, y_ - HP_BAR_BOX_OFFSET_Y, Color::RED, TRUE);
         //緑の現在値
-        DrawBox(x_-50, y_-40, x_ + currentBarWidth-50, y_-35, GetColor(0, 255, 0), TRUE);
+        DrawBox(x_- TEXT_OFFSET_X, y_- HP_BAR_OFFSET_Y, x_ + currentBarWidth- TEXT_OFFSET_X, y_- HP_BAR_BOX_OFFSET_Y, Color::GREEN, TRUE);
     }
 }
 
 void Enemy::InitAnimation(const std::vector<MotionConfig>& motionList)
 {
     // 二次元配列を 0 で初期化
-    std::fill(reinterpret_cast<int*>(images_), reinterpret_cast<int*>(images_) + (ENEMY_ANIM::MAX * 16), 0);
+    std::fill(reinterpret_cast<int*>(images_), reinterpret_cast<int*>(images_) + (ENEMY_ANIM::MAX * MAX_ANIM_FRAMES), 0);
     std::fill(maxFramesTable_, maxFramesTable_ + ENEMY_ANIM::MAX, 0);
 
     // アニメーション設定をループしてロード

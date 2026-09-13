@@ -7,14 +7,33 @@
 class TitleScene : public SceneBase
 {
 public:
+
+	static constexpr int FONT_SIZE = 30;	//タイトルフォントサイズ
+
 	static constexpr int TITLE_MESSAGE_X = (Application::SCREEN_SIZE_X - 170) / 2;	//タイトルメッセージ
 	static constexpr int TITLE_MESSAGE_Y = Application::SCREEN_SIZE_Y - 140;		//タイトルメッセージ
 
 	static constexpr int ARROW_X = TITLE_MESSAGE_X - 40;	//矢印の表示位置X
 	static constexpr int ARROW_Y = TITLE_MESSAGE_Y;			//矢印の表示位置Y
 
-	static constexpr int TUTORIAL_ARROW_Y = 470;		//チュートリアルメッセージ
-	static constexpr int EXIT_ARROW_X = Application::SCREEN_HALFSIZE_X - 180;			//ゲーム終了確認メッセージ
+	static constexpr int TUTORIAL_TEXT_X = (Application::SCREEN_SIZE_X - 220) / 2 ;	//チュートリアルON/OFFの表示位置X
+	static constexpr int TUTORIAL_TEXT_Y = Application::SCREEN_SIZE_Y - 100;		//チュートリアルON/OFFの表示位置Y
+	static constexpr int TUTORIAL_ARROW_OFFSET_X = 30;	//チュートリアル項目選択時の矢印X座標オフセット量
+
+	static constexpr int EXIT_TEXT_X = (Application::SCREEN_SIZE_X / 3) + 40;	//ゲーム終了確認メッセージ
+	static constexpr int EXIT_TEXT_Y = TITLE_MESSAGE_Y;							//ゲーム終了確認メッセージ
+
+	static constexpr int EXIT_YES_TEXT_X = (Application::SCREEN_HALFSIZE_X)+40;	//はいメッセージ
+	static constexpr int EXIT_YES_TEXT_Y = TITLE_MESSAGE_Y + 40;				//はいメッセージ
+	
+	static constexpr int EXIT_NO_TEXT_X = (Application::SCREEN_HALFSIZE_X)-130;	//いいえメッセージ
+	static constexpr int EXIT_NO_TEXT_Y = EXIT_YES_TEXT_Y;						//いいえメッセージ
+
+	static constexpr int EXIT_ARROW_X = Application::SCREEN_HALFSIZE_X - 180;	//ゲーム終了確認メッセージ
+
+	static constexpr int OFFSET_ARROW = 40;	//ゲーム終了確認メッセージ
+	static constexpr int EXIT_OPTION_SPACING_X = 180; //終了確認画面の選択肢（「はい／いいえ」）間隔のX座標幅
+
 
 	enum TITLE_SELECTION
 	{
@@ -73,8 +92,6 @@ private:
 
 	void ProcessTitleSelection(void);	//タイトル選択の処理
 	void ProcessTitleDecision(void);	//タイトル決定の処理
-	void ProcessMouseSelection(void);	//タイトル選択のマウス処理
-	void ProcessMouseDecision(MODE_SELECTION nextMode);	//タイトル決定のマウス処理
 	void Tutorial(void);				//チュートリアルのON/OFF切り替え処理
 	void ExitGame(void);				//ゲーム終了の確認処理
 };

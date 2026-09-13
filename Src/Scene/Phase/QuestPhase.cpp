@@ -9,43 +9,12 @@
 #include "../../Utility/AsoUtility.h"
 #include "../GameScene.h"
 #include "../../Object/Enemy.h"
+#include "../../Object/MagicDataBase.h"
 #include "QuestPhase.h"
 
 //外部にある敵生成関数（Enemy.cppなどに実装している想定）
 extern Enemy* SpawnEnemyByTurn(int currentTurn);
 extern Enemy* SpawnRushEnemy(int stage); //ラッシュ専用の敵生成関数
-
-// ゲーム内の全魔法データベース
-const std::vector<MagicData> MAGIC_DATABASE = 
-{
-	//【攻撃魔法】
-	{1,"ファイア",		   MAGIC_TYPE::ATTACK, 1.5f,STATUS_EFFECT::NONE,    0,  0},
-	{2,"フレイム",		   MAGIC_TYPE::ATTACK, 2.0f,STATUS_EFFECT::NONE,    0, 80},
-	{3,"プロミネンス",	   MAGIC_TYPE::ATTACK, 4.0f,STATUS_EFFECT::NONE,    0,330},
-	{4,"ビッグバン",	   MAGIC_TYPE::ATTACK,10.0f,STATUS_EFFECT::NONE,    0,500},
-	//【回復魔法】高中低、状態異常回復＋回復
-	{5, "ドレイン",		   MAGIC_TYPE::HEAL,   0.7f,STATUS_EFFECT::NONE,    0,190,true,false},
-	{6, "ヒール",		   MAGIC_TYPE::HEAL,   0.3f,STATUS_EFFECT::NONE,    0,  0},
-	{7, "ハイヒール",	   MAGIC_TYPE::HEAL,   0.5f,STATUS_EFFECT::NONE,    0, 80},
-	{8, "メガヒール",	   MAGIC_TYPE::HEAL,   1.0f,STATUS_EFFECT::NONE,    0,350},
-	{9, "キュア",		   MAGIC_TYPE::HEAL,   0.0f,STATUS_EFFECT::NONE,    0, 50,false,true},
-	{10,"レスキュー",	   MAGIC_TYPE::HEAL,   0.5f,STATUS_EFFECT::NONE,    0,240,false,true},
-	//【状態異常攻撃】高中低（確率は低30%, 中50%, 高70%,100%）
-	{11,"アシッドニードル",MAGIC_TYPE::DEBUFF, 1.0f,STATUS_EFFECT::POISON, 30, 30},
-	{12,"ヴェノムスピア",  MAGIC_TYPE::DEBUFF, 2.5f,STATUS_EFFECT::POISON, 50,100},
-	{13,"トキシックランス",MAGIC_TYPE::DEBUFF, 4.0f,STATUS_EFFECT::POISON, 70,290},
-	{14,"ポイズン",		   MAGIC_TYPE::DEBUFF, 0.0f,STATUS_EFFECT::POISON,100,160},
-	{15,"コールドブレス",  MAGIC_TYPE::DEBUFF, 1.0f,STATUS_EFFECT::FREEZE, 30, 30},
-	{16,"スノーテンペスト",MAGIC_TYPE::DEBUFF, 2.5f,STATUS_EFFECT::FREEZE, 50,100},
-	{17,"アイシクルノヴァ",MAGIC_TYPE::DEBUFF, 4.0f,STATUS_EFFECT::FREEZE, 70,290},
-	{18,"フリーズ",		   MAGIC_TYPE::DEBUFF, 0.0f,STATUS_EFFECT::FREEZE,100,160},
-	{19,"フォトンシュート",MAGIC_TYPE::DEBUFF, 1.0f,STATUS_EFFECT::FLASH,  30, 30},
-	{20,"プリズムレーザー",MAGIC_TYPE::DEBUFF, 2.5f,STATUS_EFFECT::FLASH,  50,100},
-	{21,"ミラージュレイン",MAGIC_TYPE::DEBUFF, 4.0f,STATUS_EFFECT::FLASH,  70,290},
-	{22,"フラッシュ",	   MAGIC_TYPE::DEBUFF, 0.0f,STATUS_EFFECT::FLASH, 100,160},
-	{23,"リーサルクロー",  MAGIC_TYPE::DEBUFF, 3.0f,STATUS_EFFECT::CURSE,   5,130},
-	{24,"フェイタルソード",MAGIC_TYPE::DEBUFF, 4.5f,STATUS_EFFECT::CURSE,  10,390},
-};
 
 //コンストラクタ
 QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool isHellQuest)
@@ -66,6 +35,9 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::DESK).handleId_;
 
 	messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
+
+	//魔法データベースの初期化
+	magicDataBase_ = std::make_unique<MagicDataBase>();
 
 	//クエスト開始時は一旦通常の敵を生成しておく
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
@@ -231,85 +203,12 @@ void QuestPhase::Draw(void)
 					DrawString(descX, descY, "【魔法の効果】", 0xffffff); // タイトルを黄色に
 
 					//魔法のタイプごとに説明を出し分ける
-					switch (hoverMagic.id)
-					{
-					case 1:
-						DrawString(descX, descY + 25, "火を放ち敵を攻撃する魔法。\n威力は小さい。", 0xFFFFFF);
-						break;
-					case 2:
-						DrawString(descX, descY + 25, "炎で敵を攻撃する魔法。\n威力は中くらい。", 0xFFFFFF);
-						break;
-					case 3:
-						DrawString(descX, descY + 25, "灼熱で敵を焼き尽くす魔法。\n威力は大きい。", 0xFFFFFF);
-						break;
-					case 4:
-						DrawString(descX, descY + 25, "目の前の敵を影ごと消し去る魔法。\n威力は絶大。", 0xFFFFFF);
-						break;
-					case 5: 
-						DrawString(descX, descY + 25, "敵の生命力を奪い、\n自身の体力を回復する魔法。\n効果はまあまあ。", 0xFFFFFF);
-						break;
-					case 6:
-						DrawString(descX, descY + 25, "自分の体力を回復する魔法。\n効果はちょこっと。", 0xFFFFFF);
-						break;
-					case 7:
-						DrawString(descX, descY + 25, "自分の体力を回復する魔法。\n効果はなかなか。", 0xFFFFFF);
-						break;
-					case 8:
-						DrawString(descX, descY + 25, "自分の体力を回復する魔法。\n効果はけっこう。", 0xFFFFFF);
-						break;
-					case 9:
-						DrawString(descX, descY + 25, "自分の状態異常を治療する魔法。\n回復効果はない。", 0xFFFFFF);
-						break;
-					case 10:
-						DrawString(descX, descY + 25, "自分の体力を回復し、\nさらに状態も治す魔法。\n効果はぼちぼち。", 0xFFFFFF);
-						break;
-					case 11:
-						DrawString(descX, descY + 25, "毒の針で突き刺す魔法。\n確率で毒状態にする。\n威力と確率は低い。", 0xFFFFFF);
-						break;
-					case 12:
-						DrawString(descX, descY + 25, "毒の槍で貫く魔法。\n確率で毒状態にする。\n威力と確率は普通。", 0xFFFFFF);
-						break;
-					case 13:
-						DrawString(descX, descY + 25, "毒の巨戟で穿つ魔法。\n確率で毒状態にする。\n威力と確率は高い。", 0xFFFFFF);
-						break;
-					case 14:
-						DrawString(descX, descY + 25, "毒液を浴びせる魔法。\n必ず毒状態にする。\n威力はない。", 0xFFFFFF);
-						break;
-					case 15:
-						DrawString(descX, descY + 25, "冷たい風を吹かせる魔法。\n確率で凍結状態にする。\n威力と確率は低い。", 0xFFFFFF);
-						break;
-					case 16:
-						DrawString(descX, descY + 25, "凍える嵐を起こす魔法。\n確率で凍結状態にする。\n威力と確率は普通。", 0xFFFFFF);
-						break;
-					case 17:
-						DrawString(descX, descY + 25, "氷の爆風を作り出す魔法。\n確率で凍結状態にする。\n威力と確率は高い。", 0xFFFFFF);
-						break;
-					case 18:
-						DrawString(descX, descY + 25, "凍らせる魔法。\n必ず凍結状態にする。\n威力はない。", 0xFFFFFF);
-						break;
-					case 19:
-						DrawString(descX, descY + 25, "光る球をぶつける魔法。\n確率で閃光状態にする。\n威力と確率は低い。", 0xFFFFFF);
-						break;
-					case 20:
-						DrawString(descX, descY + 25, "輝く光線で攻撃する魔法。\n確率で閃光状態にする。\n威力と確率は普通。", 0xFFFFFF);
-						break;
-					case 21:
-						DrawString(descX, descY + 25, "煌めく雨を降らせる魔法。\n確率で閃光状態にする。\n威力と確率は高い。", 0xFFFFFF);
-						break;
-					case 22:
-						DrawString(descX, descY + 25, "閃光を発生させる魔法。\n必ず閃光状態にする。\n威力はない。", 0xFFFFFF);
-						break;
-					case 23:
-						DrawString(descX, descY + 25, "闇の爪で攻撃する魔法。\n超低確率で呪い状態にする。\n威力は普通。", 0xFFFFFF);
-						break;
-					case 24:
-						DrawString(descX, descY + 25, "命を刈り取る剣を呼び出す魔法。\n低確率で呪い状態にする。\n威力は高い。", 0xFFFFFF);
-						break;
-					}
+					DrawString(descX, descY + 25, hoverMagic.description.c_str(), 0xffffff);
+
 				}
 				else
 				{
-					// 魔法知識が足りない場合は詳細を隠す
+					//魔法知識が足りない場合は詳細を隠す
 					DrawString(descX, descY, "【魔法の効果】", 0xffffff);
 					DrawFormatString(descX, descY + 25, 0xffffff, "詳細不明", hoverMagic.reqMagicKnowledge);
 				}
@@ -465,7 +364,9 @@ void QuestPhase::DetermineActionOrder(void)
 	}
 
 	//ソート（スピード順）
-	std::sort(actionOrder_.begin(), actionOrder_.end(), [](const ActionUnit& a, const ActionUnit& b) {return a.speed > b.speed; });
+	std::sort(actionOrder_.begin(), actionOrder_.end(),
+		[](const ActionUnit& a, const ActionUnit& b)
+		{return a.speed > b.speed; });
 
 	currentActionIdx_ = 0;
 	battleStep_ = BATTLE_STEP::ACTION_LOOP;
@@ -577,7 +478,7 @@ void QuestPhase::ProcessActionLoop(void)
 					//selectedMagic_ は、前のメニュー選択画面で確定した MagicData 構造体とします
 					battleMessage_ += unit.name + "の" + selectedMagic_.name + "！";
 
-					//①ダメージ処理（威力が0より大きければダメージを与える）
+					//ダメージ処理（威力が0より大きければダメージを与える）
 					if (selectedMagic_.powerMultiplier > 0 && (selectedMagic_.type == MAGIC_TYPE::ATTACK||selectedMagic_.type == MAGIC_TYPE::DEBUFF))
 					{
 						//魔力 × (魔法の威力) など、威力を反映させた計算式にする
@@ -588,7 +489,7 @@ void QuestPhase::ProcessActionLoop(void)
 						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
 					}
 
-					//②カテゴリ別の特殊処理（回復や状態異常）
+					//カテゴリ別の特殊処理（回復や状態異常）
 					switch (selectedMagic_.type)
 					{
 					case MAGIC_TYPE::HEAL:
@@ -883,6 +784,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			activeEnemy_->Damage(activeEnemy_->GetCurrentHp()/16);
 			hasEffectMessage = true;
 		}
+		//呪いの処理
 		else if (enemyStatusEffect_ == STATUS_EFFECT::CURSE)
 		{
 			enemyCurs_--;
@@ -1152,32 +1054,29 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		availableMagics_.clear(); //裏側で持っておく魔法データのリストも空にする
 
 		// ① カーソルの位置から「どのカテゴリを選んだか」を判定
-		MAGIC_TYPE selectedCategory; switch (subMenuCursor_)
+		MAGIC_TYPE selectedCategory = MAGIC_TYPE::ATTACK;
+		switch (subMenuCursor_)
 		{
-		case 0: selectedCategory = MAGIC_TYPE::ATTACK;  break;//攻撃
-		case 1: selectedCategory = MAGIC_TYPE::HEAL;    break;//回復
-		case 2: selectedCategory = MAGIC_TYPE::DEBUFF;  break;//状態異常付与
+		case 0: selectedCategory = MAGIC_TYPE::ATTACK; break; // 攻撃
+		case 1: selectedCategory = MAGIC_TYPE::HEAL;   break; // 回復
+		case 2: selectedCategory = MAGIC_TYPE::DEBUFF; break; // 状態異常付与
 		}
 
-		//②データベースから、選んだカテゴリの魔法をすべて探す
-		//（※ MAGIC_DATABASE は、前回作った全魔法のリストです）
-		for (const auto& magic : MAGIC_DATABASE)
+		// ② データベースの全魔法を「1回のループ」でチェックする
+		for (const auto& magic : magicDataBase_->GetAll())
 		{
+			// 選んだカテゴリと一致するものだけを拾う
 			if (magic.type == selectedCategory)
 			{
-				//裏側のデータリストにはそのまま保存（次のステップで使うため）
 				availableMagics_.push_back(magic);
 
-				//画面に表示するテキストの判定
+				// 知識チェックとメッセージ追加
 				if (playerStatus_->magicKnowledge_ >= magic.reqMagicKnowledge)
 				{
-					//魔法知識が足りているなら本名を表示
 					magicTypeMessages_.push_back(magic.name);
 				}
 				else
 				{
-					//魔法知識が足りない場合は「???」にする
-					//必要数値を横に添えてあげる
 					std::string hiddenName = "? ? ? (知識:" + std::to_string(magic.reqMagicKnowledge) + ")";
 					magicTypeMessages_.push_back(hiddenName);
 				}
@@ -1221,11 +1120,6 @@ void QuestPhase::MagicSelection()
 		}
 		else
 		{
-			//【条件未達】使えない魔法（「???」）を選ぼうとした場合
-			//ここでは battleStep_ を進めない（決定させない）
-
-			//エラー音（ブブーッ）を鳴らす
-			//PlaySoundMem(errorSound_, DX_PLAYTYPE_BACK); 
 		}
 	}
 
@@ -1276,6 +1170,7 @@ void QuestPhase::ProcessTutorial(void)
 		}
 	}
 }
+
 void QuestPhase::DrawTutorial(void)
 {
 	if (!SceneManager::GetInstance().IsTutorialEnabled()) return;

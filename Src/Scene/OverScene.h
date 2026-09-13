@@ -5,6 +5,18 @@
 class OverScene : public SceneBase
 {
 public:
+
+	static constexpr int VALUE = 2;
+
+	//フォントサイズ
+	static constexpr int TITLE_FONT_SIZE = 70;
+	static constexpr int OPTION_FONT_SIZE = 30;
+
+	//レイアウト調整値
+	static constexpr int OPTION_STEP_Y = 40;                  // 選択肢行の間隔
+	static constexpr int TITLE_RETURN_TEXT_OFFSET_X = 15;    // 「受け入れる」テキストの左オフセット
+	static constexpr int TITLE_RETURN_BOTTOM_MARGIN_Y = 160; // 「受け入れる」の画面下からのY距離
+
 	static constexpr int GAMEOVER_MESSAGE_X = (Application::SCREEN_HALFSIZE_X ) / 2;	//負けた時のメッセージ
 	static constexpr int GAMEOVER_MESSAGE_Y = Application::SCREEN_HALFSIZE_Y - 200;			//負けた時のメッセージ
 	

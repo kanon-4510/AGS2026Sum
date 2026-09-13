@@ -16,6 +16,9 @@ enum class PLAYER_ROUTE
 class PlayerStatus
 {
 public:
+
+	constexpr static int FONT_SIZE = 20;			//fontサイズ
+
 	constexpr static int STATUS_X = 450;			//ステータスの描画位置X
 	constexpr static int STATUS_COLOR = 0xFFFFFF;	//ステータスの描画色
 
@@ -32,6 +35,19 @@ public:
 	constexpr static int ANIM_COUNT_ATTACK = 5;	//アニメーションのフレーム数
 	constexpr static int ANIM_COUNT_DAMAGE = 10;	//アニメーションのフレーム数
 	constexpr static int ANIM_MOVE_PIXELS = 3;	//動かすピクセル数
+
+	// 技能計算の除数
+	constexpr static int PHARMACY_DIVISOR = 7;       // 薬学ボーナス除数
+	constexpr static int MARTIAL_ARTS_DIVISOR = 5;   // 武術ボーナス除数
+	constexpr static int FAITH_DIVISOR = 15;         // 信仰ボーナス除数
+	constexpr static int ARCHAEOLOGY_DIVISOR = 8;    // 考古学ボーナス除数
+	constexpr static int ASTROLOGY_DIVISOR = 5;      // 占星術ボーナス除数
+
+	// 定数設定（行間と各表示エリアの起点Y座標）
+	static constexpr int BASE_Y = 120;             // 基礎ステータスの表示起点Y
+	static constexpr int SKILL_BASE_Y = 310;       // 技能ステータスの表示起点Y
+	static constexpr int LINE_HEIGHT = 30;         // 行間
+	static constexpr int JOB_BONUS_OFFSET_X = 100; // 職業ボーナスの描画Xオフセット
 
 	int level_ = 1;
 	int exp_ = 0;

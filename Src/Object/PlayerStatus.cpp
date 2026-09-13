@@ -28,56 +28,71 @@ void PlayerStatus::Update()
 
 void PlayerStatus::Draw()
 {
-	SetFontSize(20);
+	SetFontSize(FONT_SIZE);
 	
-	//ステータスの描画処理
-	DrawFormatString(STATUS_X, 120, STATUS_COLOR, "レベル: %d", level_);
-	DrawFormatString(STATUS_X, 150, STATUS_COLOR, "体力: %d", GetMaxHp());
-	DrawFormatString(STATUS_X, 180, STATUS_COLOR, "筋力: %d", Attack());
-	DrawFormatString(STATUS_X, 210, STATUS_COLOR, "魔力: %d", MagicAttack());
-	DrawFormatString(STATUS_X, 240, STATUS_COLOR, "速力: %d", GetSpeed());
-	DrawFormatString(STATUS_X, 270, STATUS_COLOR, "職業: %s", job.c_str());
+	const unsigned int colorWhite = STATUS_COLOR;
+	const unsigned int colorGreen = STATUS_BONUS_COLOR;
+	const JobBonus jobBonus = GetJobBonus();
 
-	DrawFormatString(STATUS_X, 310, STATUS_COLOR, "薬学: %d", pharmacy_);
-	DrawFormatString(STATUS_X, 340, STATUS_COLOR, "武術: %d", martialArts_);
-	DrawFormatString(STATUS_X, 370, STATUS_COLOR, "魔法: %d", magicKnowledge_);
-	DrawFormatString(STATUS_X, 400, STATUS_COLOR, "信仰: %d", faith_);
-	DrawFormatString(STATUS_X, 430, STATUS_COLOR, "考古: %d", archaeology_);
-	DrawFormatString(STATUS_X, 460, STATUS_COLOR, "占星: %d", astrology_);
+	//基礎ステータスと職業ボーナスの定義
+	struct MainStatItem {
+		const char* label;
+		int value;
+		int bonus;
+	};
 
-	//技能ステータスのボーナス分を描画
-	unsigned int GREEN = STATUS_BONUS_COLOR;
+	const MainStatItem mainStats[] = {
+		{ "レベル", level_,                   0 },
+		{ "体力",   GetMaxHp(),              jobBonus.hp },
+		{ "筋力",   power_ + jobBonus.power, jobBonus.power }, // Attack()の代わりに直値+ボーナスを計算
+		{ "魔力",   MagicAttack(),           jobBonus.magic },
+		{ "速力",   GetSpeed(),              jobBonus.speed },
+	};
 
-	int itemBonus = SkillBonus(BonusType::ItemBonus, 0);
-	if (itemBonus > 0) DrawFormatString(STATUS_BONUS_X, 310, GREEN, "(治癒力+%d)", itemBonus);
+	//基礎ステータス & 職業ボーナスの描画
+	int currentY = BASE_Y;
+	for (const auto& item : mainStats)
+	{
+		DrawFormatString(STATUS_X, currentY, colorWhite, "%s: %d", item.label, item.value);
 
-	int atkBonus = SkillBonus(BonusType::AttackBonus, 0); //基準値0で呼ぶとボーナス量だけが返る
-	if (atkBonus > 0) DrawFormatString(STATUS_BONUS_X, 340, GREEN, "(会心率+%d)", atkBonus);
+		if (item.bonus > 0)
+		{
+			DrawFormatString(STATUS_X + JOB_BONUS_OFFSET_X, currentY, colorGreen, "(+%d)", item.bonus);
+		}
+		currentY += LINE_HEIGHT;
+	}
+	DrawFormatString(STATUS_X, currentY, colorWhite, "職業: %s", job.c_str());
 
-	int magBonus = SkillBonus(BonusType::MagicBonus, 0);
-	if (magBonus > 0) DrawFormatString(STATUS_BONUS_X, 370, GREEN, "(魔法+%d)", magBonus);
+	//技能ステータスと技能ボーナスの定義
+	struct SkillStatItem {
+		const char* label;
+		int value;
+		const char* bonusLabel;
+		int bonusValue;
+	};
 
-	int defBonus = (faith_ / 15); //軽減するダメージ量
-	if (defBonus > 0) DrawFormatString(STATUS_BONUS_X, 400, GREEN, "(守備力+%d)", defBonus);
+	const SkillStatItem skillStats[] = {
+		{ "薬学", pharmacy_,       "治癒力", SkillBonus(BonusType::ItemBonus, 0) },
+		{ "武術", martialArts_,    "会心率", SkillBonus(BonusType::AttackBonus, 0) },
+		{ "魔法", magicKnowledge_, "魔法",   SkillBonus(BonusType::MagicBonus, 0) },
+		{ "信仰", faith_,          "守備力", (faith_ / FAITH_DIVISOR) },
+		{ "考古", archaeology_,    "経験値", SkillBonus(BonusType::ExpBonus, 0) },
+		{ "占星", astrology_,      "回避率", SkillBonus(BonusType::LuckBonus, 0) },
+	};
 
-	int expBonus = SkillBonus(BonusType::ExpBonus, 0);
-	if (expBonus > 0) DrawFormatString(STATUS_BONUS_X, 430, GREEN, "(経験値+%d)", expBonus);
+	// 技能ステータス & 技能ボーナスの描画
+	currentY = SKILL_BASE_Y;
+	for (const auto& item : skillStats)
+	{
+		DrawFormatString(STATUS_X, currentY, colorWhite, "%s: %d", item.label, item.value);
 
-	int luckBonus = SkillBonus(BonusType::LuckBonus, 0);
-	if (luckBonus > 0) DrawFormatString(STATUS_BONUS_X, 460, GREEN, "(回避率+%d)", luckBonus);
+		if (item.bonusValue > 0)
+		{
+			DrawFormatString(STATUS_BONUS_X, currentY, colorGreen, "(%s+%d)", item.bonusLabel, item.bonusValue);
+		}
+		currentY += LINE_HEIGHT;
+	}
 
-	//職業ボーナスの描画
-	int jobHpBonus = GetJobBonus().hp; //職業ボーナスも表示
-	if (jobHpBonus > 0) DrawFormatString(STATUS_X + 100, 150, GREEN, "(+%d)", jobHpBonus, GetMaxHp());
-
-	int jobAtkBonus = GetJobBonus().power; //職業ボーナスも表示
-	if (jobAtkBonus > 0) DrawFormatString(STATUS_X + 100, 180, GREEN, "(+%d)", jobAtkBonus, Attack());
-
-	int jobMagBonus = GetJobBonus().magic;
-	if (jobMagBonus > 0) DrawFormatString(STATUS_X + 100, 210, GREEN, "(+%d)", jobMagBonus, MagicAttack());
-
-	int jobSpeedBonus = GetJobBonus().speed;
-	if (jobSpeedBonus > 0) DrawFormatString(STATUS_X + 100, 240, GREEN, "(+%d)", jobSpeedBonus, GetSpeed());
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
@@ -315,7 +330,7 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	case BonusType::DefenseBonus:
 	{
 		//信仰15につき、受けるダメージを-1する
-		int finalDamage = baseValue - (faith_ / 15);
+		int finalDamage = baseValue - (faith_ / FAITH_DIVISOR);
 		//ダメージがマイナス（回復）になってしまうのを防ぐため、最低でも1ダメージは受ける
 		if (finalDamage < 1) finalDamage = 1;
 		return finalDamage;

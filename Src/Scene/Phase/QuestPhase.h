@@ -2,6 +2,7 @@
 
 #include "PhaseBase.h"
 #include "../../Object/PlayerStatus.h"
+#include "../../Object/MagicDataBase.h"
 #include <vector>
 #include <string>
 
@@ -18,42 +19,9 @@ enum class QUEST_LOCATION
 	EXTRA
 };
 
-//効果の種類
-enum class MAGIC_TYPE
-{
-	ATTACK,//魔法攻撃
-	HEAL,  //回復
-	DEBUFF,//弱化
-	MAX
-};
-
-//状態異常の種類
-enum class STATUS_EFFECT
-{
-	NONE,	//なし
-	POISON,	//毒　(紫)
-	FREEZE,	//凍結(青)
-	FLASH,	//閃光(黄)
-	CURSE,	//呪い(赤)
-	SILENCE,//沈黙(緑)
-	MAX
-};
-
-struct MagicData
-{
-	int id;                     //識別ID
-	std::string name;           //魔法名
-	MAGIC_TYPE type;            //魔法の種類
-	float powerMultiplier;      //魔力に乗算する倍率（低:0.7, 中:1.3, 高:2.2 など）
-	STATUS_EFFECT ailment;      //付与する状態異常（なければ NONE）
-	int ailmentChance;          //状態異常の確率（0〜100%）
-	int reqMagicKnowledge;      //習得に必要な「魔法知識」の数値
-	bool isDrain = false;       //HP吸収魔法かどうかのフラグ
-	bool curesStatus = false;   //状態異常も一緒に治すかどうかのフラグ
-};
-
 class GameScene;
 class Enemy;
+
 class QuestPhase : public PhaseBase
 {
 public:
@@ -70,7 +38,7 @@ public:
 	enum class BATTLE_STEP
 	{
 		DIFFICULTY_SELECTION,	//難易度選択
-		COMMAND_SELECTION,		//コマンド選択
+		COMMAND_SELECTION,		//メインコマンド選択
 		COMMAND_SUB_SELECTION,	//サブコマンド選択
 		MAGIC_SELECTION,		//魔法選択
 		DETERMINE,				//コマンド決定
@@ -163,6 +131,7 @@ private:
 	std::vector<std::string> subActionMessages_; //サブアクションのメッセージを管理するリスト
 	std::vector<std::string> magicTypeMessages_; //魔法の種類のメッセージを管理するリスト
 	
+	std::unique_ptr<MagicDataBase> magicDataBase_; //魔法データベースのポインタ
 	PlayerStatus* playerStatus_;//プレイヤーのステータスの情報を渡す
 	GameScene& gameScene_;		//親の情報を渡す
 	InputManager& ins_ = InputManager::GetInstance();//inputManagerのインスタンスを取得

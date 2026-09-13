@@ -35,12 +35,12 @@ void ClearScene::Update(void)
 		if (selectIndex_ == 0)
 		{
 			normalOffsetX_ = 0;	//矢印のオフセット値を更新
-			normalOffsetY_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+			normalOffsetY_ = selectIndex_ * TEXT_OFFSET_Y;	//矢印のオフセット値を更新
 		}
 		else
 		{
-			normalOffsetX_ = selectIndex_ * 30;	//矢印のオフセット値を更新
-			normalOffsetY_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+			normalOffsetX_ = selectIndex_ * TEXT_OFFSET_X;	//矢印のオフセット値を更新
+			normalOffsetY_ = selectIndex_ * TEXT_OFFSET_Y;	//矢印のオフセット値を更新
 		}
 	}
 
@@ -69,28 +69,28 @@ void ClearScene::Update(void)
 void ClearScene::Draw(void)
 {
 	//メッセージ（下のテキスト）を表示
-	SetFontSize(70);
+	SetFontSize(TITLE_FONT_SIZE);
 	std::string str = "世界一の魔法使いになった！";
 	int width = GetDrawStringWidth(str.c_str(), str.size());
 	DrawString(GAMECLEAR_MESSAGE_X, GAMECLEAR_MESSAGE_Y,str.c_str(), 0xFFFFFF);
 
-	SetFontSize(30);
+	SetFontSize(OPTION_FONT_SIZE);
 	if (!isFinishCheck_)
 	{
 		DrawFormatString(ARROW_X + normalOffsetX_, ARROW_Y + normalOffsetY_, Color::WHITE, "→");
 
 		DrawFormatString(CLEAR_MESSAGE_X, CLEAR_MESSAGE_Y, Color::WHITE, "もう一度遊ぶ");
 
-		DrawFormatString(CLEAR_MESSAGE_X + 30, Application::SCREEN_SIZE_Y - 160, Color::WHITE, "タイトル");
+		DrawFormatString(TITLE_TEXT_X, TITLE_TEXT_Y, Color::WHITE, "タイトル");
 	}
 	else
 	{
-		DrawFormatString(EXIT_ARROW_X - exitOffset_, 400, Color::WHITE, "→");
+		DrawFormatString(EXIT_ARROW_X - exitOffset_, EXIT_ARROW_Y, Color::WHITE, "→");
 
-		DrawFormatString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y / 2, Color::WHITE, "ゲームを終了しますか？");
+		DrawFormatString(EXIT_MESSAGE_X, EXIT_MESSAGE_Y, Color::WHITE, "ゲームを終了しますか？");
 
-		DrawString((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, "はい", Color::WHITE);
-		DrawString((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "いいえ", Color::WHITE);
+		DrawString(EXIT_YES_X, EXIT_YES_Y, "はい", Color::WHITE);
+		DrawString(EXIT_NO_X, EXIT_NO_Y, "いいえ", Color::WHITE);
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
 }

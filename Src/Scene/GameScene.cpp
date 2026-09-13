@@ -40,7 +40,6 @@ void GameScene::Init(void)
 //更新処理
 void GameScene::Update(void)
 {
-	
 	//まず現在のフェーズのUpdateを回す
 	if (currentPhase_) 
 	{
@@ -59,7 +58,7 @@ void GameScene::Update(void)
 				turn_++; //ターンを進める
 
 				//4ターン目になった瞬間の処理
-				if (turn_ == 4 && playerStatus_->currentRoute_ == PLAYER_ROUTE::NONE)
+				if (turn_ == EVENT_TRIGGER_TURN && playerStatus_->currentRoute_ == PLAYER_ROUTE::NONE)
 				{
 					//メニュー選択に戻さずそのままイベントを強制スタート
 					currentPhase_ = std::make_unique<EventPhase>(playerStatus_);
@@ -78,7 +77,6 @@ void GameScene::Update(void)
 		return;
 	}
 
-
 	//フェーズが実行中でない場合（メニュー選択）
 	//上のif文の中でreturnしていれば、最終ターン終了時はここは実行されない
 	if (!currentPhase_) 
@@ -87,13 +85,13 @@ void GameScene::Update(void)
 		//３ターン目までチュートリアルの処理
 		if (SceneManager::GetInstance().IsTutorialEnabled())
 		{
-			if (turn_ <= 3)
+			if (turn_ <= TUTORUAL_JOB_CHANGE_TURN)
 			{
 				ProcessTutorial();
 			}
 		}
 
-		if (turn_ == 21)
+		if (turn_ == MAX_TURN)
 		{
 			phase_ = QUEST_PHASE::PHASE_QUEST;
 		}
@@ -108,16 +106,17 @@ void GameScene::Update(void)
 //描画処理
 void GameScene::Draw(void)
 {
-	if (currentPhase_) {
-		//ここが呼ばれていないと、どれだけ切り替わっても画面は変変わらない
+	if (currentPhase_)
+	{
+		//各フェーズの描画処理を呼び出す
 		currentPhase_->Draw();
 	}
 	else
 	{
 		DrawGraph(0, 0, stageImg_, TRUE);
-		SetFontSize(20);
+		SetFontSize(STATUS_FONT_SIZE);
 		//メニュー画面の描画処理
-		DrawFormatString(350, 30, Color::WHITE, "現在のターン \n   %d / %d", turn_, MAX_TURN);
+		DrawFormatString(TURN_TEXT_X, TURN_TEXT_Y, Color::WHITE, "現在のターン \n   %d / %d", turn_, MAX_TURN);
 		//現在のルートを文字列に変換して表示する
 		std::string routeName = "未選択";
 		switch (playerStatus_->currentRoute_)
@@ -128,22 +127,22 @@ void GameScene::Draw(void)
 		case PLAYER_ROUTE::SELFLESS:     routeName = "無欲"; break;
 		}
 		// ターンの少し下に黄色っぽく表示
-		DrawFormatString(200, 400, Color::RED, "現在のルート: %s", routeName.c_str());
+		DrawFormatString(ROUTE_TEXT_X, ROUTE_TEXT_Y, Color::RED, "現在のルート: %s", routeName.c_str());
 		SetFontSize(DEFAULT_FONT_SIZE);
 
 		//チュートリアルが有効で、かつターンが3以下の場合にチュートリアルを描画する
-		if (SceneManager::GetInstance().IsTutorialEnabled() && turn_ <= 3)
+		if (SceneManager::GetInstance().IsTutorialEnabled() && turn_ <= TUTORUAL_JOB_CHANGE_TURN)
 		{
 			DrawTutorial();
 		}
 
 		int color = GetColor(255, 255, 255);
 		int selectColor = GetColor(255, 255, 0); //選択中は黄色にする
-		SetFontSize(32);
-		Utility::DrawCommandMenu(200, 200, { "クエスト", "授業", "資格試験" }, (phase_), 60);
+		SetFontSize(MENU_FONT_SIZE);
+		Utility::DrawCommandMenu(COMMAND_MENU_X, COMMAND_MENU_Y, { "クエスト", "授業", "資格試験" }, (phase_), COMMAND_MENU_STEP_Y);
 		SetFontSize(DEFAULT_FONT_SIZE);
 
-		DrawGraph(700, 200, playerImg_, TRUE);
+		DrawGraph(PLAYER_IMG_X, PLAYER_IMG_Y, playerImg_, TRUE);
 
 		//仮でプレイヤー情報を表示
 		playerStatus_->Draw();
@@ -160,15 +159,15 @@ void GameScene::Release(void)
 void GameScene::ProcessTutorial(void)
 {
 	//チュートリアルの処理
-	if (turn_ == 1)
+	if (turn_ == TUTORUAL_QUEST_TURN)
 	{
 		phase_ = QUEST_PHASE::PHASE_QUEST;
 	}
-	else if (turn_ == 2)
+	else if (turn_ == TUTORUAL_CLASSWORK_TURN)
 	{
 		phase_ = QUEST_PHASE::PHASE_CLASSWORK;
 	}
-	else if (turn_ == 3)
+	else if (turn_ == TUTORUAL_JOB_CHANGE_TURN)
 	{
 		phase_ = QUEST_PHASE::PHASE_JOB_CHANGE;
 	}
@@ -178,21 +177,21 @@ void GameScene::DrawTutorial(void)
 {
 	DrawGraph(MESSAGE_BOX_X, MESSAGE_BOX_Y, messageBoxImg_, TRUE);
 
-	SetFontSize(20);
+	SetFontSize(STATUS_FONT_SIZE);
 	//DrawString(TUTORIAL_X + 50, MESSAGE_BOX_Y + 15, "チュートリアル", Color::BLACK);
 
 	//チュートリアルの処理
-	if (turn_ == 1)
+	if (turn_ == TUTORUAL_QUEST_TURN)
 	{
 		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, "まずはクエストに行こう。\nクエストで敵と戦って\n経験値を獲得しよう。");
 	}
-	else if (turn_ == 2)
+	else if (turn_ == TUTORUAL_CLASSWORK_TURN)
 	{
 		DrawFormatString(TUTORIAL_X, TUTORIAL_Y, Color::BLACK, "次は授業を受けよう。\n好きな科目を選んで\n技能を伸ばそう。");
 	}
-	else if (turn_ == 3)
+	else if (turn_ == TUTORUAL_JOB_CHANGE_TURN)
 	{
-		DrawFormatString(TUTORIAL_X - 5, TUTORIAL_Y, Color::BLACK, "ここで職業を選択することで\n様々な恩恵を得られる。");
+		DrawFormatString(TUTORIAL_X - TUTORIAL_STEP3_OFFSET_X, TUTORIAL_Y, Color::BLACK, "ここで職業を選択することで\n様々な恩恵を得られる。");
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
 }

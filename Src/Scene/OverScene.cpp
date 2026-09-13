@@ -38,12 +38,12 @@ void OverScene::Update(void)
 		if (selectIndex_ == 0)
 		{
 			normalOffsetX_ = 0;	//矢印のオフセット値を更新
-			normalOffsetY_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+			normalOffsetY_ = selectIndex_ * OPTION_STEP_Y;	//矢印のオフセット値を更新
 		}
 		else
 		{
-			normalOffsetX_ = selectIndex_ * 15;	//矢印のオフセット値を更新
-			normalOffsetY_ = selectIndex_ * 40;	//矢印のオフセット値を更新
+			normalOffsetX_ = selectIndex_ * TITLE_RETURN_TEXT_OFFSET_X;	//矢印のオフセット値を更新
+			normalOffsetY_ = selectIndex_ * OPTION_STEP_Y;	//矢印のオフセット値を更新
 		}
 	}
 
@@ -75,17 +75,17 @@ void OverScene::Update(void)
 //描画処理
 void OverScene::Draw(void)
 {
-	SetFontSize(70);
+	SetFontSize(TITLE_FONT_SIZE);
 	std::string str = "世界を守れなかった";
 	int width = GetDrawStringWidth(str.c_str(),str.size() );
-	DrawString(Application::SCREEN_HALFSIZE_X - width/2, GAMEOVER_MESSAGE_Y, str.c_str(), Color::RED);
+	DrawString(Application::SCREEN_HALFSIZE_X - width / VALUE, GAMEOVER_MESSAGE_Y, str.c_str(), Color::RED);
 
-	SetFontSize(30);
+	SetFontSize(OPTION_FONT_SIZE);
 	DrawFormatString(ARROW_X - normalOffsetX_, ARROW_Y + normalOffsetY_, Color::WHITE, "→");
 
 	DrawFormatString(OVER_MESSAGE_X, OVER_MESSAGE_Y, Color::WHITE, "別の道へ");
 
-	DrawFormatString(OVER_MESSAGE_X - 15, Application::SCREEN_SIZE_Y - 160, Color::WHITE, "受け入れる");
+	DrawFormatString(OVER_MESSAGE_X - TITLE_RETURN_TEXT_OFFSET_X, Application::SCREEN_SIZE_Y - TITLE_RETURN_BOTTOM_MARGIN_Y, Color::WHITE, "受け入れる");
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
 

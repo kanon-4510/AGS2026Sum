@@ -30,12 +30,6 @@ void TitleScene::Init(void)
 //更新処理
 void TitleScene::Update(void)
 {
-	if (ins_.IsMouseMoved())
-	{
-		ProcessMouseSelection();
-	}
-	ProcessMouseDecision(nextMode);
-
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
 		ProcessTitleDecision();
@@ -56,7 +50,7 @@ void TitleScene::Draw(void)
 {
 	DrawGraph(0, 0, titleImage_, true);
 
-	SetFontSize(30);
+	SetFontSize(FONT_SIZE);
 	if (mode_ == TITLE_MODE::NORMAL)
 	{
 		//ゲームをするか終了するか
@@ -72,22 +66,22 @@ void TitleScene::Draw(void)
 		DrawFormatString(ARROW_X - tutorialOffsetX_, ARROW_Y + tutorialOffsetY_, Color::WHITE, "→");
 
 		if (SceneManager::GetInstance().IsTutorialEnabled()) {
-			DrawString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 100, "チュートリアル：【 ON 】", Color::WHITE);
+			DrawString(TUTORIAL_TEXT_X, TUTORIAL_TEXT_Y, "チュートリアル：【 ON 】", Color::WHITE);
 		}
 		else {
-			DrawString((Application::SCREEN_SIZE_X - 220) / 2, Application::SCREEN_SIZE_Y - 100, "チュートリアル：【 OFF 】", Color::WHITE);
+			DrawString(TUTORIAL_TEXT_X, TUTORIAL_TEXT_Y, "チュートリアル：【 OFF 】", Color::WHITE);
 		}
 		DrawString(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, "ゲーム開始", Color::WHITE);
 	}
 	else if (mode_ == TITLE_MODE::EXIT)
 	{
 		//ゲームを終了するか
-		DrawFormatString(EXIT_ARROW_X - exitOffset_, TITLE_MESSAGE_Y + 40, Color::WHITE, "→");
+		DrawFormatString(EXIT_ARROW_X - exitOffset_, TITLE_MESSAGE_Y + OFFSET_ARROW, Color::WHITE, "→");
 
-		DrawFormatString((Application::SCREEN_SIZE_X / 3) + 40, TITLE_MESSAGE_Y, Color::WHITE, "ゲームを終了しますか？");
+		DrawFormatString(EXIT_TEXT_X, EXIT_TEXT_Y, Color::WHITE, "ゲームを終了しますか？");
 
-		DrawString((Application::SCREEN_HALFSIZE_X) + 40, TITLE_MESSAGE_Y + 40, "はい", Color::WHITE);
-		DrawString((Application::SCREEN_HALFSIZE_X) - 130, TITLE_MESSAGE_Y + 40, "いいえ", Color::WHITE);
+		DrawString(EXIT_YES_TEXT_X, EXIT_YES_TEXT_Y, "はい", Color::WHITE);
+		DrawString(EXIT_NO_TEXT_X, EXIT_NO_TEXT_Y, "いいえ", Color::WHITE);
 	}
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
@@ -107,7 +101,7 @@ void TitleScene::ProcessTitleSelection(void)
 		int index = static_cast<int>(titleSelection_);
 		index = (index + (static_cast<int>(TITLE_SELECTION::MAX) - 1)) % static_cast<int>(TITLE_SELECTION::MAX);
 		titleSelection_ = static_cast<TITLE_SELECTION>(index);
-		normalOffset_ = index * 40; //矢印のオフセット値を更新
+		normalOffset_ = index * OFFSET_ARROW; //矢印のオフセット値を更新
 	}
 	else if (ins_.IsTrgDown(KEY_INPUT_DOWN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_DOWN))
@@ -115,7 +109,7 @@ void TitleScene::ProcessTitleSelection(void)
 		int index = static_cast<int>(titleSelection_);
 		index = (index + 1) % static_cast<int>(TITLE_SELECTION::MAX);
 		titleSelection_ = static_cast<TITLE_SELECTION>(index);
-		normalOffset_ = index * 40; //矢印のオフセット値を更新
+		normalOffset_ = index * OFFSET_ARROW; //矢印のオフセット値を更新
 	}
 }
 
@@ -143,85 +137,6 @@ void TitleScene::ProcessTitleDecision(void)
 	}
 }
 
-void TitleScene::ProcessMouseSelection(void)
-{
-	nextMode = MODE_SELECTION::NONE;
-	//タイトルの選択肢をマウスで選択する処理
-	if (mode_ == TITLE_MODE::NORMAL)
-	{
-		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, 150, 30))
-		{
-			normalOffset_ = 0; //矢印のオフセット値を更新
-			nextMode = MODE_SELECTION::NORMAL_TUTORIAL;
-		}
-		else if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y + 40, 150, 30))
-		{
-			normalOffset_ = 40; //矢印のオフセット値を更新
-			nextMode = MODE_SELECTION::NORMAL_EXIT;
-		}
-	}
-	else if (mode_ == TITLE_MODE::TUTORIAL)
-	{
-		//矢印のオフセットの位置を決める
-		if (ins_.IsMouseOverRect(TITLE_MESSAGE_X, TITLE_MESSAGE_Y, 160, 30))
-		{
-			tutorialOffsetX_ = 0;
-			tutorialOffsetY_ = 0;
-			nextMode = MODE_SELECTION::TUTORIAL_NEXT;
-		}
-		else if (ins_.IsMouseOverRect(520, 620, 220, 30))
-		{
-			tutorialOffsetX_ = 30;
-			tutorialOffsetY_ = 40;
-			nextMode = MODE_SELECTION::TUTORIAL_CHANGE;
-		}
-	}
-	else if (mode_ == TITLE_MODE::EXIT)
-	{
-		//矢印のオフセットの位置を決める
-		if (ins_.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2, Application::SCREEN_SIZE_Y / 2 + 40, 50, 20))
-		{
-			exitOffset_ = 0;
-			nextMode = MODE_SELECTION::EXIT_NO;
-		}
-		else if (ins_.IsMouseOverRect((Application::SCREEN_SIZE_X - 210) / 2 + 125, Application::SCREEN_SIZE_Y / 2 + 40, 30, 20))
-		{
-			exitOffset_ = -130;
-			nextMode = MODE_SELECTION::EXIT_YES;
-		}
-	}
-}
-
-void TitleScene::ProcessMouseDecision(MODE_SELECTION nextMode)
-{
-	if (!ins_.IsTrgMouseLeft() || nextMode == MODE_SELECTION::NONE) return;
-
-	if (ins_.IsTrgMouseLeft())
-	{
-		switch (nextMode)
-		{
-		case MODE_SELECTION::NORMAL_TUTORIAL:
-			mode_ = TITLE_MODE::TUTORIAL;
-			break;
-		case MODE_SELECTION::NORMAL_EXIT:
-			mode_ = TITLE_MODE::EXIT;
-			break;
-		case MODE_SELECTION::TUTORIAL_CHANGE:
-			SceneManager::GetInstance().ToggleTutorial(); //ON,OFFを切り替える
-			break;
-		case MODE_SELECTION::TUTORIAL_NEXT:
-			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);//ゲームシーンへ遷移
-			break;
-		case MODE_SELECTION::EXIT_YES:
-			Application::isRunning_ = false; //ゲームを終了
-			break;
-		case MODE_SELECTION::EXIT_NO:
-			mode_ = TITLE_MODE::NORMAL; //通常メニューに戻る
-			break;
-		}
-	}
-}
-
 void TitleScene::Tutorial(void)
 {
 	//上下キーで切り替える
@@ -234,12 +149,12 @@ void TitleScene::Tutorial(void)
 		if (tutorialIndex_ == 0)
 		{
 			tutorialOffsetX_ = 0; //矢印のオフセット値を更新
-			tutorialOffsetY_ = tutorialIndex_ * 40; //矢印のオフセット値を更新
+			tutorialOffsetY_ = tutorialIndex_ * OFFSET_ARROW; //矢印のオフセット値を更新
 		}
 		else
 		{
-			tutorialOffsetX_ = 30; //矢印のオフセット値を更新
-			tutorialOffsetY_ = tutorialIndex_ * 40; //矢印のオフセット値を更新
+			tutorialOffsetX_ = TUTORIAL_ARROW_OFFSET_X; //矢印のオフセット値を更新
+			tutorialOffsetY_ = tutorialIndex_ * OFFSET_ARROW; //矢印のオフセット値を更新
 		}
 	}
 
@@ -254,6 +169,7 @@ void TitleScene::Tutorial(void)
 		}
 		else
 		{
+			//チュートリアルON/OFFを切り替える
 			SceneManager::GetInstance().ToggleTutorial();
 		}
 	}
@@ -273,7 +189,7 @@ void TitleScene::ExitGame(void)
 	{
 		//矢印のオフセットの位置を決める
 		confirmIndex_ = 1 - confirmIndex_;	//0と1を反転させる
-		exitOffset_ = confirmIndex_ * -180; //矢印のオフセット値を更新
+		exitOffset_ = confirmIndex_ * -EXIT_OPTION_SPACING_X; //矢印のオフセット値を更新
 	}
 
 	//最終決定

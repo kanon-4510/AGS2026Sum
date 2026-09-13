@@ -12,7 +12,7 @@ class Player;
 //敵のアニメーション状態の定義
 enum ENEMY_ANIM
 {
-	IDLE,	//待機
+	IDLE = 0,	//待機
 	ACT_1,	//攻撃1
 	ACT_2,	//攻撃2
 	ACT_3,	//攻撃3
@@ -51,6 +51,21 @@ struct EnemyActionInfo
 class Enemy
 {
 public:
+	// 敵のパラメータ
+	static constexpr int MAX_ANIM_FRAMES = 16;       // 1つのアニメーションの最大コマ数
+	static constexpr int ANIM_FRAME_INTERVAL = 6;    // アニメーション更新のフレーム間隔
+	static constexpr int SKILL_SLOT_COUNT = 3;       // スキル保持数
+
+	// 描画関連パラメータ
+	static constexpr float DEFAULT_SCALE = 2.5f;
+	static constexpr int BAR_WIDTH = 100;
+	static constexpr int TEXT_OFFSET_X = 50;
+	static constexpr int NAME_OFFSET_Y = 72;
+	static constexpr int HP_TEXT_OFFSET_Y = 55;
+	static constexpr int HP_BAR_OFFSET_Y = 40;
+	static constexpr int HP_BAR_BOX_OFFSET_Y = 35;
+
+
 	//コンストラクタ（画像ファイルのパスや、画面のどこに描画するかの座標も受け取るように拡張）
 	Enemy(std::string name, int hp, int power1, int power2, int power3, int speed, int exp,
 		std::string skill1, std::string skill2, std::string skill3,
