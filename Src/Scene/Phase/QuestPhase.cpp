@@ -21,20 +21,14 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	: gameScene_(gameScene)
 	, playerStatus_(playerStatus)
 	, isHellQuest_(isHellQuest)
-	, bgImageHandle_(-1)
 {
-	bgImageBar_ = LoadGraph("Data/Image/Stage/BattleBar.png");
-	board_[0] = LoadGraph("Data/Image/Board/Board_1.png");
-	board_[1] = LoadGraph("Data/Image/Board/Board_2.png");
-	board_[2] = LoadGraph("Data/Image/Board/Board_3.png");
-	board_[3] = LoadGraph("Data/Image/Board/Board_4.png");
-	board_[4] = LoadGraph("Data/Image/Board/Board_5.png");
-	board_[5] = LoadGraph("Data/Image/Board/Board_6.png");
-	board_[6] = LoadGraph("Data/Image/Board/Board_7.png");
-	board_[7] = LoadGraph("Data/Image/Board/Board_8.png");
 	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::DESK).handleId_;
 
 	messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
+
+	//ステージの初期化
+	stage_ = std::make_unique<Stage>();
+	stage_->Init();
 
 	//魔法データベースの初期化
 	magicDataBase_ = std::make_unique<MagicDataBase>();
@@ -42,7 +36,7 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	//クエスト開始時は一旦通常の敵を生成しておく
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
 	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
-	battleStep_ = BATTLE_STEP::DIFFICULTY_SELECTION;
+	battleStep_ = BATTLE_STEP::STAGE_SELECTION;	//最初はステージ選択からスタート
 	locationMenu_ = { "平原","魔法の森","岩山の道場","魔大陸","壊れた聖堂","古代遺跡","星の丘" };	//ここで難易度メニューを動的に作成
 	selectableLocations_ = { QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL };
 
@@ -57,8 +51,6 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 //デストラクタ
 QuestPhase::~QuestPhase(void)
 {
-	if (bgImageHandle_ != -1)DeleteGraph(bgImageHandle_);
-
 	if (activeEnemy_ != nullptr)
 	{
 		delete activeEnemy_;
@@ -69,17 +61,19 @@ QuestPhase::~QuestPhase(void)
 //更新処理
 void QuestPhase::Update(void)
 {
-
 	//ターン管理関数
-	ManageTurn();
+	ManageTurn();	
 
-	playerStatus_->Update(); //プレイヤーの更新処理
+	//プレイヤーの更新処理
+	playerStatus_->Update(); 
 
 	if (activeEnemy_ != nullptr)
 	{
-		activeEnemy_->Update(); //敵の更新処理
+		//敵の更新処理
+		activeEnemy_->Update(); 
 	}
 
+	//21ターン目以降で敵が全滅している場合はクリア画面に遷移する
 	if (gameScene_.GetTurn() >= 21  && activeEnemy_ != nullptr && activeEnemy_->IsDead())
 	{
 		//クエストBGMを止める
@@ -92,36 +86,24 @@ void QuestPhase::Update(void)
 //描画処理
 void QuestPhase::Draw(void)
 {
-	if (bgImageHandle_ != -1)DrawGraph(0, -100, bgImageHandle_, TRUE);//背景を描画する
+	if (stage_ != nullptr) 
+	{
+		//背景を描画する
+		stage_->DrawBackground();
+	}
+	
 #pragma region 戦闘時の画面下部バーの表示
-	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION)
+	if (battleStep_ != BATTLE_STEP::STAGE_SELECTION)
 	{
 		SetFontSize(22);
-		DrawGraph(0, 0, bgImageBar_, true);
-		DrawFormatString( 230,590,0xffffff,"ルピナス");
-		DrawFormatString( 245,615,0xffffff,"レベル %2d",playerStatus_->level_);
-		DrawFormatString( 245,640,0xffffff,"　筋力 %d" ,playerStatus_->power_ + playerStatus_->GetJobBonus().power);
-		DrawFormatString( 245,665,0xffffff,"　魔力 %d" ,playerStatus_->MagicAttack());
-		DrawFormatString( 245,690,0xffffff,"素早さ %d" ,playerStatus_->GetSpeed());
-		DrawFormatString(1065,510,0xffffff,"　　治癒力:%+3d",playerStatus_->pharmacy_/7);
-		DrawFormatString(1065,545,0xffffff,"会心発生率:%3d%%",playerStatus_->martialArts_/5);
-		DrawFormatString(1065,580,0xffffff,"魔術ランク:%3d",(playerStatus_->magicKnowledge_/50)+1);
-		DrawFormatString(1065,615,0xffffff,"　　守備力:%3d",playerStatus_->faith_/15);
-		DrawFormatString(1065,650,0xffffff,"獲得経験値:%+3d",playerStatus_->archaeology_/8);
-		DrawFormatString(1065,685,0xffffff,"　　回避率:%3d%%",playerStatus_->astrology_/5);
-		DrawFormatString(900,590,0xffffff,"%s",playerStatus_->job.c_str());
-		DrawFormatString(900,640,0xffffff,"状態:");
-		if(statusEffect_==STATUS_EFFECT::NONE)   DrawFormatString(955,640,0xffffff,"なし");
-		if(statusEffect_==STATUS_EFFECT::POISON) DrawFormatString(955,640,0x00cc00,"どく");
-		if(statusEffect_==STATUS_EFFECT::FLASH)  DrawFormatString(955,640,0xffff00,"せんこう");
-		if(statusEffect_==STATUS_EFFECT::FREEZE) DrawFormatString(955,640,0x00cccc,"とうけつ");
-		if(statusEffect_==STATUS_EFFECT::CURSE)  DrawFormatString(955,640,0xcc00cc,"のろい");
-		if(statusEffect_==STATUS_EFFECT::SILENCE)DrawFormatString(955,640,0xdd0000,"ちんもく");
-		SetFontSize(16);
+		playerStatus_->DrawStatus();	//プレイヤーのステータスを描画
+
+		SetFontSize(DEFAULT_FONT_SIZE);
 	}
 #pragma endregion
 
-	if (battleStep_ != BATTLE_STEP::DIFFICULTY_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
+	//敵の描画とWAVE表示
+	if (battleStep_ != BATTLE_STEP::STAGE_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
 	{
 		activeEnemy_->Draw(); //敵の描画
 
@@ -132,10 +114,10 @@ void QuestPhase::Draw(void)
 		playerStatus_->DrawQuestImages();	//プレイヤーの画像を描画
 	}
 
-	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)//難易度選択中はコマンドやHPを表示しない
+	if (battleStep_ == BATTLE_STEP::STAGE_SELECTION)//難易度選択中はコマンドやHPを表示しない
 	{
 		DrawGraph(0, 0, bgImg_, true);
-		DrawRotaGraph(630,360, 1, 0, board_[difficultyCursor_], true);
+		stage_->DrawStageBoard();
 		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, locationMenu_, difficultyCursor_);
 	}
 	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
@@ -239,6 +221,12 @@ void QuestPhase::ProcessDifficulty(void)
 	int maxDifficulty = static_cast<int>(locationMenu_.size());
 	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
 
+		//難易度選択後のメッセージを作成
+	if (stage_)
+	{
+		stage_->SetStageType(static_cast<Stage::STAGE_TYPE>(difficultyCursor_)); //ステージの種類を設定
+	}
+
 	//決定処理
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
@@ -260,17 +248,6 @@ void QuestPhase::ProcessDifficulty(void)
 			//通常の難易度としてenumに保存する
 			location_ = selectableLocations_[difficultyCursor_];
 		}
-		switch (location_)
-		{
-		case QUEST_LOCATION::PLAINS: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_1.png"); break;
-		case QUEST_LOCATION::FOREST: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_2.png"); break;
-		case QUEST_LOCATION::SHRINE: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_3.png"); break;
-		case QUEST_LOCATION::CONTINENT: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_4.png"); break;
-		case QUEST_LOCATION::CATHEDRAL: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_5.png"); break;
-		case QUEST_LOCATION::RUINS: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_6.png"); break;
-		case QUEST_LOCATION::HILL: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_7.png"); break;
-		case QUEST_LOCATION::EXTRA: bgImageHandle_ = LoadGraph("Data/Image/Stage/Stage_8.png"); break;
-		}
 
 		//バトル開始時のダメージ
 		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
@@ -289,7 +266,7 @@ void QuestPhase::ManageTurn(void)
 {
 	switch (battleStep_)
 	{
-	case QuestPhase::BATTLE_STEP::DIFFICULTY_SELECTION:
+	case QuestPhase::BATTLE_STEP::STAGE_SELECTION:
 		playerStatus_->hp_ = playerStatus_->GetMaxHp();
 		//難易度選択処理などをここに書く
 		ProcessDifficulty();
@@ -398,333 +375,11 @@ void QuestPhase::ProcessActionLoop(void)
 	{
 		if (unit.isPlayer)
 		{
-			//---状態異常の行動前チェック---
-			bool skipAction = false;
-			bool isMiss = false;
-
-			//凍結(行動不可)
-			if (statusEffect_ == STATUS_EFFECT::FREEZE)
-			{
-				if (GetRand(99) < 60) //60%で凍ったまま行動不可
-				{
-					battleMessage_ = "体が凍りついて動けない";
-					skipAction = true;
-				}
-				else //確率を乗り越えたら解除してそのまま行動
-				{
-					battleMessage_ = "氷が溶けてうごけるようになった!\n";
-					statusEffect_ = STATUS_EFFECT::NONE;
-				}
-			}
-			//閃光(命中低下)
-			if (!skipAction && statusEffect_ == STATUS_EFFECT::FLASH)
-			{
-				if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC && (unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
-				{
-					if (GetRand(99) < 50) isMiss = true; //50%で外れる
-				}
-			}
-
-			//実際の行動処理
-			if (skipAction)
-			{
-				//メッセージは設定済みなので何もしない
-			}
-			else if (isMiss)
-			{
-				battleMessage_ += "目が眩んで攻撃が外れた";
-			}
-			else
-			{
-				if (command_ == COMMAND::ATTACK)
-				{
-					battleMessage_ += unit.name + "の攻撃！";
-
-					//基本の攻撃力に、スキルがあれば魔力を足す
-					int attackPow = playerStatus_->Attack();
-					if (playerStatus_->hasMagicToAttack)
-					{
-						attackPow += playerStatus_->MagicAttack()/2;
-						battleMessage_ += "\n【カドゥケウス】攻撃の威力が上がった！";
-					}
-
-					//会心判定
-					//計算式：武術のステータス÷5
-					int criticalChance = playerStatus_->martialArts_ / 5;
-					if (GetRand(99) < criticalChance)
-					{
-						battleMessage_ += "クリティカルヒット！";
-						int critMultiplier = playerStatus_->hasCritBoost ? 6.0 : 2.0;
-						playerStatus_->AttackAnimation();
-						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-						if (playerStatus_->hasCritBoost)battleMessage_ += "\n【極聖光】会心倍率が上がった！";
-						activeEnemy_->Damage(attackPow * critMultiplier);
-
-						//ダメージSE
-						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
-					}
-					else
-					{
-						playerStatus_->AttackAnimation();
-						activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-						activeEnemy_->Damage(attackPow);
-
-						//攻撃SE
-						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
-					}
-				}
-				else if (command_ == COMMAND::MAGIC)
-				{
-					//selectedMagic_ は、前のメニュー選択画面で確定した MagicData 構造体とします
-					battleMessage_ += unit.name + "の" + selectedMagic_.name + "！";
-
-					//ダメージ処理（威力が0より大きければダメージを与える）
-					if (selectedMagic_.powerMultiplier > 0 && (selectedMagic_.type == MAGIC_TYPE::ATTACK||selectedMagic_.type == MAGIC_TYPE::DEBUFF))
-					{
-						//魔力 × (魔法の威力) など、威力を反映させた計算式にする
-						int magicDamage = playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier;
-						activeEnemy_->Damage(magicDamage);
-
-						//攻撃SE
-						SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
-					}
-
-					//カテゴリ別の特殊処理（回復や状態異常）
-					switch (selectedMagic_.type)
-					{
-					case MAGIC_TYPE::HEAL:
-						//powerの数値を回復量として使う
-						//ドレイン（吸収）だった場合の処理
-						if (selectedMagic_.isDrain)
-						{
-							//敵にダメージを与える
-							int drainDamage = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
-							activeEnemy_->ChangeAnim(ANIM_DAMAGE); //ダメージアニメーション
-							activeEnemy_->Damage(drainDamage);
-
-							//プレイヤーの体力を回復する（与えたダメージ分）
-							playerStatus_->Heal(drainDamage);
-							battleMessage_ += "\n敵から体力を奪った！";
-						}
-						//通常の回復処理（威力が0より大きい場合だけ回復メッセージが出る）
-						if (!selectedMagic_.isDrain && selectedMagic_.powerMultiplier > 0.0f)
-						{
-							int healAmount = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
-							playerStatus_->Heal(healAmount);
-							battleMessage_ += "\n体力が回復した！";
-						}
-						//状態異常治療フラグが true だったら治す
-						if (selectedMagic_.curesStatus)
-						{
-							statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
-							statusTurns_ = 4;
-							poisonCnt_ = 0;
-							battleMessage_ += "\n状態異常が回復した！";
-						}
-						break;
-					case MAGIC_TYPE::DEBUFF:
-						//状態異常を付与する魔法の場合
-						if (selectedMagic_.ailment != STATUS_EFFECT::NONE)
-						{
-							//魔法ごとに設定された「状態異常確率」で判定
-							if (GetRand(99) < selectedMagic_.ailmentChance)
-							{
-								enemyStatusEffect_ = selectedMagic_.ailment;
-								battleMessage_ += "\n敵に状態異常を与えた！";
-							}
-						}
-						break;
-					}
-				}
-			}
+			playerturnAction();
 		}
 		else
 		{
-			//行動前チェック
-			bool skipAction = false;
-			bool isMiss = false;
-			activeEnemy_->ResetGuard();
-
-			//凍結(行動不可)
-			if (enemyStatusEffect_ == STATUS_EFFECT::FREEZE)
-			{
-				if (GetRand(99) < 60) //60%で凍ったまま行動不可
-				{
-					battleMessage_ += unit.name + "は凍りついて動けない";
-					skipAction = true;
-				}
-				else //確率を乗り越えたら解除してそのまま行動
-				{
-					battleMessage_ += unit.name + "は氷が溶けてうごけるようになった\n";
-					enemyStatusEffect_ = STATUS_EFFECT::NONE;
-				}
-			}
-			//閃光(命中低下)
-			if (!skipAction && enemyStatusEffect_ == STATUS_EFFECT::FLASH)
-			{
-				if (GetRand(99) < 50) isMiss = true; //50%で外れる
-			}
-			//実際の行動処理
-			if (skipAction)
-			{
-				//メッセージは設定済みなので何もしない
-			}
-			else if (isMiss)
-			{
-				battleMessage_ += unit.name + "は目が眩んで攻撃が外れた";
-			}
-			else
-			{
-				EnemyActionInfo eAction = activeEnemy_->DecideAction();
-				unit.skillName = eAction.skillName;
-
-				//敵の行動分岐
-				battleMessage_ += unit.name + "の" + unit.skillName + "！";
-
-				//技の名前によって特別な効果を発動させる
-				if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
-					|| unit.skillName == "自己再生")
-				{
-					//Power分回復
-					int healAmount = activeEnemy_->GetPower3();
-					activeEnemy_->Heal(healAmount);
-					battleMessage_ += "\n" + unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
-				}
-				else if(unit.skillName == "遡行")
-				{
-					//Power分回復
-					int healAmount = activeEnemy_->GetPower3();
-					activeEnemy_->Heal(healAmount);
-					enemyStatusEffect_ = STATUS_EFFECT::NONE; //状態異常を治す
-					enemyCurs_ = ENEMY_CURS_TURN;
-					battleMessage_ += "\n" + unit.name + "の肉体が巻き戻る";
-				}
-				else if (unit.skillName == "まもる" || unit.skillName == "守る"
-					|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
-				{
-					//Power分ダメージ軽減
-					activeEnemy_->SetGuard(activeEnemy_->GetPower3());
-					battleMessage_ += "\n" + unit.name + "は身構えている";
-				}
-				else {
-					//回避判定
-					//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
-					int evasionChance = playerStatus_->astrology_ / 5;
-
-					//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
-					if (evasionChance > 90) evasionChance = 90;
-					int roll = GetRand(99);
-
-					if (roll < evasionChance)
-					{
-						//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
-						battleMessage_ = unit.name + "の" + unit.skillName;
-						battleMessage_ += "\n攻撃を回避した！";
-					}
-					else if (!activeEnemy_->IsDead())
-					{
-						//初撃無効スキルを持っていて、まだ使っていない場合
-						if (playerStatus_->hasFirstHitNull && !playerStatus_->isFirstHitUsed)
-						{
-							playerStatus_->isFirstHitUsed = true; //消費する
-							battleMessage_ += playerStatus_->GetName() + "クラススキル【神秘の護り】\n攻撃を防いだ！";
-							return; //ダメージ処理に行かずに関数を抜ける
-						}
-
-						if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
-							|| unit.skillName == "金縛り" || unit.skillName == "発狂")
-						{
-							//プレイヤーを凍結状態にする
-							int damage = activeEnemy_->GetPower3();
-							playerStatus_->Damage(damage);
-							if (statusEffect_ == STATUS_EFFECT::NONE)
-							{
-								statusEffect_ = STATUS_EFFECT::FREEZE;
-								battleMessage_ += "\n"+playerStatus_->GetName() + "は凍りついた！";
-							}
-						}
-						else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
-							|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
-						{
-							//プレイヤーを沈黙状態にする
-							int damage = activeEnemy_->GetPower3();
-							playerStatus_->Damage(damage);
-							if (statusEffect_ == STATUS_EFFECT::NONE)
-							{
-								statusEffect_ = STATUS_EFFECT::SILENCE;
-								battleMessage_ += "\n" + playerStatus_->GetName() + "は沈黙になった！";
-							}
-						}
-						else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
-							|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
-						{
-							//プレイヤーを毒状態にする
-							int damage = activeEnemy_->GetPower2();
-							playerStatus_->Damage(damage);
-							if (statusEffect_ == STATUS_EFFECT::NONE)
-							{
-								statusEffect_ = STATUS_EFFECT::POISON;
-								battleMessage_ += "\n" + playerStatus_->GetName() + "は毒状態になった！";
-							}
-						}
-						else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
-							|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
-						{
-							//プレイヤーを呪い状態にする
-							int damage = activeEnemy_->GetPower2();
-							playerStatus_->Damage(damage);
-							if (statusEffect_ == STATUS_EFFECT::NONE)
-							{
-								statusEffect_ = STATUS_EFFECT::CURSE;
-								battleMessage_ += "\n" + playerStatus_->GetName() + "は呪われた！";
-							}
-						}
-						else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
-							|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃"
-							|| unit.skillName == "魔の威光")
-						{
-							//プレイヤーを閃光状態にする
-							int damage = activeEnemy_->GetPower2();
-							playerStatus_->Damage(damage);
-							if (statusEffect_ == STATUS_EFFECT::NONE)
-							{
-								statusEffect_ = STATUS_EFFECT::FLASH;
-								battleMessage_ += "\n" + playerStatus_->GetName() + "は目がくらんだ！";
-							}
-						}
-						else
-						{
-							//---それ以外は通常の攻撃技として処理---
-							//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
-							int damage = 0;
-
-							if (unit.command == ANIM_ACT_1)
-							{
-								damage = activeEnemy_->GetPower1();
-
-								activeEnemy_->ChangeAnim(unit.command);
-							}
-							else if (unit.command == ANIM_ACT_2)
-							{
-								damage = activeEnemy_->GetPower2();
-								activeEnemy_->ChangeAnim(unit.command);
-							}
-							else if (unit.command == ANIM_ACT_3)
-							{
-								damage = activeEnemy_->GetPower3();
-								activeEnemy_->ChangeAnim(unit.command);
-							}
-
-							//回避失敗 通常通りダメージを受ける
-							playerStatus_->DamageAnimation();
-							playerStatus_->Damage(damage);
-
-							//ダメージSE
-							SoundManager::GetInstance().Play(SoundManager::SRC::DAMAGE_SE, Sound::TIMES::ONCE);
-						}
-					}
-				}
-			}
+			enemyturnAction();
 		}
 
 		//倒した時の上書き
@@ -752,6 +407,343 @@ void QuestPhase::ProcessActionLoop(void)
 
 		//敵がまだ生きていれば、次のキャラの行動へ
 		currentActionIdx_++;
+	}
+}
+
+void QuestPhase::playerturnAction(void)
+{
+	auto& unit = actionOrder_[currentActionIdx_];
+
+	//---状態異常の行動前チェック---
+	bool skipAction = false;
+	bool isMiss = false;
+
+	//凍結(行動不可)
+	if (statusEffect_ == STATUS_EFFECT::FREEZE)
+	{
+		if (GetRand(99) < 60) //60%で凍ったまま行動不可
+		{
+			battleMessage_ = "体が凍りついて動けない";
+			skipAction = true;
+		}
+		else //確率を乗り越えたら解除してそのまま行動
+		{
+			battleMessage_ = "氷が溶けてうごけるようになった!\n";
+			statusEffect_ = STATUS_EFFECT::NONE;
+		}
+	}
+	//閃光(命中低下)
+	if (!skipAction && statusEffect_ == STATUS_EFFECT::FLASH)
+	{
+		if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC && (unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
+		{
+			if (GetRand(99) < 50) isMiss = true; //50%で外れる
+		}
+	}
+
+	//実際の行動処理
+	if (skipAction)
+	{
+		//メッセージは設定済みなので何もしない
+	}
+	else if (isMiss)
+	{
+		battleMessage_ += "目が眩んで攻撃が外れた";
+	}
+	else
+	{
+		if (command_ == COMMAND::ATTACK)
+		{
+			battleMessage_ += unit.name + "の攻撃！";
+
+			//基本の攻撃力に、スキルがあれば魔力を足す
+			int attackPow = playerStatus_->Attack();
+			if (playerStatus_->hasMagicToAttack)
+			{
+				attackPow += playerStatus_->MagicAttack() / 2;
+				battleMessage_ += "\n【カドゥケウス】攻撃の威力が上がった！";
+			}
+
+			//会心判定
+			//計算式：武術のステータス÷5
+			int criticalChance = playerStatus_->martialArts_ / 5;
+			if (GetRand(99) < criticalChance)
+			{
+				battleMessage_ += "クリティカルヒット！";
+				int critMultiplier = playerStatus_->hasCritBoost ? 6.0 : 2.0;
+				playerStatus_->AttackAnimation();
+				activeEnemy_->ChangeAnim(ANIM_DAMAGE);
+				if (playerStatus_->hasCritBoost)battleMessage_ += "\n【極聖光】会心倍率が上がった！";
+				activeEnemy_->Damage(attackPow * critMultiplier);
+
+				//ダメージSE
+				SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
+			}
+			else
+			{
+				playerStatus_->AttackAnimation();
+				activeEnemy_->ChangeAnim(ANIM_DAMAGE);
+				activeEnemy_->Damage(attackPow);
+
+				//攻撃SE
+				SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
+			}
+		}
+		else if (command_ == COMMAND::MAGIC)
+		{
+			//selectedMagic_ は、前のメニュー選択画面で確定した MagicData 構造体とします
+			battleMessage_ += unit.name + "の" + selectedMagic_.name + "！";
+
+			//ダメージ処理（威力が0より大きければダメージを与える）
+			if (selectedMagic_.powerMultiplier > 0 && (selectedMagic_.type == MAGIC_TYPE::ATTACK || selectedMagic_.type == MAGIC_TYPE::DEBUFF))
+			{
+				//魔力 × (魔法の威力) など、威力を反映させた計算式にする
+				int magicDamage = playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier;
+				activeEnemy_->Damage(magicDamage);
+
+				//攻撃SE
+				SoundManager::GetInstance().Play(SoundManager::SRC::ATTACK_SE, Sound::TIMES::ONCE);
+			}
+
+			//カテゴリ別の特殊処理（回復や状態異常）
+			switch (selectedMagic_.type)
+			{
+			case MAGIC_TYPE::HEAL:
+				//powerの数値を回復量として使う
+				//ドレイン（吸収）だった場合の処理
+				if (selectedMagic_.isDrain)
+				{
+					//敵にダメージを与える
+					int drainDamage = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
+					activeEnemy_->ChangeAnim(ANIM_DAMAGE); //ダメージアニメーション
+					activeEnemy_->Damage(drainDamage);
+
+					//プレイヤーの体力を回復する（与えたダメージ分）
+					playerStatus_->Heal(drainDamage);
+					battleMessage_ += "\n敵から体力を奪った！";
+				}
+				//通常の回復処理（威力が0より大きい場合だけ回復メッセージが出る）
+				if (!selectedMagic_.isDrain && selectedMagic_.powerMultiplier > 0.0f)
+				{
+					int healAmount = static_cast<int>(playerStatus_->MagicAttack() * selectedMagic_.powerMultiplier);
+					playerStatus_->Heal(healAmount);
+					battleMessage_ += "\n体力が回復した！";
+				}
+				//状態異常治療フラグが true だったら治す
+				if (selectedMagic_.curesStatus)
+				{
+					statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
+					statusTurns_ = 4;
+					poisonCnt_ = 0;
+					battleMessage_ += "\n状態異常が回復した！";
+				}
+				break;
+			case MAGIC_TYPE::DEBUFF:
+				//状態異常を付与する魔法の場合
+				if (selectedMagic_.ailment != STATUS_EFFECT::NONE)
+				{
+					//魔法ごとに設定された「状態異常確率」で判定
+					if (GetRand(99) < selectedMagic_.ailmentChance)
+					{
+						enemyStatusEffect_ = selectedMagic_.ailment;
+						battleMessage_ += "\n敵に状態異常を与えた！";
+					}
+				}
+				break;
+			}
+		}
+	}
+
+}
+
+void QuestPhase::enemyturnAction(void)
+{
+	//行動前チェック
+	bool skipAction = false;
+	bool isMiss = false;
+	activeEnemy_->ResetGuard();
+
+	auto& unit = actionOrder_[currentActionIdx_];
+
+	//凍結(行動不可)
+	if (enemyStatusEffect_ == STATUS_EFFECT::FREEZE)
+	{
+		if (GetRand(99) < 60) //60%で凍ったまま行動不可
+		{
+			battleMessage_ += unit.name + "は凍りついて動けない";
+			skipAction = true;
+		}
+		else //確率を乗り越えたら解除してそのまま行動
+		{
+			battleMessage_ += unit.name + "は氷が溶けてうごけるようになった\n";
+			enemyStatusEffect_ = STATUS_EFFECT::NONE;
+		}
+	}
+	//閃光(命中低下)
+	if (!skipAction && enemyStatusEffect_ == STATUS_EFFECT::FLASH)
+	{
+		if (GetRand(99) < 50) isMiss = true; //50%で外れる
+	}
+	//実際の行動処理
+	if (skipAction)
+	{
+		//メッセージは設定済みなので何もしない
+	}
+	else if (isMiss)
+	{
+		battleMessage_ += unit.name + "は目が眩んで攻撃が外れた";
+	}
+	else
+	{
+		EnemyActionInfo eAction = activeEnemy_->DecideAction();
+		unit.skillName = eAction.skillName;
+
+		//敵の行動分岐
+		battleMessage_ += unit.name + "の" + unit.skillName + "！";
+
+		//技の名前によって特別な効果を発動させる
+		if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
+			|| unit.skillName == "自己再生")
+		{
+			//Power分回復
+			int healAmount = activeEnemy_->GetPower3();
+			activeEnemy_->Heal(healAmount);
+			battleMessage_ += "\n" + unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
+		}
+		else if (unit.skillName == "遡行")
+		{
+			//Power分回復
+			int healAmount = activeEnemy_->GetPower3();
+			activeEnemy_->Heal(healAmount);
+			enemyStatusEffect_ = STATUS_EFFECT::NONE; //状態異常を治す
+			enemyCurs_ = ENEMY_CURS_TURN;
+			battleMessage_ += "\n" + unit.name + "の肉体が巻き戻る";
+		}
+		else if (unit.skillName == "まもる" || unit.skillName == "守る"
+			|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
+		{
+			//Power分ダメージ軽減
+			activeEnemy_->SetGuard(activeEnemy_->GetPower3());
+			battleMessage_ += "\n" + unit.name + "は身構えている";
+		}
+		else {
+			//回避判定
+			//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
+			int evasionChance = playerStatus_->astrology_ / 5;
+
+			//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
+			if (evasionChance > 90) evasionChance = 90;
+			int roll = GetRand(99);
+
+			if (roll < evasionChance)
+			{
+				//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
+				battleMessage_ = unit.name + "の" + unit.skillName;
+				battleMessage_ += "\n攻撃を回避した！";
+			}
+			else if (!activeEnemy_->IsDead())
+			{
+				//初撃無効スキルを持っていて、まだ使っていない場合
+				if (playerStatus_->hasFirstHitNull && !playerStatus_->isFirstHitUsed)
+				{
+					playerStatus_->isFirstHitUsed = true; //消費する
+					battleMessage_ += playerStatus_->GetName() + "クラススキル【神秘の護り】\n攻撃を防いだ！";
+					return; //ダメージ処理に行かずに関数を抜ける
+				}
+
+				if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
+					|| unit.skillName == "金縛り" || unit.skillName == "発狂")
+				{
+					//プレイヤーを凍結状態にする
+					int damage = activeEnemy_->GetPower3();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::FREEZE;
+						battleMessage_ += "\n" + playerStatus_->GetName() + "は凍りついた！";
+					}
+				}
+				else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
+					|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
+				{
+					//プレイヤーを沈黙状態にする
+					int damage = activeEnemy_->GetPower3();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::SILENCE;
+						battleMessage_ += "\n" + playerStatus_->GetName() + "は沈黙になった！";
+					}
+				}
+				else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
+					|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
+				{
+					//プレイヤーを毒状態にする
+					int damage = activeEnemy_->GetPower2();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::POISON;
+						battleMessage_ += "\n" + playerStatus_->GetName() + "は毒状態になった！";
+					}
+				}
+				else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
+					|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
+				{
+					//プレイヤーを呪い状態にする
+					int damage = activeEnemy_->GetPower2();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::CURSE;
+						battleMessage_ += "\n" + playerStatus_->GetName() + "は呪われた！";
+					}
+				}
+				else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
+					|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃"
+					|| unit.skillName == "魔の威光")
+				{
+					//プレイヤーを閃光状態にする
+					int damage = activeEnemy_->GetPower2();
+					playerStatus_->Damage(damage);
+					if (statusEffect_ == STATUS_EFFECT::NONE)
+					{
+						statusEffect_ = STATUS_EFFECT::FLASH;
+						battleMessage_ += "\n" + playerStatus_->GetName() + "は目がくらんだ！";
+					}
+				}
+				else
+				{
+					//---それ以外は通常の攻撃技として処理---
+					//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
+					int damage = 0;
+
+					if (unit.command == ANIM_ACT_1)
+					{
+						damage = activeEnemy_->GetPower1();
+
+						activeEnemy_->ChangeAnim(unit.command);
+					}
+					else if (unit.command == ANIM_ACT_2)
+					{
+						damage = activeEnemy_->GetPower2();
+						activeEnemy_->ChangeAnim(unit.command);
+					}
+					else if (unit.command == ANIM_ACT_3)
+					{
+						damage = activeEnemy_->GetPower3();
+						activeEnemy_->ChangeAnim(unit.command);
+					}
+
+					//回避失敗 通常通りダメージを受ける
+					playerStatus_->DamageAnimation();
+					playerStatus_->Damage(damage);
+
+					//ダメージSE
+					SoundManager::GetInstance().Play(SoundManager::SRC::DAMAGE_SE, Sound::TIMES::ONCE);
+				}
+			}
+		}
 	}
 }
 
@@ -1027,7 +1019,6 @@ void QuestPhase::ProcessPlayerAction()
 
 		//次のステップへ
 		battleStep_ = BATTLE_STEP::COMMAND_SUB_SELECTION;
-		//battleStep_ = BATTLE_STEP::DETERMINE;
 	}
 }
 
@@ -1053,7 +1044,7 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		magicTypeMessages_.clear();
 		availableMagics_.clear(); //裏側で持っておく魔法データのリストも空にする
 
-		// ① カーソルの位置から「どのカテゴリを選んだか」を判定
+		//カーソルの位置から「どのカテゴリを選んだか」を判定
 		MAGIC_TYPE selectedCategory = MAGIC_TYPE::ATTACK;
 		switch (subMenuCursor_)
 		{
@@ -1062,7 +1053,7 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		case 2: selectedCategory = MAGIC_TYPE::DEBUFF; break; // 状態異常付与
 		}
 
-		// ② データベースの全魔法を「1回のループ」でチェックする
+		//データベースの全魔法を「1回のループ」でチェックする
 		for (const auto& magic : magicDataBase_->GetAll())
 		{
 			// 選んだカテゴリと一致するものだけを拾う
@@ -1117,9 +1108,6 @@ void QuestPhase::MagicSelection()
 			chosenMagicIdx_ = magicMenuCursor_;
 
 			battleStep_ = BATTLE_STEP::DETERMINE;
-		}
-		else
-		{
 		}
 	}
 
@@ -1179,7 +1167,7 @@ void QuestPhase::DrawTutorial(void)
 	tutorialMessage_ = "";
 
 	SetFontSize(20);
-	if (battleStep_ == BATTLE_STEP::DIFFICULTY_SELECTION)
+	if (battleStep_ == BATTLE_STEP::STAGE_SELECTION)
 	{
 		tutorialMessage_ = "受けるクエストを選ぼう。\n選ぶクエストによって\n上昇するステータスが変わるよ。";
 	}

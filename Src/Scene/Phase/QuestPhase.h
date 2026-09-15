@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "PhaseBase.h"
+#include "../../Object/Stage.h"
 #include "../../Object/PlayerStatus.h"
 #include "../../Object/MagicDataBase.h"
 #include <vector>
@@ -25,19 +26,10 @@ class Enemy;
 class QuestPhase : public PhaseBase
 {
 public:
-	//難易度
-	enum class DIFFICULTY
-	{
-		EASY,
-		NORMAL,
-		HARD,
-		MAX
-	};
-	
 	//バトルのステップ
 	enum class BATTLE_STEP
 	{
-		DIFFICULTY_SELECTION,	//難易度選択
+		STAGE_SELECTION,		//ステージ選択
 		COMMAND_SELECTION,		//メインコマンド選択
 		COMMAND_SUB_SELECTION,	//サブコマンド選択
 		MAGIC_SELECTION,		//魔法選択
@@ -69,9 +61,6 @@ public:
 	};
 
 	//------定数---------
-	//メッセージの表示位置
-
-
 	//難易度選択のメッセージの位置
 	static constexpr int DIFFICULTY_MSG_X = 0;
 	static constexpr int DIFFICULTY_MSG_Y = 40;
@@ -121,23 +110,21 @@ public:
 
 	void Update(void) override;		//更新処理
 	void Draw(void) override;		//描画処理
+	virtual bool IsFinished() const override;//フェーズが終了したかどうかを親に伝える
 
-	//フェーズが終了したかどうかを親に伝える
-	virtual bool IsFinished() const override;
 private:
+	
 	std::vector<ActionUnit> actionOrder_;	//行動の順番を管理するためのリスト
 	std::string tutorialMessage_;			//チュートリアル用のメッセージ
 	std::string battleMessage_;				//バトル用のメッセージ
 	std::vector<std::string> subActionMessages_; //サブアクションのメッセージを管理するリスト
 	std::vector<std::string> magicTypeMessages_; //魔法の種類のメッセージを管理するリスト
 	
-	std::unique_ptr<MagicDataBase> magicDataBase_; //魔法データベースのポインタ
-	PlayerStatus* playerStatus_;//プレイヤーのステータスの情報を渡す
-	GameScene& gameScene_;		//親の情報を渡す
-	InputManager& ins_ = InputManager::GetInstance();//inputManagerのインスタンスを取得
-
-	//難易度を管理する変数
-	DIFFICULTY difficulty_ = DIFFICULTY::EASY;
+	GameScene& gameScene_;			//親の情報を渡す
+	std::unique_ptr<Stage> stage_;	//ステージの情報を渡す
+	PlayerStatus* playerStatus_;	//プレイヤーのステータスの情報を渡す
+	std::unique_ptr<MagicDataBase> magicDataBase_;		//魔法データベースのポインタ
+	InputManager& ins_ = InputManager::GetInstance();	//inputManagerのインスタンスを取得
 
 	//現在のバトルステップを管理する変数
 	BATTLE_STEP battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
@@ -149,36 +136,33 @@ private:
 	STATUS_EFFECT statusEffect_;//状態異常を管理する変数
 	STATUS_EFFECT enemyStatusEffect_ = STATUS_EFFECT::NONE;	//敵の状態異常を管理する変数
 	int statusTurns_ = 4;		//状態異常の残りターン数
-	int enemyCurs_=6;
+	int enemyCurs_ = 6;			//呪いの残りターン数
 	int poisonCnt_ = 0;			//毒の呪いカウント 
 
 	//クエスト場所系
 	QUEST_LOCATION location_;		//配列
 	std::string locationRewardMsg_;	//メッセージ用
-	int bgImageHandle_;				//背景画像
-	int bgImageBar_;
-	std::vector<std::string> locationMenu_;
-	std::vector<QUEST_LOCATION> selectableLocations_; //メニューに対応するenumを記憶する用
+	std::vector<std::string> locationMenu_;				//メニューに表示する文字列を記憶する用
+	std::vector<QUEST_LOCATION> selectableLocations_;	//メニューに対応するenumを記憶する用
 	int difficultyCursor_ = 0;                //難易度選択用のカーソル
 
-	int messageBoxImg_;	//メッセージボックスの画像ハンドル
-
-	//魔法
-	bool wasMagicUsedLastTurn_ = false;		 //前のターンに魔法を使ったか
-	bool magicUsedThisTurn_ = false;		 //今のターンに魔法を使ったか（更新用）
+	//魔法系
 	std::vector<MagicData> availableMagics_; //現在のカテゴリの魔法リスト（裏管理用）
 	MagicData selectedMagic_;                //プレイヤーが最終決定した魔法データ
+	bool wasMagicUsedLastTurn_ = false;		 //前のターンに魔法を使ったか
+	bool magicUsedThisTurn_ = false;		 //今のターンに魔法を使ったか（更新用）
 
+	//敵の管理
 	Enemy* activeEnemy_ = nullptr; //現在戦っている敵のポインタ
 	int battleTurn_ = 1;		   //現在のバトルターン数
 	int currentWave_ = 1;          //現在の連戦数（1戦目からスタート）
 	const int MAX_WAVES = 3;       //1回の遠征での最大連戦数（例：3連戦）
 
-	//------フラグ---------
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 	bool isHellQuest_ = false;//激ムズクエスト突入したか
 
-	//-------変数---------
+	int messageBoxImg_;	//メッセージボックスの画像ハンドル
+
 	int currentActionIdx_ = 0;	//行動リストの何番目かを指す
 	int subMenuCursor_ = 0;		//サブメニューのカーソル
 
@@ -187,45 +171,28 @@ private:
 
 	int bgImg_ = -1; //背景画像のハンドル
 	int playerImg_ = -1; //プレイヤーの画像ハンドル	
-	int board_[8];
 
-	//------関数---------
-	//ターンを管理する関数
-	void ManageTurn(void);
+
 	
-	//難易度選択の処理
-	void ProcessDifficulty(void);
+	void ManageTurn(void);//ターンを管理する関数
 	
-	//プレイヤーの行動の処理などをここに書く
-	void ProcessPlayerAction(void);
 	
-	//プレイヤーの行動の処理などをここに書く
-	void ProcessPlayerSubAction(void);
+	void ProcessDifficulty(void);		//難易度選択の処理
+	void ProcessPlayerAction(void);		//プレイヤーの行動の処理などをここに書く
+	void ProcessPlayerSubAction(void);	//プレイヤーの行動の処理などをここに書く
+	void MagicSelection();				//魔法選択の処理
+	void DetermineActionOrder(void);	//行動の順番を決定する関数
+	void ProcessActionLoop(void);		//行動の順番に従って処理を行う関数
 	
-	//魔法選択の処理
-	void MagicSelection();
+	void playerturnAction(void);		//プレイヤーの行動処理
+	void enemyturnAction(void);			//敵の行動処理
 
-	//行動の順番を決定する関数
-	void DetermineActionOrder(void);
-	
-	//行動の順番に従って処理を行う関数
-	void ProcessActionLoop(void);
+	void CheckEnemyDeath(void);		//敵の死亡判定
+	void ProcessStatusEffect(void);	//状態異常
+	void DisplayResult(void);		//結果を表示する関数
 
-	//敵の死亡判定
-	void CheckEnemyDeath(void);
-	void ProcessStatusEffect(void);//状態異常
+	void ProcessTutorial(void);//チュートリアル
+	void DrawTutorial(void);//チュートリアルの描画処理
 
-	//結果を表示する関数
-	void DisplayResult(void);
-
-	//チュートリアル
-	void ProcessTutorial(void);
-
-	//Draw
-	//--------------
-	//チュートリアルの描画処理
-	void DrawTutorial(void);
-
-	//Draw関数内でコマンド選択の描画を行う関数
-	void DrawCommandSelection(void);
+	void DrawCommandSelection(void);//Draw関数内でコマンド選択の描画を行う関数
 };

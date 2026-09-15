@@ -1,7 +1,8 @@
 #pragma once
-#include "JobData.h"
 #include <string>
 #include <vector>
+#include "JobData.h"
+#include "MagicDataBase.h"
 
 	//ルート
 enum class PLAYER_ROUTE
@@ -117,6 +118,7 @@ public:
 	void Update();
 
 	void Draw();//描画処理
+	void DrawStatus();//ステータスの描画処理
 	void DrawQuestImages();//クエスト用の画像などを描画する処理
 
 	int Attack();//攻撃処理
@@ -168,6 +170,9 @@ public:
 private:
 	std::string name = "ルピナス";	//プレイヤーの名前
 
+	STATUS_EFFECT statusEffect_;//状態異常を管理する変数
+
+	int bgImageBar_;				//背景画像のハンドル
 	int battlePlayer_;	//プレイヤーの画像を格納
 
 	int attackMotionTimer_ = 0; // 演出用のタイマー（フレーム数）

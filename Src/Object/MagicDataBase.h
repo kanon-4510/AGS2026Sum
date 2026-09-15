@@ -12,12 +12,12 @@ enum class MAGIC_TYPE {
 
 //状態異常の種類
 enum class STATUS_EFFECT {
-	NONE,
-	POISON,
-	FLASH,
-	FREEZE,
-	CURSE,
-	SILENCE
+	NONE,		//状態異常なし
+	POISON,		//毒
+	FLASH,		//閃光
+	FREEZE,		//凍結
+	CURSE,		//呪い
+	SILENCE		//沈黙
 };
 
 struct MagicData {

@@ -1,11 +1,12 @@
 #include "PlayerStatus.h"
-#include <EffekseerForDXLib.h>
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/SoundManager.h"
 
 PlayerStatus::PlayerStatus()
 {
+	bgImageBar_ = LoadGraph("Data/Image/Stage/BattleBar.png");
+
 	battlePlayer_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BATTLE_PLAYER).handleId_;
 }
 
@@ -94,6 +95,36 @@ void PlayerStatus::Draw()
 	}
 
 	SetFontSize(DEFAULT_FONT_SIZE);
+}
+
+void PlayerStatus::DrawStatus()
+{
+	
+
+	DrawFormatString(230, 590, 0xffffff, "ルピナス");
+	
+	DrawFormatString(245, 615, 0xffffff, "レベル %2d", level_);
+	DrawFormatString(245, 640, 0xffffff, "　筋力 %d", power_ + GetJobBonus().power);
+	DrawFormatString(245, 665, 0xffffff, "　魔力 %d", MagicAttack());
+	DrawFormatString(245, 690, 0xffffff, "素早さ %d", GetSpeed());
+
+	DrawFormatString(1065, 510, 0xffffff, "　　治癒力:%+3d", pharmacy_ / PHARMACY_DIVISOR);
+	DrawFormatString(1065, 545, 0xffffff, "会心発生率:%3d%%", martialArts_ / MARTIAL_ARTS_DIVISOR);
+	DrawFormatString(1065, 580, 0xffffff, "魔術ランク:%3d", (magicKnowledge_ / 50) + 1);
+	DrawFormatString(1065, 615, 0xffffff, "　　守備力:%3d", faith_ / FAITH_DIVISOR);
+	DrawFormatString(1065, 650, 0xffffff, "獲得経験値:%+3d", archaeology_ / ARCHAEOLOGY_DIVISOR);
+	DrawFormatString(1065, 685, 0xffffff, "　　回避率:%3d%%", astrology_ / ASTROLOGY_DIVISOR);
+
+	DrawFormatString(900, 590, 0xffffff, "%s", job.c_str());
+	DrawFormatString(900, 640, 0xffffff, "状態:");
+
+
+	if (statusEffect_ == STATUS_EFFECT::NONE)   DrawFormatString(955, 640, 0xffffff, "なし");
+	if (statusEffect_ == STATUS_EFFECT::POISON) DrawFormatString(955, 640, 0x00cc00, "どく");
+	if (statusEffect_ == STATUS_EFFECT::FLASH)  DrawFormatString(955, 640, 0xffff00, "せんこう");
+	if (statusEffect_ == STATUS_EFFECT::FREEZE) DrawFormatString(955, 640, 0x00cccc, "とうけつ");
+	if (statusEffect_ == STATUS_EFFECT::CURSE)  DrawFormatString(955, 640, 0xcc00cc, "のろい");
+	if (statusEffect_ == STATUS_EFFECT::SILENCE)DrawFormatString(955, 640, 0xdd0000, "ちんもく");
 }
 
 void PlayerStatus::DrawQuestImages()
