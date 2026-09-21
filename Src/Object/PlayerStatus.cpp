@@ -99,7 +99,7 @@ void PlayerStatus::Draw()
 
 void PlayerStatus::DrawStatus()
 {
-	
+	DrawGraph(0,0, bgImageBar_, true);
 
 	DrawFormatString(230, 590, 0xffffff, "ƒ‹ƒsƒiƒX");
 	

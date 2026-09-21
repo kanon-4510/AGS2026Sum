@@ -41,7 +41,7 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 	selectableLocations_ = { QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL };
 
 	//17ターン目以降 かつ まだ一度も挑んでいないなら
-	if (gameScene_.GetTurn() >= 17 && gameScene_.GetTurn() < 21 && !playerStatus_->hasChallengedHellQuest_)
+	if (gameScene_.GetTurn() >= POP_UP_EXTRA_STAGE_TURN && gameScene_.GetTurn() < gameScene_.MAX_TURN && !playerStatus_->hasChallengedHellQuest_)
 	{
 		locationMenu_.push_back("エクストラ");
 		selectableLocations_.push_back(QUEST_LOCATION::EXTRA);
@@ -74,191 +74,12 @@ void QuestPhase::Update(void)
 	}
 
 	//21ターン目以降で敵が全滅している場合はクリア画面に遷移する
-	if (gameScene_.GetTurn() >= 21  && activeEnemy_ != nullptr && activeEnemy_->IsDead())
+	if (gameScene_.GetTurn() >= gameScene_.MAX_TURN  && activeEnemy_ != nullptr && activeEnemy_->IsDead())
 	{
 		//クエストBGMを止める
 		SoundManager::GetInstance().Stop(SoundManager::SRC::QUEST_BGM);
 
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
-	}
-}
-
-//描画処理
-void QuestPhase::Draw(void)
-{
-	if (stage_ != nullptr) 
-	{
-		//背景を描画する
-		stage_->DrawBackground();
-	}
-	
-#pragma region 戦闘時の画面下部バーの表示
-	if (battleStep_ != BATTLE_STEP::STAGE_SELECTION)
-	{
-		SetFontSize(22);
-		playerStatus_->DrawStatus();	//プレイヤーのステータスを描画
-
-		SetFontSize(DEFAULT_FONT_SIZE);
-	}
-#pragma endregion
-
-	//敵の描画とWAVE表示
-	if (battleStep_ != BATTLE_STEP::STAGE_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
-	{
-		activeEnemy_->Draw(); //敵の描画
-
-		int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;
-		SetFontSize(32);
-		DrawFormatString(0,0, 0xFFFF00, "【WAVE %d / %d】", currentWave_, maxWaves);
-		SetFontSize(16);
-		playerStatus_->DrawQuestImages();	//プレイヤーの画像を描画
-	}
-
-	if (battleStep_ == BATTLE_STEP::STAGE_SELECTION)//難易度選択中はコマンドやHPを表示しない
-	{
-		DrawGraph(0, 0, bgImg_, true);
-		stage_->DrawStageBoard();
-		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, locationMenu_, difficultyCursor_);
-	}
-	else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION)
-	{
-		DrawCommandSelection();
-
-		//行動の結果メッセージがあれば表示
-		if (battleMessage_ != "")
-		{
-			DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
-		}
-	}
-	else if (battleStep_ == BATTLE_STEP::COMMAND_SUB_SELECTION)
-	{
-		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
-		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, subActionMessages_, subMenuCursor_);
-	}
-	else if (battleStep_ == BATTLE_STEP::MAGIC_SELECTION)
-	{
-		//魔法の種類の描画
-		//同時に画面に表示したい最大件数（枠のサイズ）
-		//リストが空の場合は描画しない
-		if (!magicTypeMessages_.empty())
-		{
-			//スクロールの開始位置（オフセット）を計算
-			int scrollOffset = 0;
-			if (magicMenuCursor_ >= MAX_DISPLAY)
-			{
-				//カーソルが画面の下端（6個目以降）に行ったら、表示範囲をズラす
-				scrollOffset = magicMenuCursor_ - MAX_DISPLAY + 1;
-			}
-
-			//「今画面に見せるべき魔法」だけを詰め替える
-			std::vector<std::string> visibleMessages;
-			for (int i = scrollOffset; i < scrollOffset + MAX_DISPLAY && i < magicTypeMessages_.size(); ++i)
-			{
-				visibleMessages.push_back(magicTypeMessages_[i]);
-			}
-
-			//切り出したリストと、枠内での相対カーソル位置を渡して描画
-			int relativeCursor = magicMenuCursor_ - scrollOffset;
-			Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, visibleMessages, relativeCursor);
-
-			//上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
-			if (scrollOffset > 0)
-			{
-				DrawFormatString(COMMAND_MSG_X + 50, COMMAND_MSG_Y - 20, 0xFFFFFF, "▲"); // 上にスクロールできる
-			}
-			if (scrollOffset + MAX_DISPLAY < magicTypeMessages_.size())
-			{
-				//1行の高さが仮に30ピクセルだとした場合の計算
-				DrawFormatString(COMMAND_MSG_X + 50, COMMAND_MSG_Y + (visibleMessages.size() * 30) + 10, 0xFFFFFF, "▼"); //下にスクロールできる
-			}
-
-			if (magicMenuCursor_ >= 0 && magicMenuCursor_ < availableMagics_.size())
-			{
-				const auto& hoverMagic = availableMagics_[magicMenuCursor_];
-
-				//説明を表示する座標（魔法リストの右側に表示する設定）
-				int descX = COMMAND_MSG_X + 170;
-				int descY = COMMAND_MSG_Y;
-
-				if (playerStatus_->magicKnowledge_ >= hoverMagic.reqMagicKnowledge)
-				{
-					DrawString(descX, descY, "【魔法の効果】", 0xffffff); // タイトルを黄色に
-
-					//魔法のタイプごとに説明を出し分ける
-					DrawString(descX, descY + 25, hoverMagic.description.c_str(), 0xffffff);
-
-				}
-				else
-				{
-					//魔法知識が足りない場合は詳細を隠す
-					DrawString(descX, descY, "【魔法の効果】", 0xffffff);
-					DrawFormatString(descX, descY + 25, 0xffffff, "詳細不明", hoverMagic.reqMagicKnowledge);
-				}
-			}
-		}
-	}
-	else if (battleStep_ == BATTLE_STEP::RESULT)
-	{
-		DrawString(350,510, "遠征クリア！経験値を獲得した！\nレベルが上がった！基礎ステータスが上がった！", 0xFFFFFF);
-		DrawString(350,545, locationRewardMsg_.c_str(), 0xFFFF00);
-	}
-
-	if (activeEnemy_ != nullptr)
-	{
-		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, 0xFF0000, battleMessage_.c_str());
-	}
-	DrawTutorial();
-}
-
-bool QuestPhase::IsFinished() const
-{
-	return isFinished_;
-}
-
-void QuestPhase::ProcessDifficulty(void)
-{
-	//選択肢の数を、配列のサイズから自動取得
-	int maxDifficulty = static_cast<int>(locationMenu_.size());
-	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
-
-		//難易度選択後のメッセージを作成
-	if (stage_)
-	{
-		stage_->SetStageType(static_cast<Stage::STAGE_TYPE>(difficultyCursor_)); //ステージの種類を設定
-	}
-
-	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
-	{
-		//選んだメニューの「文字列」で分岐させる
-		if (locationMenu_[difficultyCursor_] == "エクストラ")
-		{
-			isHellQuest_ = true;
-			playerStatus_->hasChallengedHellQuest_ = true;//二度と選べないようにフラグを回収
-			location_ = QUEST_LOCATION::EXTRA;			  //場所を魔大陸に設定
-
-			//通常敵のメモリを解放し5連戦用の1体目とすげ替える
-			delete activeEnemy_;
-			activeEnemy_ = SpawnRushEnemy(0);
-		}
-		else
-		{
-			isHellQuest_ = false;
-			//通常の難易度としてenumに保存する
-			location_ = selectableLocations_[difficultyCursor_];
-		}
-
-		//バトル開始時のダメージ
-		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
-
-		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
-	}
-	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
-		//キャンセルキーが押されたらフェーズを終了する
-		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
-		isFinished_ = true;
 	}
 }
 
@@ -303,12 +124,197 @@ void QuestPhase::ManageTurn(void)
 	}
 }
 
+//描画処理
+void QuestPhase::Draw(void)
+{
+	if (stage_ != nullptr) 
+	{
+		//背景を描画する
+		stage_->DrawBackground();
+	}
+	
+	//メッセージボックスの描画
+	if (battleStep_ != BATTLE_STEP::STAGE_SELECTION)
+	{
+		SetFontSize(STATUS_FONT_SIZE);
+		playerStatus_->DrawStatus();	//プレイヤーのステータスを描画
+		SetFontSize(DEFAULT_FONT_SIZE);
+	}
+
+	//敵の描画とWAVE表示
+	if (battleStep_ != BATTLE_STEP::STAGE_SELECTION && battleStep_ != BATTLE_STEP::RESULT)
+	{
+		activeEnemy_->Draw(); //敵の描画
+
+		int maxWaves = isHellQuest_ ? EXTER_WAVES : MAX_WAVES;
+		SetFontSize(WAVE_FONT_SIZE);
+		DrawFormatString(0,0, 0xFFFF00, "【WAVE %d / %d】", currentWave_, maxWaves);
+		SetFontSize(DEFAULT_FONT_SIZE);
+		playerStatus_->DrawQuestImages();	//プレイヤーの画像を描画
+	}
+
+	switch (battleStep_)
+	{
+	case QuestPhase::BATTLE_STEP::STAGE_SELECTION:
+		DrawGraph(0, 0, bgImg_, true);	//背景画像を描画
+		stage_->DrawStageBoard();		//ステージボードを描画
+		Utility::DrawCommandMenu(DIFFICULTY_MSG_X, DIFFICULTY_MSG_Y, locationMenu_, difficultyCursor_);
+		break;
+
+	case QuestPhase::BATTLE_STEP::COMMAND_SELECTION:
+		//メインコマンドの描画
+		DrawCommandSelection();
+
+		//行動の結果メッセージがあれば表示
+		if (battleMessage_ != "")
+		{
+			DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, Color::RED, battleMessage_.c_str());
+		}
+		break;
+
+	case QuestPhase::BATTLE_STEP::COMMAND_SUB_SELECTION:
+		//サブコマンドの描画（例：魔法の種類やアイテムの選択肢など）
+		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, subActionMessages_, subMenuCursor_);
+		break;
+	case QuestPhase::BATTLE_STEP::MAGIC_SELECTION:
+		//魔法選択の描画
+		DrawMagicSelection();
+		break;
+
+	case QuestPhase::BATTLE_STEP::RESULT:
+		DrawString(RESULT_MSG_X, RESULT_MSG_Y, "遠征クリア！経験値を獲得した！\nレベルが上がった！基礎ステータスが上がった！", 0xFFFFFF);
+		DrawString(RESULT_MSG_X, RESULT_REWARD_Y, locationRewardMsg_.c_str(), Color::YELLOW);
+		break;
+
+	case QuestPhase::BATTLE_STEP::MAX:
+		break;
+	}
+
+	if (activeEnemy_ != nullptr)
+	{
+		DrawFormatString(BATTLE_MSG_X, BATTLE_MSG_Y, Color::RED, battleMessage_.c_str());
+	}
+	DrawTutorial();
+}
+
+void QuestPhase::DrawMagicSelection()
+{
+	//魔法の種類の描画
+	if (!magicTypeMessages_.empty())
+	{
+		//スクロールの開始位置（オフセット）を計算
+		int scrollOffset = 0;
+		if (magicMenuCursor_ >= MAX_DISPLAY)
+		{
+			//カーソルが画面の下端（6個目以降）に行ったら、表示範囲をズラす
+			scrollOffset = magicMenuCursor_ - MAX_DISPLAY + 1;
+		}
+
+		//「今画面に見せるべき魔法」だけを詰め替える
+		std::vector<std::string> visibleMessages;
+		for (int i = scrollOffset; i < scrollOffset + MAX_DISPLAY && i < magicTypeMessages_.size(); ++i)
+		{
+			visibleMessages.push_back(magicTypeMessages_[i]);
+		}
+
+		//切り出したリストと、枠内での相対カーソル位置を渡して描画
+		int relativeCursor = magicMenuCursor_ - scrollOffset;
+		Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, visibleMessages, relativeCursor);
+
+		//上下にまだ隠れた魔法があるよ！という▲▼ガイド表示
+		if (scrollOffset > 0)
+		{
+			DrawFormatString(COMMAND_MSG_X + SCROLL_ARROW_OFFSET_X, COMMAND_MSG_Y - SCROLL_UP_ARROW_OFFSET_Y, Color::WHITE, "▲"); // 上にスクロールできる
+		}
+		if (scrollOffset + MAX_DISPLAY < magicTypeMessages_.size())
+		{
+			//1行の高さが仮に30ピクセルだとした場合の計算
+			DrawFormatString(COMMAND_MSG_X + SCROLL_ARROW_OFFSET_X, COMMAND_MSG_Y + (visibleMessages.size() * MAGIC_LINE_HEIGHT) + SCROLL_DOWN_ARROW_OFFSET_Y, Color::WHITE, "▼"); //下にスクロールできる
+		}
+
+		if (magicMenuCursor_ >= 0 && magicMenuCursor_ < availableMagics_.size())
+		{
+			const auto& hoverMagic = availableMagics_[magicMenuCursor_];
+
+			//説明を表示する座標（魔法リストの右側に表示する設定）
+			int descX = COMMAND_MSG_X + MAGIC_DESC_OFFSET_X;
+			int descY = COMMAND_MSG_Y;
+
+			if (playerStatus_->magicKnowledge_ >= hoverMagic.reqMagicKnowledge)
+			{
+				DrawString(descX, descY, "【魔法の効果】", Color::WHITE); // タイトルを黄色に
+
+				//魔法のタイプごとに説明を出し分ける
+				DrawString(descX, descY + MAGIC_DESC_TEXT_OFFSET_Y, hoverMagic.description.c_str(), Color::WHITE);
+
+			}
+			else
+			{
+				//魔法知識が足りない場合は詳細を隠す
+				DrawString(descX, descY, "【魔法の効果】", 0xffffff);
+				DrawFormatString(descX, descY + MAGIC_DESC_TEXT_OFFSET_Y, Color::WHITE, "詳細不明", hoverMagic.reqMagicKnowledge);
+			}
+		}
+	}
+}
+
+bool QuestPhase::IsFinished() const
+{
+	return isFinished_;
+}
+
+void QuestPhase::ProcessDifficulty(void)
+{
+	//選択肢の数を、配列のサイズから自動取得
+	int maxDifficulty = static_cast<int>(locationMenu_.size());
+	Utility::ProcessCommandMenuSelection(difficultyCursor_, maxDifficulty);
+
+		//難易度選択後のメッセージを作成
+	if (stage_)
+	{
+		stage_->SetStageType(static_cast<Stage::STAGE_TYPE>(difficultyCursor_)); //ステージの種類を設定
+	}
+
+	//決定処理
+	if (IsConfirmPressed())
+	{
+		//選んだメニューの「文字列」で分岐させる
+		if (locationMenu_[difficultyCursor_] == "エクストラ")
+		{
+			isHellQuest_ = true;
+			playerStatus_->hasChallengedHellQuest_ = true;//二度と選べないようにフラグを回収
+			location_ = QUEST_LOCATION::EXTRA;			  //場所を魔大陸に設定
+
+			//通常敵のメモリを解放し5連戦用の1体目とすげ替える
+			delete activeEnemy_;
+			activeEnemy_ = SpawnRushEnemy(0);
+		}
+		else
+		{
+			isHellQuest_ = false;
+			//通常の難易度としてenumに保存する
+			location_ = selectableLocations_[difficultyCursor_];
+		}
+
+		//バトル開始時のダメージ
+		if (playerStatus_->hasStartDamage)activeEnemy_->Damage(playerStatus_->magic_);
+
+		battleStep_ = BATTLE_STEP::COMMAND_SELECTION;
+	}
+	else if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_TAB) ||
+		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT)) {
+		//キャンセルキーが押されたらフェーズを終了する
+		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::CANCEL; //コマンド選択に戻る
+		isFinished_ = true;
+	}
+}
+
 void QuestPhase::DetermineActionOrder(void)
 {
 	actionOrder_.clear();
 
 	//プレイヤー追加 (idは0、ターゲットは今のところ敵の0番とする)
-	actionOrder_.push_back({ playerStatus_->GetName().c_str(), playerStatus_->GetSpeed(), true, 0, (int)command_, 0});
+	actionOrder_.push_back({ playerStatus_->GetName().c_str(), playerStatus_->GetSpeed(), true, 0, static_cast<int>(command_), 0});
 	if (command_ == COMMAND::ATTACK)
 	{
 		actionOrder_.back().skillName = "単体攻撃";
@@ -370,7 +376,7 @@ void QuestPhase::ProcessActionLoop(void)
 		return;
 	}
 
-	//①ダメージとメッセージの処理
+	//ダメージとメッセージの処理
 	if (battleMessage_ == "")
 	{
 		if (unit.isPlayer)
@@ -391,10 +397,9 @@ void QuestPhase::ProcessActionLoop(void)
 		}
 	}
 
-	//②Enterキー待ちと、連戦(Wave)の処理
+	//Enterキー待ちと、連戦(Wave)の処理
 	if (activeEnemy_->IsAnimFinished() == true &&
-		ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		(IsConfirmPressed()))
 	{
 		battleMessage_ = "";
 
@@ -421,7 +426,7 @@ void QuestPhase::playerturnAction(void)
 	//凍結(行動不可)
 	if (statusEffect_ == STATUS_EFFECT::FREEZE)
 	{
-		if (GetRand(99) < 60) //60%で凍ったまま行動不可
+		if (GetRand(RANDOM_MAX) < FREEZE_STUN_CHANCE) //60%で凍ったまま行動不可
 		{
 			battleMessage_ = "体が凍りついて動けない";
 			skipAction = true;
@@ -437,7 +442,7 @@ void QuestPhase::playerturnAction(void)
 	{
 		if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC && (unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
 		{
-			if (GetRand(99) < 50) isMiss = true; //50%で外れる
+			if (GetRand(RANDOM_MAX) < FLASH_MISS_CHANCE) isMiss = true; //50%で外れる
 		}
 	}
 
@@ -460,17 +465,17 @@ void QuestPhase::playerturnAction(void)
 			int attackPow = playerStatus_->Attack();
 			if (playerStatus_->hasMagicToAttack)
 			{
-				attackPow += playerStatus_->MagicAttack() / 2;
+				attackPow += playerStatus_->MagicAttack() / MAGIC_ATTACK_DIVISOR;
 				battleMessage_ += "\n【カドゥケウス】攻撃の威力が上がった！";
 			}
 
 			//会心判定
 			//計算式：武術のステータス÷5
-			int criticalChance = playerStatus_->martialArts_ / 5;
-			if (GetRand(99) < criticalChance)
+			int criticalChance = playerStatus_->martialArts_ / MARTIALARTS_DIVISOR;
+			if (GetRand(RANDOM_MAX) < criticalChance)
 			{
 				battleMessage_ += "クリティカルヒット！";
-				int critMultiplier = playerStatus_->hasCritBoost ? 6.0 : 2.0;
+				int critMultiplier = playerStatus_->hasCritBoost ? CRIT_MULTIPLIER_BOOSTED : CRIT_MULTIPLIER_NORMAL;
 				playerStatus_->AttackAnimation();
 				activeEnemy_->ChangeAnim(ANIM_DAMAGE);
 				if (playerStatus_->hasCritBoost)battleMessage_ += "\n【極聖光】会心倍率が上がった！";
@@ -533,7 +538,7 @@ void QuestPhase::playerturnAction(void)
 				if (selectedMagic_.curesStatus)
 				{
 					statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
-					statusTurns_ = 4;
+					statusTurns_ = DEFAULT_STATUS_TURNS;
 					poisonCnt_ = 0;
 					battleMessage_ += "\n状態異常が回復した！";
 				}
@@ -543,7 +548,7 @@ void QuestPhase::playerturnAction(void)
 				if (selectedMagic_.ailment != STATUS_EFFECT::NONE)
 				{
 					//魔法ごとに設定された「状態異常確率」で判定
-					if (GetRand(99) < selectedMagic_.ailmentChance)
+					if (GetRand(RANDOM_MAX) < selectedMagic_.ailmentChance)
 					{
 						enemyStatusEffect_ = selectedMagic_.ailment;
 						battleMessage_ += "\n敵に状態異常を与えた！";
@@ -559,8 +564,6 @@ void QuestPhase::playerturnAction(void)
 void QuestPhase::enemyturnAction(void)
 {
 	//行動前チェック
-	bool skipAction = false;
-	bool isMiss = false;
 	activeEnemy_->ResetGuard();
 
 	auto& unit = actionOrder_[currentActionIdx_];
@@ -568,181 +571,168 @@ void QuestPhase::enemyturnAction(void)
 	//凍結(行動不可)
 	if (enemyStatusEffect_ == STATUS_EFFECT::FREEZE)
 	{
-		if (GetRand(99) < 60) //60%で凍ったまま行動不可
+		if (GetRand(RANDOM_MAX) < FREEZE_STUN_CHANCE) //60%で凍ったまま行動不可
 		{
 			battleMessage_ += unit.name + "は凍りついて動けない";
-			skipAction = true;
+			return;
 		}
-		else //確率を乗り越えたら解除してそのまま行動
-		{
-			battleMessage_ += unit.name + "は氷が溶けてうごけるようになった\n";
-			enemyStatusEffect_ = STATUS_EFFECT::NONE;
-		}
+
+		battleMessage_ += unit.name + "は氷が溶けてうごけるようになった\n";
+		enemyStatusEffect_ = STATUS_EFFECT::NONE;
 	}
 	//閃光(命中低下)
-	if (!skipAction && enemyStatusEffect_ == STATUS_EFFECT::FLASH)
-	{
-		if (GetRand(99) < 50) isMiss = true; //50%で外れる
-	}
-	//実際の行動処理
-	if (skipAction)
-	{
-		//メッセージは設定済みなので何もしない
-	}
-	else if (isMiss)
+	if (enemyStatusEffect_ == STATUS_EFFECT::FLASH && GetRand(RANDOM_MAX) < FLASH_MISS_CHANCE)
 	{
 		battleMessage_ += unit.name + "は目が眩んで攻撃が外れた";
+		return;
+	}
+
+	//敵の行動を決定する
+	EnemyActionInfo eAction = activeEnemy_->DecideAction();
+	unit.skillName = eAction.skillName;
+	battleMessage_ += unit.name + "の" + unit.skillName + "！";
+
+	//技の名前によって特別な効果を発動させる
+	if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
+		|| unit.skillName == "自己再生")
+	{
+		//Power分回復
+		int healAmount = activeEnemy_->GetPower3();
+		activeEnemy_->Heal(healAmount);
+		battleMessage_ += "\n" + unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
+	}
+	else if (unit.skillName == "遡行")
+	{
+		//Power分回復
+		int healAmount = activeEnemy_->GetPower3();
+		activeEnemy_->Heal(healAmount);
+		enemyStatusEffect_ = STATUS_EFFECT::NONE; //状態異常を治す
+		enemyCurs_ = ENEMY_CURS_TURN;
+		battleMessage_ += "\n" + unit.name + "の肉体が巻き戻る";
+	}
+	else if (unit.skillName == "まもる" || unit.skillName == "守る"
+		|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
+	{
+		//Power分ダメージ軽減
+		activeEnemy_->SetGuard(activeEnemy_->GetPower3());
+		battleMessage_ += "\n" + unit.name + "は身構えている";
 	}
 	else
 	{
-		EnemyActionInfo eAction = activeEnemy_->DecideAction();
-		unit.skillName = eAction.skillName;
+		//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
+		int evasionChance = std::min<int>(playerStatus_->astrology_ / ASTROLOGY_DIVISOR, ASTROLOGY_RANDAM_VALUE);
 
-		//敵の行動分岐
-		battleMessage_ += unit.name + "の" + unit.skillName + "！";
-
-		//技の名前によって特別な効果を発動させる
-		if (unit.skillName == "大地の恵み" || unit.skillName == "電力チャージ"
-			|| unit.skillName == "自己再生")
+		if (GetRand(RANDOM_MAX) < evasionChance)
 		{
-			//Power分回復
-			int healAmount = activeEnemy_->GetPower3();
-			activeEnemy_->Heal(healAmount);
-			battleMessage_ += "\n" + unit.name + "の体力が" + std::to_string(healAmount) + "回復した";
+			//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
+			battleMessage_ = unit.name + "の" + unit.skillName;
+			battleMessage_ += "\n攻撃を回避した！";
+			return;
 		}
-		else if (unit.skillName == "遡行")
-		{
-			//Power分回復
-			int healAmount = activeEnemy_->GetPower3();
-			activeEnemy_->Heal(healAmount);
-			enemyStatusEffect_ = STATUS_EFFECT::NONE; //状態異常を治す
-			enemyCurs_ = ENEMY_CURS_TURN;
-			battleMessage_ += "\n" + unit.name + "の肉体が巻き戻る";
-		}
-		else if (unit.skillName == "まもる" || unit.skillName == "守る"
-			|| unit.skillName == "守りの構え" || unit.skillName == "受流しの構え")
-		{
-			//Power分ダメージ軽減
-			activeEnemy_->SetGuard(activeEnemy_->GetPower3());
-			battleMessage_ += "\n" + unit.name + "は身構えている";
-		}
-		else {
-			//回避判定
-			//計算式：占星術のステータス÷5　　※運の数値に合わせて調整
-			int evasionChance = playerStatus_->astrology_ / 5;
 
-			//バランス崩壊を防ぐための安全装置（最大回避率を90%でストップさせる）
-			if (evasionChance > 90) evasionChance = 90;
-			int roll = GetRand(99);
+		if (activeEnemy_->IsDead())
+		{
+			return; //敵が死んでいたら処理を抜ける
+		}
 
-			if (roll < evasionChance)
+		//初撃無効スキルを持っていて、まだ使っていない場合
+		if (playerStatus_->hasFirstHitNull && !playerStatus_->isFirstHitUsed)
+		{
+			playerStatus_->isFirstHitUsed = true; //消費する
+			battleMessage_ += playerStatus_->GetName() + "クラススキル【神秘の護り】\n攻撃を防いだ！";
+			return; //ダメージ処理に行かずに関数を抜ける
+		}
+
+		if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
+			|| unit.skillName == "金縛り" || unit.skillName == "発狂")
+		{
+			//プレイヤーを凍結状態にする
+			int damage = activeEnemy_->GetPower3();
+			playerStatus_->Damage(damage);
+			if (statusEffect_ == STATUS_EFFECT::NONE)
 			{
-				//回避成功！ダメージ処理はスキップしてメッセージだけ上書き
-				battleMessage_ = unit.name + "の" + unit.skillName;
-				battleMessage_ += "\n攻撃を回避した！";
+				statusEffect_ = STATUS_EFFECT::FREEZE;
+				battleMessage_ += "\n" + playerStatus_->GetName() + "は凍りついた！";
 			}
-			else if (!activeEnemy_->IsDead())
+		}
+		else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
+			|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
+		{
+			//プレイヤーを沈黙状態にする
+			int damage = activeEnemy_->GetPower3();
+			playerStatus_->Damage(damage);
+			if (statusEffect_ == STATUS_EFFECT::NONE)
 			{
-				//初撃無効スキルを持っていて、まだ使っていない場合
-				if (playerStatus_->hasFirstHitNull && !playerStatus_->isFirstHitUsed)
-				{
-					playerStatus_->isFirstHitUsed = true; //消費する
-					battleMessage_ += playerStatus_->GetName() + "クラススキル【神秘の護り】\n攻撃を防いだ！";
-					return; //ダメージ処理に行かずに関数を抜ける
-				}
-
-				if (unit.skillName == "蛇にらみ" || unit.skillName == "石化の魔眼"
-					|| unit.skillName == "金縛り" || unit.skillName == "発狂")
-				{
-					//プレイヤーを凍結状態にする
-					int damage = activeEnemy_->GetPower3();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::FREEZE;
-						battleMessage_ += "\n" + playerStatus_->GetName() + "は凍りついた！";
-					}
-				}
-				else if (unit.skillName == "放熱" || unit.skillName == "ふきつなかぜ"
-					|| unit.skillName == "破魔空間" || unit.skillName == "火炎放射" || unit.skillName == "沈黙の呪い")
-				{
-					//プレイヤーを沈黙状態にする
-					int damage = activeEnemy_->GetPower3();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::SILENCE;
-						battleMessage_ += "\n" + playerStatus_->GetName() + "は沈黙になった！";
-					}
-				}
-				else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
-					|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
-				{
-					//プレイヤーを毒状態にする
-					int damage = activeEnemy_->GetPower2();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::POISON;
-						battleMessage_ += "\n" + playerStatus_->GetName() + "は毒状態になった！";
-					}
-				}
-				else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
-					|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
-				{
-					//プレイヤーを呪い状態にする
-					int damage = activeEnemy_->GetPower2();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::CURSE;
-						battleMessage_ += "\n" + playerStatus_->GetName() + "は呪われた！";
-					}
-				}
-				else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
-					|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃"
-					|| unit.skillName == "魔の威光")
-				{
-					//プレイヤーを閃光状態にする
-					int damage = activeEnemy_->GetPower2();
-					playerStatus_->Damage(damage);
-					if (statusEffect_ == STATUS_EFFECT::NONE)
-					{
-						statusEffect_ = STATUS_EFFECT::FLASH;
-						battleMessage_ += "\n" + playerStatus_->GetName() + "は目がくらんだ！";
-					}
-				}
-				else
-				{
-					//---それ以外は通常の攻撃技として処理---
-					//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
-					int damage = 0;
-
-					if (unit.command == ANIM_ACT_1)
-					{
-						damage = activeEnemy_->GetPower1();
-
-						activeEnemy_->ChangeAnim(unit.command);
-					}
-					else if (unit.command == ANIM_ACT_2)
-					{
-						damage = activeEnemy_->GetPower2();
-						activeEnemy_->ChangeAnim(unit.command);
-					}
-					else if (unit.command == ANIM_ACT_3)
-					{
-						damage = activeEnemy_->GetPower3();
-						activeEnemy_->ChangeAnim(unit.command);
-					}
-
-					//回避失敗 通常通りダメージを受ける
-					playerStatus_->DamageAnimation();
-					playerStatus_->Damage(damage);
-
-					//ダメージSE
-					SoundManager::GetInstance().Play(SoundManager::SRC::DAMAGE_SE, Sound::TIMES::ONCE);
-				}
+				statusEffect_ = STATUS_EFFECT::SILENCE;
+				battleMessage_ += "\n" + playerStatus_->GetName() + "は沈黙になった！";
 			}
+		}
+		else if (unit.skillName == "どくのや" || unit.skillName == "毒の粉"
+			|| unit.skillName == "毒牙" || unit.skillName == "かみつく" || unit.skillName == "毒パンチ")
+		{
+			//プレイヤーを毒状態にする
+			int damage = activeEnemy_->GetPower2();
+			playerStatus_->Damage(damage);
+			if (statusEffect_ == STATUS_EFFECT::NONE)
+			{
+				statusEffect_ = STATUS_EFFECT::POISON;
+				battleMessage_ += "\n" + playerStatus_->GetName() + "は毒状態になった！";
+			}
+		}
+		else if (unit.skillName == "呪い" || unit.skillName == "呪われた包丁"
+			|| unit.skillName == "血槍" || unit.skillName == "鬼火" || unit.skillName == "切断")
+		{
+			//プレイヤーを呪い状態にする
+			int damage = activeEnemy_->GetPower2();
+			playerStatus_->Damage(damage);
+			if (statusEffect_ == STATUS_EFFECT::NONE)
+			{
+				statusEffect_ = STATUS_EFFECT::CURSE;
+				battleMessage_ += "\n" + playerStatus_->GetName() + "は呪われた！";
+			}
+		}
+		else if (unit.skillName == "ばくはつ" || unit.skillName == "電撃斬"
+			|| unit.skillName == "雷連斬" || unit.skillName == "エレキビーム" || unit.skillName == "斬撃"
+			|| unit.skillName == "魔の威光")
+		{
+			//プレイヤーを閃光状態にする
+			int damage = activeEnemy_->GetPower2();
+			playerStatus_->Damage(damage);
+			if (statusEffect_ == STATUS_EFFECT::NONE)
+			{
+				statusEffect_ = STATUS_EFFECT::FLASH;
+				battleMessage_ += "\n" + playerStatus_->GetName() + "は目がくらんだ！";
+			}
+		}
+		else
+		{
+			//---それ以外は通常の攻撃技として処理---
+			//unit.command (0:通常, 1:中技, 2:大技) で威力を変える
+			int damage = 0;
+
+			if (unit.command == ANIM_ACT_1)
+			{
+				damage = activeEnemy_->GetPower1();
+
+				activeEnemy_->ChangeAnim(unit.command);
+			}
+			else if (unit.command == ANIM_ACT_2)
+			{
+				damage = activeEnemy_->GetPower2();
+				activeEnemy_->ChangeAnim(unit.command);
+			}
+			else if (unit.command == ANIM_ACT_3)
+			{
+				damage = activeEnemy_->GetPower3();
+				activeEnemy_->ChangeAnim(unit.command);
+			}
+
+			//回避失敗 通常通りダメージを受ける
+			playerStatus_->DamageAnimation();
+			playerStatus_->Damage(damage);
+
+			//ダメージSE
+			SoundManager::GetInstance().Play(SoundManager::SRC::DAMAGE_SE, Sound::TIMES::ONCE);
 		}
 	}
 }
@@ -757,7 +747,7 @@ void QuestPhase::ProcessStatusEffect(void)
 		//毎ターンHP回復（状態異常ダメージの前に回復させる）
 		if (playerStatus_->hasAutoRegen && playerStatus_->hp_ > 0 && playerStatus_->hp_ < playerStatus_->GetMaxHp())
 		{
-			int regenAmount = playerStatus_->GetMaxHp() / 10;
+			int regenAmount = playerStatus_->GetMaxHp() / AUTO_REGEN_DIVISOR;
 			playerStatus_->hp_ += regenAmount;
 			if (playerStatus_->hp_ > playerStatus_->GetMaxHp())
 			{
@@ -773,7 +763,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ = activeEnemy_->GetName() + "は毒のダメージを受けた\n";
 			activeEnemy_->ChangeAnim(ANIM_DAMAGE);
-			activeEnemy_->Damage(activeEnemy_->GetCurrentHp()/16);
+			activeEnemy_->Damage(activeEnemy_->GetCurrentHp()/ POISON_DAMAGE_DIVISOR);
 			hasEffectMessage = true;
 		}
 		//呪いの処理
@@ -806,7 +796,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			poisonCnt_++;
 			//ターンの最後にダメージを受ける（例：1ダメージ）
 			battleMessage_ += playerStatus_->GetName() + "は毒のダメージを受けた";
-			playerStatus_->Damage(playerStatus_->GetMaxHp()*(poisonCnt_/16));
+			playerStatus_->Damage(playerStatus_->GetMaxHp()*(poisonCnt_/ POISON_DAMAGE_DIVISOR));
 			hasEffectMessage = true;
 		}
 		//ターン経過で即死(curse)
@@ -831,7 +821,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			if (statusTurns_ <= 0)
 			{
 				battleMessage_ = "沈黙が解けた ";
-				statusTurns_ = 4;
+				statusTurns_ = DEFAULT_STATUS_TURNS;
 				statusEffect_ = STATUS_EFFECT::NONE; //状態異常を解除
 				hasEffectMessage = true;
 			}
@@ -850,8 +840,7 @@ void QuestPhase::ProcessStatusEffect(void)
 	//ここに来るのは、battleMessage_ に何かしらの文章が入っている場合
 	//Enterキー待ちをしてから次のターン（またはゲームオーバー）へ進む
 	if (activeEnemy_->IsAnimFinished() == true && 
-		ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		(IsConfirmPressed()))
 	{
 		//もし敵を倒していたら
 		if (activeEnemy_->IsDead())
@@ -876,7 +865,7 @@ void QuestPhase::CheckEnemyDeath(void)
 	delete activeEnemy_;
 	activeEnemy_ = nullptr;
 
-	int maxWaves = isHellQuest_ ? 5 : MAX_WAVES;//最大Wave数を動的に切り替え
+	int maxWaves = isHellQuest_ ? EXTER_WAVES : MAX_WAVES;//最大Wave数を動的に切り替え
 
 	//連戦チェック
 	if (currentWave_ < maxWaves)
@@ -903,7 +892,7 @@ void QuestPhase::CheckEnemyDeath(void)
 	else
 	{
 		//全Waveクリア 経験値と場所ボーナスを付与
-		int rand = 15 + (GetRand(20) - 10);	//乱数の取得
+		int rand = REWARD_BASE_VALUE + (GetRand(REWARD_RANDOM_RANGE) - REWARD_RANDOM_OFFSET);	//乱数の取得
 		int statusBonus = 0;//実際にボーナス計算された後の値を入れる変数
 
 		switch (location_)
@@ -938,7 +927,7 @@ void QuestPhase::CheckEnemyDeath(void)
 			break;
 		}
 
-		if (isHellQuest_)playerStatus_->GetExp(450);//激ムズクエストは莫大な経験値を付与
+		if (isHellQuest_)playerStatus_->GetExp(EXTRA_STAGE_EXP);//激ムズクエストは莫大な経験値を付与
 
 		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 		battleStep_ = BATTLE_STEP::RESULT;
@@ -952,8 +941,7 @@ void QuestPhase::CheckEnemyDeath(void)
 void QuestPhase::DisplayResult(void)
 {
 	//経験値獲得は ProcessActionLoop内で敵を倒すたびに行うように変更したため、ここは次へ進む処理のみ
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	if (IsConfirmPressed())
 	{
 		PhaseBase::phaseResult_ = PhaseBase::PHASE_RESULT::NEXT_TURN;
 		isFinished_ = true; //フェーズ終了
@@ -981,8 +969,7 @@ void QuestPhase::ProcessPlayerAction()
 	ProcessTutorial();
 
 	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	if (IsConfirmPressed())
 	{
 		//沈黙状態の時は、魔法を選ぼうとしても決定できない
 		if (command_ == COMMAND::MAGIC && statusEffect_ == STATUS_EFFECT::SILENCE)
@@ -1032,8 +1019,7 @@ void QuestPhase::ProcessPlayerSubAction(void)
 	Utility::ProcessCommandMenuSelection(subMenuCursor_, maxSubItems);
 
 	//--- 決定処理 ---
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	if (IsConfirmPressed())
 	{
 		//【重要】ここで「何番のサブメニューを選んだか」を記憶しておく
 		//この数値を、後の DetermineActionOrder や ActionUnit に引き渡す
@@ -1048,9 +1034,15 @@ void QuestPhase::ProcessPlayerSubAction(void)
 		MAGIC_TYPE selectedCategory = MAGIC_TYPE::ATTACK;
 		switch (subMenuCursor_)
 		{
-		case 0: selectedCategory = MAGIC_TYPE::ATTACK; break; // 攻撃
-		case 1: selectedCategory = MAGIC_TYPE::HEAL;   break; // 回復
-		case 2: selectedCategory = MAGIC_TYPE::DEBUFF; break; // 状態異常付与
+		case static_cast<int>(MAGIC_TYPE::ATTACK):
+				selectedCategory = MAGIC_TYPE::ATTACK;
+				break;
+			case static_cast<int>(MAGIC_TYPE::HEAL):
+				selectedCategory = MAGIC_TYPE::HEAL;
+				break;
+			case static_cast<int>(MAGIC_TYPE::DEBUFF):
+				selectedCategory = MAGIC_TYPE::DEBUFF;
+				break;
 		}
 
 		//データベースの全魔法を「1回のループ」でチェックする
@@ -1093,8 +1085,7 @@ void QuestPhase::MagicSelection()
 	Utility::ProcessCommandMenuSelection(magicMenuCursor_, maxMagItems);
 
 	//決定処理
-	if (ins_.IsTrgDown(KEY_INPUT_RETURN) ||
-		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	if (IsConfirmPressed())
 	{
 		//今カーソルが合っている魔法の「データ」を取り出す
 		auto& chosenMagic = availableMagics_[magicMenuCursor_];
@@ -1124,6 +1115,11 @@ void QuestPhase::DrawCommandSelection(void)
 	Utility::DrawCommandMenu(COMMAND_MSG_X, COMMAND_MSG_Y, { "攻撃","魔法" }, static_cast<int>(command_));
 }
 
+bool QuestPhase::IsConfirmPressed() const
+{
+	return ins_.IsTrgDown(KEY_INPUT_RETURN) || ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN);
+}
+
 void QuestPhase::ProcessTutorial(void)
 {
 	if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
@@ -1151,7 +1147,7 @@ void QuestPhase::ProcessTutorial(void)
 			}
 		}
 		else if (battleStep_ == BATTLE_STEP::COMMAND_SELECTION
-			&& battleTurn_ == 2)
+			&& battleTurn_ == MAGIC_INTARVAL_TUTORIAL_TURN)
 		{
 			// メインコマンドは「攻撃（0）」に強制固定
 			command_ = COMMAND::MAGIC;
@@ -1166,7 +1162,7 @@ void QuestPhase::DrawTutorial(void)
 
 	tutorialMessage_ = "";
 
-	SetFontSize(20);
+	SetFontSize(TUTORIAL_FONT_SIZE);
 	if (battleStep_ == BATTLE_STEP::STAGE_SELECTION)
 	{
 		tutorialMessage_ = "受けるクエストを選ぼう。\n選ぶクエストによって\n上昇するステータスが変わるよ。";
@@ -1175,16 +1171,16 @@ void QuestPhase::DrawTutorial(void)
 	{
 		switch (battleTurn_)
 		{
-		case 1:
+		case ATTACK_TUTORIAL:
 			tutorialMessage_ = "攻撃してみよう\n攻撃を選んだ状態で\n決定ボタンを押してみよう。\n威力は筋力を参照するよ。";
 			break;
-		case 2:
+		case MAGIC_TUTORIAL:
 			tutorialMessage_ = "魔法を使ってみよう\n好きな魔法を選んで\n使ってみよう。\n威力は魔法ごとに異なるよ。";
 			break;
-		case 3:
+		case MAGIC_INTARVAL_TUTORIAL_TURN:
 			tutorialMessage_ = "魔法は一度使うと連続して\n使うことはできないよ。\n次は攻撃を選んでみよう。";
 			break;
-		case 4:
+		case TUTORIAL_MAX_TURN:
 			tutorialMessage_ = "あとは考えながら\n好きなように戦ってみよう。";
 			break;
 		default:

@@ -6,7 +6,6 @@
 enum class MAGIC_TYPE {
 	ATTACK,
 	HEAL,
-	BUFF,
 	DEBUFF
 };
 

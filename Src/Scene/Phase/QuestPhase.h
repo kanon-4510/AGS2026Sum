@@ -61,6 +61,18 @@ public:
 	};
 
 	//------定数---------
+	
+	//フォントサイズ
+	static constexpr int TUTORIAL_FONT_SIZE = 20;	//フォントサイズが20
+	static constexpr int STATUS_FONT_SIZE = 22;		//フォントサイズが22
+	static constexpr int WAVE_FONT_SIZE = 32;		//フォントサイズが22
+
+	//チュートリアルターン
+	static constexpr int ATTACK_TUTORIAL = 0;	//ターン数が１の時
+	static constexpr int MAGIC_TUTORIAL = 1;	//ターン数が２の時
+	static constexpr int MAGIC_INTARVAL_TUTORIAL_TURN = 2;	//ターン数が３の時
+	static constexpr int TUTORIAL_MAX_TURN = 3;	//ターン数が４の時
+
 	//難易度選択のメッセージの位置
 	static constexpr int DIFFICULTY_MSG_X = 0;
 	static constexpr int DIFFICULTY_MSG_Y = 40;
@@ -69,6 +81,19 @@ public:
 	static constexpr int DIFFICULTY_ENTER_MSG_X = 0;
 	static constexpr int DIFFICULTY_ENTER_MSG_Y = 400;
 	
+	static constexpr int RESULT_MSG_X = 350;             // リザルトメッセージX座標
+	static constexpr int RESULT_MSG_Y = 510;             // リザルトメッセージY座標
+	static constexpr int RESULT_REWARD_Y = 545;          // 報酬メッセージY座標
+
+	static constexpr int REWARD_RANDOM_BASE = 15;        // 報酬計算のベース値
+	static constexpr int REWARD_RANDOM_RANGE = 20;       // 報酬計算の乱数範囲
+	static constexpr int REWARD_RANDOM_OFFSET = 10;      // 報酬計算のオフセット値
+
+
+	// スクロールガイド（▲▼）位置調整用オフセット
+	static constexpr int SCROLL_UP_ARROW_OFFSET_Y = 20;     // 上矢印のY上方向オフセット
+	static constexpr int SCROLL_DOWN_ARROW_OFFSET_Y = 10;     // 下矢印のY下方向オフセット
+
 	//現在のターンメッセージの位置
 	static constexpr int TURN_MSG_X = 0;
 	static constexpr int TURN_MSG_Y = 80;
@@ -84,6 +109,12 @@ public:
 	//コマンドの位置
 	static constexpr int COMMAND_MSG_X = 400;
 	static constexpr int COMMAND_MSG_Y = 600;
+
+	static constexpr int MAGIC_DESC_OFFSET_X = 170;      // 魔法説明欄のXオフセット
+	static constexpr int MAGIC_LINE_HEIGHT = 30;         // 魔法一覧の1行の高さ
+	static constexpr int SCROLL_ARROW_OFFSET_X = 50;     // スクロール矢印のXオフセット
+
+	static constexpr int MAGIC_DESC_TEXT_OFFSET_Y = 25;   // 魔法説明本文のY座標オフセット
 
 	//敵とプレイヤー行動を表示するメッセージの位置
 	static constexpr int BATTLE_MSG_X = 350;
@@ -102,8 +133,33 @@ public:
 	static constexpr int ANIM_DAMAGE = 3;
 	static constexpr int ANIM_DEAD = 4;
 
+	static constexpr int ASTROLOGY_DIVISOR = 5;			//占星術ボーナス除数
+	static constexpr int ASTROLOGY_RANDAM_VALUE = 90;	//ranndom関数の最大値
+
+	static constexpr int MARTIALARTS_DIVISOR = 5;			//武術ボーナス除数
+	
 	//呪いのターンを６に戻す
 	static constexpr int ENEMY_CURS_TURN = 6;
+
+	//エクストラステージ出現ターン
+	static constexpr int POP_UP_EXTRA_STAGE_TURN = 17;
+
+	//エクストラステージの経験値
+	static constexpr int EXTRA_STAGE_EXP = 450;
+	
+	static constexpr int RANDOM_MAX = 99;	//ランダム関数の最大値
+	static constexpr int FREEZE_STUN_CHANCE = 60;        // 凍結時に関数・行動が不可になる確率(%)
+	static constexpr int FLASH_MISS_CHANCE = 50;         // 閃光時に攻撃が外れる確率(%)
+	static constexpr int MAGIC_ATTACK_DIVISOR = 2;         // 魔法攻撃力の半分を加算するための除数
+	static constexpr int CRIT_MULTIPLIER_NORMAL = 2;     // 通常の会心倍率
+	static constexpr int CRIT_MULTIPLIER_BOOSTED = 6;    // 極聖光発動時の会心倍率
+	static constexpr int AUTO_REGEN_DIVISOR = 10;        // エリクサー自動回復の除数 (最大HP/10)
+	static constexpr int POISON_DAMAGE_DIVISOR = 16;     // 毒ダメージの除数 (HP/16)
+	static constexpr int DEFAULT_STATUS_TURNS = 4;       // 状態異常の基本継続ターン数
+
+	static constexpr int REWARD_BASE_VALUE = 15; // 報酬の基準値
+	static constexpr int REWARD_RANDOM_RANGE = 20; // 報酬乱数の範囲 (0〜20)
+	static constexpr int REWARD_RANDOM_OFFSET = 10; // 報酬乱数のオフセット値
 
 	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest = false);//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
@@ -157,6 +213,7 @@ private:
 	int battleTurn_ = 1;		   //現在のバトルターン数
 	int currentWave_ = 1;          //現在の連戦数（1戦目からスタート）
 	const int MAX_WAVES = 3;       //1回の遠征での最大連戦数（例：3連戦）
+	const int EXTER_WAVES = 5;     //エクストラモードの最大連戦数（例：5連戦）
 
 	bool isFinished_ = false; //フェーズが終了したかどうかを管理するフラグ
 	bool isHellQuest_ = false;//激ムズクエスト突入したか
@@ -172,10 +229,7 @@ private:
 	int bgImg_ = -1; //背景画像のハンドル
 	int playerImg_ = -1; //プレイヤーの画像ハンドル	
 
-
-	
 	void ManageTurn(void);//ターンを管理する関数
-	
 	
 	void ProcessDifficulty(void);		//難易度選択の処理
 	void ProcessPlayerAction(void);		//プレイヤーの行動の処理などをここに書く
@@ -191,8 +245,12 @@ private:
 	void ProcessStatusEffect(void);	//状態異常
 	void DisplayResult(void);		//結果を表示する関数
 
+	void DrawMagicSelection();	//魔法選択の描画処理
+
 	void ProcessTutorial(void);//チュートリアル
 	void DrawTutorial(void);//チュートリアルの描画処理
 
 	void DrawCommandSelection(void);//Draw関数内でコマンド選択の描画を行う関数
+	
+	bool IsConfirmPressed()const;	//決定ボタンが押されたかどうかを判定する関数
 };
