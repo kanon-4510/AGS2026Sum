@@ -35,7 +35,7 @@ QuestPhase::QuestPhase(PlayerStatus* playerStatus, GameScene& gameScene, bool is
 
 	//クエスト開始時は一旦通常の敵を生成しておく
 	activeEnemy_ = SpawnEnemyByTurn(gameScene_.GetTurn());
-	statusEffect_ = STATUS_EFFECT::NONE;	//状態異常の初期化
+	playerStatus_->SetStatusEffect(STATUS_EFFECT::NONE);
 	battleStep_ = BATTLE_STEP::STAGE_SELECTION;	//最初はステージ選択からスタート
 	locationMenu_ = { "平原","魔法の森","岩山の道場","魔大陸","壊れた聖堂","古代遺跡","星の丘" };	//ここで難易度メニューを動的に作成
 	selectableLocations_ = { QUEST_LOCATION::PLAINS,QUEST_LOCATION::FOREST,QUEST_LOCATION::SHRINE,QUEST_LOCATION::CONTINENT,QUEST_LOCATION::CATHEDRAL,QUEST_LOCATION::RUINS,QUEST_LOCATION::HILL };
@@ -424,7 +424,7 @@ void QuestPhase::playerturnAction(void)
 	bool isMiss = false;
 
 	//凍結(行動不可)
-	if (statusEffect_ == STATUS_EFFECT::FREEZE)
+	if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::FREEZE)
 	{
 		if (GetRand(RANDOM_MAX) < FREEZE_STUN_CHANCE) //60%で凍ったまま行動不可
 		{
@@ -434,11 +434,11 @@ void QuestPhase::playerturnAction(void)
 		else //確率を乗り越えたら解除してそのまま行動
 		{
 			battleMessage_ = "氷が溶けてうごけるようになった!\n";
-			statusEffect_ = STATUS_EFFECT::NONE;
+			playerStatus_->SetStatusEffect(STATUS_EFFECT::NONE);
 		}
 	}
 	//閃光(命中低下)
-	if (!skipAction && statusEffect_ == STATUS_EFFECT::FLASH)
+	if (!skipAction && playerStatus_->GetStatusEffect() == STATUS_EFFECT::FLASH)
 	{
 		if (command_ == COMMAND::ATTACK || (command_ == COMMAND::MAGIC && (unit.magicType == MAGIC_TYPE::ATTACK || unit.magicType == MAGIC_TYPE::DEBUFF)))
 		{
@@ -537,7 +537,8 @@ void QuestPhase::playerturnAction(void)
 				//状態異常治療フラグが true だったら治す
 				if (selectedMagic_.curesStatus)
 				{
-					statusEffect_ = STATUS_EFFECT::NONE; //プレイヤーの状態異常を治す
+					//プレイヤーの状態異常を治す
+					playerStatus_->SetStatusEffect(STATUS_EFFECT::NONE);
 					statusTurns_ = DEFAULT_STATUS_TURNS;
 					poisonCnt_ = 0;
 					battleMessage_ += "\n状態異常が回復した！";
@@ -649,9 +650,9 @@ void QuestPhase::enemyturnAction(void)
 			//プレイヤーを凍結状態にする
 			int damage = activeEnemy_->GetPower3();
 			playerStatus_->Damage(damage);
-			if (statusEffect_ == STATUS_EFFECT::NONE)
+			if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::NONE)
 			{
-				statusEffect_ = STATUS_EFFECT::FREEZE;
+				playerStatus_->SetStatusEffect(STATUS_EFFECT::FREEZE);
 				battleMessage_ += "\n" + playerStatus_->GetName() + "は凍りついた！";
 			}
 		}
@@ -661,9 +662,9 @@ void QuestPhase::enemyturnAction(void)
 			//プレイヤーを沈黙状態にする
 			int damage = activeEnemy_->GetPower3();
 			playerStatus_->Damage(damage);
-			if (statusEffect_ == STATUS_EFFECT::NONE)
+			if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::NONE)
 			{
-				statusEffect_ = STATUS_EFFECT::SILENCE;
+				playerStatus_->SetStatusEffect(STATUS_EFFECT::SILENCE);
 				battleMessage_ += "\n" + playerStatus_->GetName() + "は沈黙になった！";
 			}
 		}
@@ -673,9 +674,9 @@ void QuestPhase::enemyturnAction(void)
 			//プレイヤーを毒状態にする
 			int damage = activeEnemy_->GetPower2();
 			playerStatus_->Damage(damage);
-			if (statusEffect_ == STATUS_EFFECT::NONE)
+			if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::NONE)
 			{
-				statusEffect_ = STATUS_EFFECT::POISON;
+				playerStatus_->SetStatusEffect(STATUS_EFFECT::POISON);
 				battleMessage_ += "\n" + playerStatus_->GetName() + "は毒状態になった！";
 			}
 		}
@@ -685,9 +686,9 @@ void QuestPhase::enemyturnAction(void)
 			//プレイヤーを呪い状態にする
 			int damage = activeEnemy_->GetPower2();
 			playerStatus_->Damage(damage);
-			if (statusEffect_ == STATUS_EFFECT::NONE)
+			if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::NONE)
 			{
-				statusEffect_ = STATUS_EFFECT::CURSE;
+				playerStatus_->SetStatusEffect(STATUS_EFFECT::CURSE);
 				battleMessage_ += "\n" + playerStatus_->GetName() + "は呪われた！";
 			}
 		}
@@ -698,9 +699,9 @@ void QuestPhase::enemyturnAction(void)
 			//プレイヤーを閃光状態にする
 			int damage = activeEnemy_->GetPower2();
 			playerStatus_->Damage(damage);
-			if (statusEffect_ == STATUS_EFFECT::NONE)
+			if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::NONE)
 			{
-				statusEffect_ = STATUS_EFFECT::FLASH;
+				playerStatus_->SetStatusEffect(STATUS_EFFECT::FLASH);
 				battleMessage_ += "\n" + playerStatus_->GetName() + "は目がくらんだ！";
 			}
 		}
@@ -791,7 +792,7 @@ void QuestPhase::ProcessStatusEffect(void)
 		}
 
 		//定数ダメージ(poison)
-		if (statusEffect_ == STATUS_EFFECT::POISON)
+		if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::POISON)
 		{
 			poisonCnt_++;
 			//ターンの最後にダメージを受ける（例：1ダメージ）
@@ -800,7 +801,7 @@ void QuestPhase::ProcessStatusEffect(void)
 			hasEffectMessage = true;
 		}
 		//ターン経過で即死(curse)
-		else if (statusEffect_ == STATUS_EFFECT::CURSE)
+		else if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::CURSE)
 		{
 			statusTurns_--; //残りターンを減らす
 			if (statusTurns_ <= 0)
@@ -815,14 +816,14 @@ void QuestPhase::ProcessStatusEffect(void)
 			hasEffectMessage = true;
 		}
 		//魔法使用不可ターン経過で治癒(silence)
-		else if (statusEffect_ == STATUS_EFFECT::SILENCE)
+		else if (playerStatus_->GetStatusEffect() == STATUS_EFFECT::SILENCE)
 		{
 			statusTurns_--; //残りターンを減らす
 			if (statusTurns_ <= 0)
 			{
 				battleMessage_ = "沈黙が解けた ";
 				statusTurns_ = DEFAULT_STATUS_TURNS;
-				statusEffect_ = STATUS_EFFECT::NONE; //状態異常を解除
+				playerStatus_->SetStatusEffect(STATUS_EFFECT::NONE);
 				hasEffectMessage = true;
 			}
 		}
@@ -892,7 +893,7 @@ void QuestPhase::CheckEnemyDeath(void)
 	else
 	{
 		//全Waveクリア 経験値と場所ボーナスを付与
-		int rand = REWARD_BASE_VALUE + (GetRand(REWARD_RANDOM_RANGE) - REWARD_RANDOM_OFFSET);	//乱数の取得
+		int rand = REWARD_RANDOM_BASE + (GetRand(REWARD_RANDOM_RANGE) - REWARD_RANDOM_OFFSET);	//乱数の取得
 		int statusBonus = 0;//実際にボーナス計算された後の値を入れる変数
 
 		switch (location_)
@@ -931,7 +932,7 @@ void QuestPhase::CheckEnemyDeath(void)
 
 		wasMagicUsedLastTurn_ = magicUsedThisTurn_;
 		battleStep_ = BATTLE_STEP::RESULT;
-		statusEffect_ = STATUS_EFFECT::NONE; //状態異常リセット
+		playerStatus_->SetStatusEffect(STATUS_EFFECT::NONE); //状態異常リセット
 		enemyStatusEffect_ = STATUS_EFFECT::NONE;
 		SoundManager::GetInstance().Stop(SoundManager::SRC::QUEST_BGM);
 		return;
@@ -972,7 +973,7 @@ void QuestPhase::ProcessPlayerAction()
 	if (IsConfirmPressed())
 	{
 		//沈黙状態の時は、魔法を選ぼうとしても決定できない
-		if (command_ == COMMAND::MAGIC && statusEffect_ == STATUS_EFFECT::SILENCE)
+		if (command_ == COMMAND::MAGIC && playerStatus_->GetStatusEffect() == STATUS_EFFECT::SILENCE)
 		{
 			//エラー音を鳴らす
 			battleMessage_ = "魔法を唱えられない";

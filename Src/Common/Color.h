@@ -17,4 +17,10 @@ public:
     static const int GRAY = 0x808080;   //灰;
     static const int CHARCOAL_GRAY = 0x323232;   //チャコールグレー;
     static const int BLACK = 0x000000;  //黒;
+
+    static constexpr int DARK_GREEN = 0x00cc00; // 落ち着いた緑
+    static constexpr int CYAN = 0x00cccc; // シアン（青緑）
+    static constexpr int MAGENTA = 0xcc00cc; // マゼンタ（赤紫）
+    static constexpr int DARK_RED = 0xdd0000; // 濃い赤
+
 };

@@ -157,9 +157,6 @@ public:
 	static constexpr int POISON_DAMAGE_DIVISOR = 16;     // 毒ダメージの除数 (HP/16)
 	static constexpr int DEFAULT_STATUS_TURNS = 4;       // 状態異常の基本継続ターン数
 
-	static constexpr int REWARD_BASE_VALUE = 15; // 報酬の基準値
-	static constexpr int REWARD_RANDOM_RANGE = 20; // 報酬乱数の範囲 (0〜20)
-	static constexpr int REWARD_RANDOM_OFFSET = 10; // 報酬乱数のオフセット値
 
 	QuestPhase(PlayerStatus* playerStatus,GameScene& gameScene,bool isHellQuest = false);//デフォルトコンストラクタ
 	virtual~QuestPhase(void);		//デストラクタ
@@ -189,7 +186,6 @@ private:
 	COMMAND command_; 
 
 	//状態異常系
-	STATUS_EFFECT statusEffect_;//状態異常を管理する変数
 	STATUS_EFFECT enemyStatusEffect_ = STATUS_EFFECT::NONE;	//敵の状態異常を管理する変数
 	int statusTurns_ = 4;		//状態異常の残りターン数
 	int enemyCurs_ = 6;			//呪いの残りターン数

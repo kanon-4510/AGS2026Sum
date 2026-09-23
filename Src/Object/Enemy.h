@@ -12,12 +12,12 @@ class Player;
 //敵のアニメーション状態の定義
 enum ENEMY_ANIM
 {
-	IDLE = 0,	//待機
 	ACT_1,	//攻撃1
 	ACT_2,	//攻撃2
 	ACT_3,	//攻撃3
 	DAMAGE,	//ダメージ
 	DEAD,	//死亡
+	IDLE,	//待機
 	MAX		//最大値
 };
 
@@ -65,6 +65,20 @@ public:
 	static constexpr int HP_BAR_OFFSET_Y = 40;
 	static constexpr int HP_BAR_BOX_OFFSET_Y = 35;
 
+	// スポーン位置パラメータ
+	static constexpr int DEFAULT_SPAWN_X = 300;
+	static constexpr int DEFAULT_SPAWN_Y = 270;
+
+	// ターン数の閾値定数
+	static constexpr int TURN_BOSS = 21;
+	static constexpr int TURN_STAGE_4 = 17;
+	static constexpr int TURN_STAGE_3 = 13;
+	static constexpr int TURN_STAGE_2 = 9;
+	static constexpr int TURN_STAGE_1 = 5;
+
+	// 出現敵パターンの抽選上限（GetRand(N) は 0～N を返すため 種類数 - 1）
+	static constexpr int RAND_MAX_5_TYPES = 4;
+	static constexpr int RAND_MAX_4_TYPES = 3;
 
 	//コンストラクタ（画像ファイルのパスや、画面のどこに描画するかの座標も受け取るように拡張）
 	Enemy(std::string name, int hp, int power1, int power2, int power3, int speed, int exp,
@@ -120,7 +134,7 @@ private:
 	int power3_;
 	int speed_;
 	int exp_;
-	std::string skills_[3];
+	std::string skills_[SKILL_SLOT_COUNT];
 
 	int guard_ = 0; //軽減ダメージ量
 

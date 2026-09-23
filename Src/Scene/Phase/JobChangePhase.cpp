@@ -13,9 +13,9 @@ JobChangePhase::JobChangePhase(PlayerStatus* playerStatus, GameScene& gameScene)
     bookImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::BOOK).handleId_;
     messageBoxImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::MESSAGE_BOX).handleId_;
     LoadDivGraph("Data/Image/Book/ListBookRtoL.png",
-        8,4,2,790,790, pageLeftImg_);
+        PAGE_ANIME_FRAME_COUNT, PAGE_DIV_NUM_X, PAGE_DIV_NUM_Y, PAGE_IMAGE_SIZE_X, PAGE_IMAGE_SIZE_Y, pageLeftImg_);
     LoadDivGraph("Data/Image/Book/ListBookLtoR.png",
-        8,4,2,790,790, pageRightImg_);
+        PAGE_ANIME_FRAME_COUNT, PAGE_DIV_NUM_X, PAGE_DIV_NUM_Y, PAGE_IMAGE_SIZE_X, PAGE_IMAGE_SIZE_Y, pageRightImg_);
     playerStatus_->InitJob(); //職業の初期化
 }
 
@@ -44,17 +44,17 @@ void JobChangePhase::Draw(void)
 
     if(timer_ < COUNT_MAX)
     {
-        DrawString(480,650,"現在の職業と同じ職業は選択できません", Color::RED);
+        DrawString(ALERT_MSG_X, ALERT_MSG_Y,"現在の職業と同じ職業は選択できません", Color::RED);
         timer_++; //メッセージ表示のカウントを増やす
 	}
 
     SetFontSize(FONT_SIZE);
     if (!isShowingDetails_)
     {
-        DrawString(430, 150, "目 次", Color::BROWN);
+        DrawString(INDEX_TITLE_X, INDEX_TITLE_Y, "目 次", Color::BROWN);
 
-        int half = static_cast<int>(jobList.size() / 2);
-        if (jobList.size() % 2 != 0) {
+        int half = static_cast<int>(jobList.size() / PAGE_DIV_NUM_Y);
+        if (jobList.size() % PAGE_DIV_NUM_Y != 0) {
             half++; // 奇数の場合、前半（左列）が1つ多くなるように調整
         }
 
@@ -73,17 +73,17 @@ void JobChangePhase::Draw(void)
             }
 
             //描画位置の設定
-            int drawX = 400;
-            int drawY = 200;
+            int drawX = JOB_LIST_LEFT_X;
+            int drawY = JOB_LIST_START_Y;
 
             if (i < half) {
                 //前半半分左側の列
-                drawY = 200 + i * JOB_LIST_SPACING;
+                drawY = JOB_LIST_START_Y + i * JOB_LIST_SPACING;
             }
             else {
                 //後半半分右側の列
-                drawX = 700; //右列のX座標。職業名の長さに合わせて数値を調整してください
-                drawY = 200 + (i - half) * JOB_LIST_SPACING; //Y座標を上（200）から再スタート
+                drawX = JOB_LIST_RIGHT_X; //右列のX座標。職業名の長さに合わせて数値を調整してください
+                drawY = JOB_LIST_START_Y + (i - half) * JOB_LIST_SPACING; //Y座標を上（200）から再スタート
             }
 
             //選択中の職業
@@ -137,19 +137,19 @@ void JobChangePhase::DrawJobBonus(const JobData& job)
 
         int offset = 1;
         if (bonus.hp > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, " HP   : +%d", bonus.hp);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * BONUS_Y_INTERVAL, Color::BLACK, " HP   : +%d", bonus.hp);
             offset++;
         }
         if (bonus.power > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "POW   : +%d", bonus.power);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * BONUS_Y_INTERVAL, Color::BLACK, "POW   : +%d", bonus.power);
             offset++;
         }
         if (bonus.magic > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "MAG   : +%d", bonus.magic);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * BONUS_Y_INTERVAL, Color::BLACK, "MAG   : +%d", bonus.magic);
             offset++;
         }
         if (bonus.speed > 0) {
-            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * 40, Color::BLACK, "SPD   : +%d", bonus.speed);
+            DrawFormatString(JOB_BONUS_X, JOB_BONUS_Y + offset * BONUS_Y_INTERVAL, Color::BLACK, "SPD   : +%d", bonus.speed);
             offset++;
         }
     }
@@ -176,9 +176,9 @@ void JobChangePhase::DrawDetails(void)
 
     if (text.skillName != nullptr)
     {
-        DrawFormatString(JOB_DESC_X + 70, JOB_DESC_Y + 160, Color::BROWN, "%s", text.skillName);
+        DrawFormatString(JOB_DESC_X + SKILL_NAME_OFFSET_X, JOB_DESC_Y + SKILL_NAME_OFFSET_Y, Color::BROWN, "%s", text.skillName);
         
-        DrawString(JOB_DESC_X, JOB_DESC_Y + 190, text.skillDesc, Color::BLACK);
+        DrawString(JOB_DESC_X, JOB_DESC_Y + SKILL_DESC_OFFSET_Y, text.skillDesc, Color::BLACK);
     }
 
     //ヘッダーテキスト
@@ -189,7 +189,7 @@ void JobChangePhase::DrawDetails(void)
 
     // ステータス描画用の初期Y座標
     int currentY = JOB_STATUS_Y + JOB_LIST_SPACING;
-	if (selectedIndex_ == 13)   //大魔法使いの場合は全技能200と表示する
+	if (selectedIndex_ == ARCHMAGE_JOB_INDEX)   //大魔法使いの場合は全技能200と表示する
     {
         DrawFormatString(JOB_STATUS_X, currentY, Color::BLACK, "全技能: 100");
     }
@@ -237,19 +237,19 @@ void JobChangePhase::DrawAnimation(void)
 {
     if (pageAnimeTimer_ >= 0)
     {
-        int animSpeed = 5;  // コマの切り替わる速さ（3フレームごとに1コマ進む）
+        int animSpeed = PAGE_ANIME_SPEED;  // コマの切り替わる速さ（3フレームごとに1コマ進む）
         int currentFrame = pageAnimeTimer_ / animSpeed;
 
-        if (currentFrame > 7)currentFrame = 7; // 配列の範囲（0～7）を超えないようにガード
+        if (currentFrame > JOBS_PER_COLUMN)currentFrame = JOBS_PER_COLUMN; // 配列の範囲（0～7）を超えないようにガード
         if(ispageLR_)
         {
             //本のめくりアニメーションを描画（座標は画面に合わせて調整してください）
-            DrawGraph(jobListX, jobListY - 230, pageLeftImg_[currentFrame], true);
+            DrawGraph(jobListX, jobListY - PAGE_ANIME_OFFSET_Y, pageLeftImg_[currentFrame], true);
         }
         else
         {
             //本のめくりアニメーションを描画（座標は画面に合わせて調整してください）
-            DrawGraph(jobListX, jobListY - 230, pageRightImg_[currentFrame], true);
+            DrawGraph(jobListX, jobListY - PAGE_ANIME_OFFSET_Y, pageRightImg_[currentFrame], true);
 		}
     }
 }
@@ -269,7 +269,7 @@ void JobChangePhase::ProcessJobListSelection(void)
     if (pageAnimeTimer_ >= 0)
     {
         pageAnimeTimer_++;
-        if (pageAnimeTimer_ >= 40)
+        if (pageAnimeTimer_ >= PAGE_ANIME_MAX_TIMER)
         {
             pageAnimeTimer_ = -1; // 24フレーム経ったら停止状態に戻す
         }
@@ -289,11 +289,11 @@ void JobChangePhase::ProcessJobListSelection(void)
     }
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RIGHT) ||
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_RIGHT)) {
-        selectedIndex_ = (selectedIndex_ + 7) % jobList.size();
+        selectedIndex_ = (selectedIndex_ + JOBS_PER_COLUMN) % jobList.size();
     }
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_LEFT) ||
         ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DG_LEFT)) {
-        selectedIndex_ = (selectedIndex_ - 7 + jobList.size()) % jobList.size();
+        selectedIndex_ = (selectedIndex_ - JOBS_PER_COLUMN + jobList.size()) % jobList.size();
     }
 
     if (InputManager::GetInstance().IsTrgDown(KEY_INPUT_RETURN) ||
@@ -322,7 +322,7 @@ void JobChangePhase::ProcessDetailsListSelection(void)
     if (pageAnimeTimer_ >= 0)
     {
         pageAnimeTimer_++;
-        if (pageAnimeTimer_ >= 40)
+        if (pageAnimeTimer_ >= PAGE_ANIME_MAX_TIMER)
         {
             pageAnimeTimer_ = -1; //24フレーム経ったら停止状態に戻す
         }
@@ -403,7 +403,7 @@ JobText JobChangePhase::GetJobText(int index) const
 void JobChangePhase::DrawTutorial(void)
 {
     if (!SceneManager::GetInstance().IsTutorialEnabled()) return;
-    if (gameScene_.GetTurn() != 3)return;
+    if (gameScene_.GetTurn() != TUTORIAL_TARGET_TURN)return;
 
     std::string drawString ="";
     SetFontSize(20);

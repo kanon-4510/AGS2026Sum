@@ -2,6 +2,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/SoundManager.h"
+#include "../Common/Color.h"
 
 PlayerStatus::PlayerStatus()
 {
@@ -99,60 +100,89 @@ void PlayerStatus::Draw()
 
 void PlayerStatus::DrawStatus()
 {
-	DrawGraph(0,0, bgImageBar_, true);
+	DrawGraph(0, 0, bgImageBar_, true);
 
-	DrawFormatString(230, 590, 0xffffff, "ルピナス");
-	
-	DrawFormatString(245, 615, 0xffffff, "レベル %2d", level_);
-	DrawFormatString(245, 640, 0xffffff, "　筋力 %d", power_ + GetJobBonus().power);
-	DrawFormatString(245, 665, 0xffffff, "　魔力 %d", MagicAttack());
-	DrawFormatString(245, 690, 0xffffff, "素早さ %d", GetSpeed());
+	// 名前描画
+	DrawFormatString(STATUS_NAME_X, STATUS_NAME_Y, Color::WHITE, "ルピナス");
 
-	DrawFormatString(1065, 510, 0xffffff, "　　治癒力:%+3d", pharmacy_ / PHARMACY_DIVISOR);
-	DrawFormatString(1065, 545, 0xffffff, "会心発生率:%3d%%", martialArts_ / MARTIAL_ARTS_DIVISOR);
-	DrawFormatString(1065, 580, 0xffffff, "魔術ランク:%3d", (magicKnowledge_ / 50) + 1);
-	DrawFormatString(1065, 615, 0xffffff, "　　守備力:%3d", faith_ / FAITH_DIVISOR);
-	DrawFormatString(1065, 650, 0xffffff, "獲得経験値:%+3d", archaeology_ / ARCHAEOLOGY_DIVISOR);
-	DrawFormatString(1065, 685, 0xffffff, "　　回避率:%3d%%", astrology_ / ASTROLOGY_DIVISOR);
+	// 基本ステータス描画（Y座標を行高で計算）
+	int baseY = BASE_PARAM_START_Y;
+	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, "レベル %2d", level_);
+	baseY += BASE_PARAM_LINE_HEIGHT;
+	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, " 筋力 %d", power_ + GetJobBonus().power);
+	baseY += BASE_PARAM_LINE_HEIGHT;
+	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, " 魔力 %d", MagicAttack());
+	baseY += BASE_PARAM_LINE_HEIGHT;
+	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, "素早さ %d", GetSpeed());
 
-	DrawFormatString(900, 590, 0xffffff, "%s", job.c_str());
-	DrawFormatString(900, 640, 0xffffff, "状態:");
+	// 技能ステータス描画（Y座標を行高で計算）
+	int skillY = SKILL_PARAM_START_Y;
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "  治癒力:%+3d", pharmacy_ / PHARMACY_DIVISOR);
+	skillY += SKILL_PARAM_LINE_HEIGHT;
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "会心発生率:%3d%%", martialArts_ / MARTIAL_ARTS_DIVISOR);
+	skillY += SKILL_PARAM_LINE_HEIGHT;
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "魔術ランク:%3d", (magicKnowledge_ / MAGIC_RANK_DIVISOR) + 1);
+	skillY += SKILL_PARAM_LINE_HEIGHT;
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "  守備力:%3d", faith_ / FAITH_DIVISOR);
+	skillY += SKILL_PARAM_LINE_HEIGHT;
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "獲得経験値:%+3d", archaeology_ / ARCHAEOLOGY_DIVISOR);
+	skillY += SKILL_PARAM_LINE_HEIGHT;
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "  回避率:%3d%%", astrology_ / ASTROLOGY_DIVISOR);
 
+	// 職業・状態異常のラベル
+	DrawFormatString(JOB_STATUS_X, JOB_NAME_Y, Color::WHITE, "%s", job.c_str());
+	DrawFormatString(JOB_STATUS_X, CONDITION_LABEL_Y, Color::WHITE, "状態:");
 
-	if (statusEffect_ == STATUS_EFFECT::NONE)   DrawFormatString(955, 640, 0xffffff, "なし");
-	if (statusEffect_ == STATUS_EFFECT::POISON) DrawFormatString(955, 640, 0x00cc00, "どく");
-	if (statusEffect_ == STATUS_EFFECT::FLASH)  DrawFormatString(955, 640, 0xffff00, "せんこう");
-	if (statusEffect_ == STATUS_EFFECT::FREEZE) DrawFormatString(955, 640, 0x00cccc, "とうけつ");
-	if (statusEffect_ == STATUS_EFFECT::CURSE)  DrawFormatString(955, 640, 0xcc00cc, "のろい");
-	if (statusEffect_ == STATUS_EFFECT::SILENCE)DrawFormatString(955, 640, 0xdd0000, "ちんもく");
+	// 状態異常値の描画
+	switch (statusEffect_)
+	{
+	case STATUS_EFFECT::POISON:
+		DrawFormatString(CONDITION_VALUE_X, CONDITION_LABEL_Y, Color::DARK_GREEN, "どく");
+		break;
+	case STATUS_EFFECT::FLASH:
+		DrawFormatString(CONDITION_VALUE_X, CONDITION_LABEL_Y, Color::YELLOW, "せんこう");
+		break;
+	case STATUS_EFFECT::FREEZE:
+		DrawFormatString(CONDITION_VALUE_X, CONDITION_LABEL_Y, Color::CYAN, "とうけつ");
+		break;
+	case STATUS_EFFECT::CURSE:
+		DrawFormatString(CONDITION_VALUE_X, CONDITION_LABEL_Y, Color::MAGENTA, "のろい");
+		break;
+	case STATUS_EFFECT::SILENCE:
+		DrawFormatString(CONDITION_VALUE_X, CONDITION_LABEL_Y, Color::DARK_RED, "ちんもく");
+		break;
+	case STATUS_EFFECT::NONE:
+	default:
+		DrawFormatString(CONDITION_VALUE_X, CONDITION_LABEL_Y, Color::WHITE, "なし");
+		break;
+	}
 }
 
 void PlayerStatus::DrawQuestImages()
 {
-	//敵の名前とHPを文字で表示（色の指定は白: GetColor(255,255,255)）
-	unsigned int white = GetColor(255, 255, 255);
-	DrawString(PLAYER_POS_X, PLAYER_POS_Y -37, name.c_str(), white);
-	DrawFormatString(PLAYER_POS_X, PLAYER_POS_Y - 20, white, "HP: %d / %d", hp_, GetMaxHp());
+	//敵の名前とHPを文字で表示
+	DrawString(PLAYER_POS_X, PLAYER_POS_Y - NAME_OFFSET_Y, name.c_str(), Color::WHITE);
+	DrawFormatString(PLAYER_POS_X, PLAYER_POS_Y - HP_TEXT_OFFSET_Y, Color::WHITE, "HP: %d / %d", hp_, GetMaxHp());
 
-	int barWidth = 100; //バーの最大幅
+	int barWidth = HP_BAR_WIDTH; //バーの最大幅
 	int currentBarWidth = barWidth * hp_ / GetMaxHp();
 	//赤い背景
-	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - 5, PLAYER_POS_X + barWidth, PLAYER_POS_Y, GetColor(255, 0, 0), TRUE);
+	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - HP_BAR_OFFSET_Y, PLAYER_POS_X + barWidth, PLAYER_POS_Y, Color::RED, TRUE);
 	//緑の現在値
-	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - 5, PLAYER_POS_X + currentBarWidth, PLAYER_POS_Y, GetColor(0, 255, 0), TRUE);
+	DrawBox(PLAYER_POS_X, PLAYER_POS_Y - HP_BAR_OFFSET_Y, PLAYER_POS_X + currentBarWidth, PLAYER_POS_Y, Color::GREEN, TRUE);
 
 	bool isVisible = true; // 描画するかどうかのフラグ
 
 	if (damageMotionTimer_ > 0)
 	{
 		//2フレームごとにパタパタ点滅
-		if ((damageMotionTimer_ / 2) % 3 == 0)
+		if ((damageMotionTimer_ / DAMAGE_BLINK_FRAME_DIVISOR) % DAMAGE_BLINK_CYCLE_MODULO == 0)
 		{
 			isVisible = false;
 		}
 
 		//赤く染める
-		SetDrawBright(255, 0, 0);
+		SetDrawBright(DAMAGE_TINT_R, DAMAGE_TINT_G, DAMAGE_TINT_B);
 	}
 
 	if (isVisible)
@@ -162,7 +192,7 @@ void PlayerStatus::DrawQuestImages()
 
 	if (damageMotionTimer_ > 0)
 	{
-		SetDrawBright(255, 255, 255);
+		SetDrawBright(NORMAL_TINT_RGB, NORMAL_TINT_RGB, NORMAL_TINT_RGB);
 	}
 }
 
@@ -173,22 +203,22 @@ void PlayerStatus::InitJob()
 
 	//職業の初期化
 	//名前, LV, POW, MAG, 薬学, 武術, 魔法知, 信仰, 考古, 占星
-	jobList.push_back(JobData("一般魔法使い",2,0,0, 0,0,10,0,0,0));
+	jobList.push_back(JobData("一般魔法使い" ,2, 0, 0, 0, 0, 10, 0, 0, 0));
 
-	jobList.push_back(JobData("付加術師",5,0,0,100,  0,  0,  0,  0,  0));
-	jobList.push_back(JobData("魔剣士"	,5,0,0,  0,100,  0,  0,  0,  0));
-	jobList.push_back(JobData("魔導師"	,5,0,0,  0,  0,130,  0,  0,  0));
-	jobList.push_back(JobData("聖職者"	,5,0,0,  0,  0,  0,100,  0,  0));
-	jobList.push_back(JobData("呪術師"	,5,0,0,  0,  0,  0,  0,100,  0));
-	jobList.push_back(JobData("占い師"	,5,0,0,  0,  0,  0,  0,  0,100));
-
-	jobList.push_back(JobData("錬金術師",15,0,0,170,  0, 30,  0,100,  0));
-	jobList.push_back(JobData("聖騎士"	,15,0,0,  0,230,  0, 70,  0,  0));
-	jobList.push_back(JobData("賢者"	,15,0,0,  0,  0,200,  0, 50, 50));
-	jobList.push_back(JobData("悪魔祓い",15,0,0, 70, 30,  0,200,  0,  0));
-	jobList.push_back(JobData("死霊術師",15,0,0,  0,  0,100,  0,200,  0));
-	jobList.push_back(JobData("予言者"	,15,0,0, 30,  0,  0, 40,  0,230));
-										  
+	jobList.push_back(JobData("付加術師" ,5,	 0,  0,	100,   0,   0,	  0,	  0,	  0));
+	jobList.push_back(JobData("魔剣士"	 ,5,	 0,  0,	  0, 100,   0,	  0,	  0,	  0));
+	jobList.push_back(JobData("魔導師"	 ,5,	 0,  0,	  0,   0, 130,	  0,	  0,	  0));
+	jobList.push_back(JobData("聖職者"	 ,5,	 0,  0,	  0,   0,   0,	100,	  0,	  0));
+	jobList.push_back(JobData("呪術師"	 ,5,	 0,  0,	  0,   0,   0,	  0,	100,	  0));
+	jobList.push_back(JobData("占い師"	 ,5,	 0,  0,	  0,   0,   0,	  0,	  0,	100));
+										 				 
+	jobList.push_back(JobData("錬金術師" ,15, 0,	 0,	170,   0,  30,	  0,	100,	  0));
+	jobList.push_back(JobData("聖騎士"	 ,15, 0,	 0,	  0, 230,   0,	 70,	  0,	  0));
+	jobList.push_back(JobData("賢者"	 ,15, 0,	 0,	  0,   0, 200,	  0,	 50,	 50));
+	jobList.push_back(JobData("悪魔祓い" ,15, 0,	 0,	 70,  30,   0,	200,	  0,	  0));
+	jobList.push_back(JobData("死霊術師" ,15, 0,	 0,	  0,   0, 100,	  0,	200,	  0));
+	jobList.push_back(JobData("予言者"	 ,15, 0,	 0,	 30,   0,   0,	 40,	  0,	230));
+				  
 	jobList.push_back(JobData("大魔法使い",30,0,0,100,100,100,100,100,100));
 
 	//ジョブチェンジした時用
@@ -226,6 +256,16 @@ int PlayerStatus::MagicAttack()
 	int magicWithJob = base + jobBonus;
 
 	return SkillBonus(BonusType::MagicBonus, magicWithJob);
+}
+
+STATUS_EFFECT PlayerStatus::GetStatusEffect() const
+{
+	return statusEffect_;
+}
+
+void PlayerStatus::SetStatusEffect(STATUS_EFFECT effect)
+{
+	statusEffect_ = effect;
 }
 
 void PlayerStatus::Heal(int amount)
@@ -348,11 +388,11 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	case BonusType::ItemBonus:
 		//薬学10につき、アイテム回復量を+1する
 		//基本回復5、薬学30 → 5 + (30 / 10) = 8
-		return baseValue + (pharmacy_ / 7);
+		return baseValue + (pharmacy_ / PHARMACY_DIVISOR);
 
 	case BonusType::AttackBonus:
 		//武術5につき、会心率を+1する
-		return baseValue + (martialArts_ / 5);
+		return baseValue + (martialArts_ / MARTIAL_ARTS_DIVISOR);
 
 	case BonusType::MagicBonus:
 		//魔法知につき、魔法を増やす
@@ -370,11 +410,11 @@ int PlayerStatus::SkillBonus(BonusType type, int baseValue)
 	case BonusType::ExpBonus:
 		//考古学10につき、獲得経験値を+1する（固定値追加）
 		//例：基本経験値10、考古学10 → 20 + (20 / 10) = 12
-		return baseValue + (archaeology_ / 8);
+		return baseValue + (archaeology_ / ARCHAEOLOGY_DIVISOR);
 
 	case BonusType::LuckBonus:
 		//占星術5につき、回避率のステータスを+1する
-		return baseValue + (astrology_ / 5);
+		return baseValue + (astrology_ / ASTROLOGY_DIVISOR);
 	}
 	return baseValue;
 }
@@ -493,22 +533,22 @@ void PlayerStatus::DamageAnimation()
 
 int PlayerStatus::AddSkillPoint(SkillType type, int baseAmount)
 {
-	float multiplier = 1.0f; //基本は等倍（1.0倍）
+	float multiplier = DEFAULT_SKILL_MULTIPLIER; //基本は等倍（1.0倍）
 
 	// 選んだルートと、上がる技能の組み合わせでボーナス（1.5倍など）をかける
 	switch (currentRoute_)
 	{
 	case PLAYER_ROUTE::BREAKTHROUGH: //打破：武術と考古学
-		if (type == SkillType::MartialArts || type == SkillType::Archaeology) multiplier = 1.8f;
+		if (type == SkillType::MartialArts || type == SkillType::Archaeology) multiplier = ROUTE_SPECIALTY_MULTIPLIER;
 		break;
 	case PLAYER_ROUTE::SALVATION:    //救世：信仰と薬学
-		if (type == SkillType::Faith || type == SkillType::Pharmacy) multiplier = 1.8f;
+		if (type == SkillType::Faith || type == SkillType::Pharmacy) multiplier = ROUTE_SPECIALTY_MULTIPLIER;
 		break;
 	case PLAYER_ROUTE::TRUTH:        //真理：魔法知識と占星術
-		if (type == SkillType::MagicKnowledge || type == SkillType::Astrology) multiplier = 1.8f;
+		if (type == SkillType::MagicKnowledge || type == SkillType::Astrology) multiplier = ROUTE_SPECIALTY_MULTIPLIER;
 		break;
 	case PLAYER_ROUTE::SELFLESS:     //無欲：すべてに少しボーナス
-		multiplier = 1.5f;
+		multiplier = ROUTE_SELFLESS_MULTIPLIER;
 		break;
 	}
 

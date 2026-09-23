@@ -7,6 +7,41 @@
 #include "../GameScene.h"
 #include "ClassWorkPhase.h"
 
+// 授業データの構造体定義
+struct ClassworkData
+{
+	const char* name;
+	const char* description;
+	const char* effectName;
+	int interval; // 能力アップに必要な値の間隔
+	PlayerStatus::SkillType skillType;
+};
+
+// マジックナンバーおよび重複したテキストをテーブル化
+static const ClassworkData CLASSWORK_TABLE[] = {
+	{ "薬学調合", "魔法薬の調合だけでなく、魔石鑑\n定や魔道具の扱い方を学ぶ。\n受講すると回復魔法の効果が上昇\nする。", "治癒力", 7, PlayerStatus::SkillType::Pharmacy },
+	{ "武術訓練", "魔法一筋では生きていくことなど\n出来ない。基礎的な体術や武器の\n取回しを学ぶ。\n受講すると会心発生率が上昇する。", "会心率", 5, PlayerStatus::SkillType::MartialArts },
+	{ "魔法知識", "魔法についての知見を深める授業。\n魔法の原理から法陣図や記述式も\n学ぶ。\n受講すると使える魔法が増える。", "使える魔法の種類", 50, PlayerStatus::SkillType::MagicKnowledge },
+	{ "信仰",     "神が人に魔法を授けるまでの神話\nと、もたらされた加護と寵愛を主\nに学ぶ。\n受講すると守備力が上昇する。", "被ダメージ軽減", 15, PlayerStatus::SkillType::Faith },
+	{ "考古学",   "古代魔術やルーンの解読、封印術\nの解呪など魔法がたどった歴史を\n学ぶ。\n受講すると獲得経験値が上昇する。", "獲得経験値", 8, PlayerStatus::SkillType::Archaeology },
+	{ "占星術",   "天文を知り、星の導きから運命力\nや透視などの予見について学ぶ。\n受講すると回避率が上昇する。", "回避率", 5, PlayerStatus::SkillType::Astrology },
+};
+
+// 技能タイプに対応する現在のステータス値を取得するヘルパー関数
+static int GetCurrentSkillPoint(const PlayerStatus* status, PlayerStatus::SkillType type)
+{
+	switch (type)
+	{
+	case PlayerStatus::SkillType::Pharmacy:       return status->pharmacy_;
+	case PlayerStatus::SkillType::MartialArts:    return status->martialArts_;
+	case PlayerStatus::SkillType::MagicKnowledge: return status->magicKnowledge_;
+	case PlayerStatus::SkillType::Faith:          return status->faith_;
+	case PlayerStatus::SkillType::Archaeology:    return status->archaeology_;
+	case PlayerStatus::SkillType::Astrology:      return status->astrology_;
+	default: return 0;
+	}
+}
+
 ClassWorkPhase::ClassWorkPhase(PlayerStatus* playerstatus, GameScene& gameScene):playerStatus_(playerstatus), gameScene_(gameScene)
 {
 	bgImg_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_SCENE).handleId_;
@@ -30,89 +65,44 @@ void ClassWorkPhase::Update(void)
 
 void ClassWorkPhase::Draw(void)
 {
-	DrawGraph(0, 0, bgImg_, true);
-	DrawGraph(700, 200, playerImg_, true);
+	DrawGraph(BG_POS_X, BG_POS_Y, bgImg_, true);
+	DrawGraph(PLAYER_POS_X, PLAYER_POS_Y, playerImg_, true);
 	DrawTutorial();
 
-	SetFontSize(24);
-	DrawFormatString(TEXT_POS_X, TEXT_POS_Y, (select_ == CLASSWORK_SELECT::PHARMACY ? Color::YELLOW : Color::WHITE), "薬学調合");
-	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 50, (select_ == CLASSWORK_SELECT::MARTIALARTS ? Color::YELLOW : Color::WHITE), "武術訓練");
-	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 100, (select_ == CLASSWORK_SELECT::MAGICKNOWLEDGE ? Color::YELLOW : Color::WHITE), "魔法知識");
-	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 150, (select_ == CLASSWORK_SELECT::FAITH ? Color::YELLOW : Color::WHITE), "信仰");
-	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 200, (select_ == CLASSWORK_SELECT::ARCHAEOLOGY ? Color::YELLOW : Color::WHITE), "考古学");
-	DrawFormatString(TEXT_POS_X, TEXT_POS_Y + 250, (select_ == CLASSWORK_SELECT::ASTROLOGY ? Color::YELLOW : Color::WHITE), "占星術");
-	
+	SetFontSize(MENU_FONT_SIZE);
+
+	// テーブルを利用してループでメニューを描画
+	for (int i = 0; i < static_cast<int>(CLASSWORK_SELECT::MAX); ++i)
+	{
+		auto color = (select_ == static_cast<CLASSWORK_SELECT>(i)) ? Color::YELLOW : Color::WHITE;
+		DrawFormatString(TEXT_POS_X, TEXT_POS_Y + (MENU_Y_INTERVAL * i), color, CLASSWORK_TABLE[i].name);
+	}
+
 	DrawSkillBonus();
 	SetFontSize(DEFAULT_FONT_SIZE);
 }
 
 void ClassWorkPhase::DrawSkillBonus(void)
 {
-	DrawString(bonusX, bonusY, "技能ボーナス", Color::YELLOW);
+	DrawString(BONUS_POS_X, BONUS_POS_Y, "技能ボーナス", Color::YELLOW);
 
-	//現在のボーナス値と、授業を受けた後のボーナス値を比較するための変数
-	std::string effectName = "";
-	int reqInterval = 0;	//次のレベルまでの必要値（例：薬学なら次の治癒力アップまでの必要値）
+	int index = static_cast<int>(select_);
+	if (index < 0 || index >= static_cast<int>(CLASSWORK_SELECT::MAX)) return;
 
-	//選択されている項目に応じて、一瞬だけステータスを上げて効果の変化を測定する
-	SetFontSize(23);
-	switch (select_)
-	{
-	case CLASSWORK_SELECT::PHARMACY:
-		DrawString(bonusX, bonusY - 200
-			, "魔法薬の調合だけでなく、魔石鑑\n定や魔道具の扱い方を学ぶ。\n受講すると回復魔法の効果が上昇\nする。"
-			, Color::WHITE);
-		effectName = "治癒力";
-		reqInterval = 7 - playerStatus_->pharmacy_ % 7; //7ごとにアップ
-		break;
+	const auto& info = CLASSWORK_TABLE[index];
 
-	case CLASSWORK_SELECT::MARTIALARTS:
-		DrawString(bonusX, bonusY - 200
-			, "魔法一筋では生きていくことなど\n出来ない。基礎的な体術や武器の\n取回しを学ぶ。\n受講すると会心発生率が上昇する。"
-			, Color::WHITE);
-		effectName = "会心率";
-		reqInterval = 5 - playerStatus_->martialArts_ % 5; //5ごとにアップ
-		break;
+	// 説明文描画
+	SetFontSize(DESC_FONT_SIZE);
+	DrawString(BONUS_POS_X, BONUS_POS_Y - BONUS_DESC_OFFSET_Y, info.description, Color::WHITE);
 
-	case CLASSWORK_SELECT::MAGICKNOWLEDGE:
-		DrawString(bonusX, bonusY - 200
-			, "魔法についての知見を深める授業。\n魔法の原理から法陣図や記述式も\n学ぶ。\n受講すると使える魔法が増える。"
-			, Color::WHITE);
-		effectName = "使える魔法の種類";
-		reqInterval = 50 - playerStatus_->magicKnowledge_ % 50; //50ごとにアップ
-		break;
+	// 次のレベルまでの必要値計算
+	int currentPoint = GetCurrentSkillPoint(playerStatus_, info.skillType);
+	int reqInterval = info.interval - (currentPoint % info.interval);
 
-	case CLASSWORK_SELECT::FAITH:
-		DrawString(bonusX, bonusY - 200
-			, "神が人に魔法を授けるまでの神話\nと、もたらされた加護と寵愛を主\nに学ぶ。\n受講すると守備力が上昇する。"
-			, Color::WHITE);
-		effectName = "被ダメージ軽減";
-		reqInterval = 15 - playerStatus_->faith_ % 15; //15ごとにアップ
-		break;
-
-	case CLASSWORK_SELECT::ARCHAEOLOGY:
-		DrawString(bonusX, bonusY - 200
-			, "古代魔術やルーンの解読、封印術\nの解呪など魔法がたどった歴史を\n学ぶ。\n受講すると獲得経験値が上昇する。"
-			, Color::WHITE);
-		effectName = "獲得経験値";
-		reqInterval = 8 - playerStatus_->archaeology_ % 8; //8ごとにアップ
-		break;
-
-	case CLASSWORK_SELECT::ASTROLOGY:
-		DrawString(bonusX, bonusY - 200
-			, "天文を知り、星の導きから運命力\nや透視などの予見について学ぶ。\n受講すると回避率が上昇する。"
-			, Color::WHITE);
-		effectName = "回避率";
-		reqInterval = 5 - playerStatus_->astrology_ % 5; //5ごとにアップ
-		break;
-	}
-	
-	SetFontSize(24);
-	//画面に効果の仕様を出力
-	DrawFormatString(bonusX, bonusY + 30, Color::WHITE, "効果内容: %s", effectName.c_str());
-
-	//「〇〇ごとに効果アップ！」と表示する
-	DrawFormatString(bonusX, bonusY + 55, Color::GREEN, "残り　%d で能力アップ！", reqInterval);
+	// 効果仕様の出力
+	SetFontSize(MENU_FONT_SIZE);
+	DrawFormatString(BONUS_POS_X, BONUS_POS_Y + BONUS_EFFECT_OFFSET_Y, Color::WHITE, "効果内容: %s", info.effectName);
+	DrawFormatString(BONUS_POS_X, BONUS_POS_Y + BONUS_NEXT_LEVEL_OFFSET_Y, Color::GREEN, "残り %d で能力アップ！", reqInterval);
 }
 
 bool ClassWorkPhase::IsFinished() const
@@ -144,7 +134,7 @@ void ClassWorkPhase::ProcessClassworkDecision()
 	if (ins_.IsTrgDown(KEY_INPUT_RETURN) || 
 		ins_.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 	{
-		int rand = GetRand(30)-15;	//乱数の取得
+		int rand = GetRand(SKILL_RAND_RANGE)- SKILL_RAND_OFFSET;	//乱数の取得
 		int skill = SKILL_UP + rand;//上昇幅の確定
 
 		switch (select_)
@@ -188,7 +178,7 @@ void ClassWorkPhase::ProcessTutorial(void)
 	{
 		return;
 	}
-	if (gameScene_.GetTurn() == 2)
+	if (gameScene_.GetTurn() == TUTORIAL_TARGET_TURN)
 	{
 		select_ = CLASSWORK_SELECT::MAGICKNOWLEDGE;
 	}
@@ -200,9 +190,9 @@ void ClassWorkPhase::DrawTutorial(void)
 	{
 		return;
 	}
-	if (gameScene_.GetTurn() == 2)
+	if (gameScene_.GetTurn() == TUTORIAL_TARGET_TURN)
 	{
-		SetFontSize(20);
+		SetFontSize(TUTORIAL_FONT_SIZE);
 		DrawGraph(GameScene::MESSAGE_BOX_X, GameScene::MESSAGE_BOX_Y, messageBoxImg_, true);
 
 		DrawString(GameScene::TUTORIAL_X, GameScene::TUTORIAL_Y

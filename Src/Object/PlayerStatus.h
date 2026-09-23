@@ -33,9 +33,47 @@ public:
 	constexpr static int PLAYER_POS_X = 900;	//プレイヤーの描画位置X
 	constexpr static int PLAYER_POS_Y = 240;	//プレイヤーの描画位置Y
 
+	static constexpr int DAMAGE_BLINK_FRAME_DIVISOR = 2; // 点滅速度（フレーム除数）
+	static constexpr int DAMAGE_BLINK_CYCLE_MODULO = 3;  // 点滅周期（剰余）
+
 	constexpr static int ANIM_COUNT_ATTACK = 5;	//アニメーションのフレーム数
 	constexpr static int ANIM_COUNT_DAMAGE = 10;	//アニメーションのフレーム数
 	constexpr static int ANIM_MOVE_PIXELS = 3;	//動かすピクセル数
+
+	// SetDrawBright用カラー定数
+	static constexpr int DAMAGE_TINT_R = 255;
+	static constexpr int DAMAGE_TINT_G = 0;
+	static constexpr int DAMAGE_TINT_B = 0;
+	static constexpr int NORMAL_TINT_RGB = 255;
+
+	//DrawQuestImages 用のレイアウト定数
+	static constexpr int HP_BAR_WIDTH = 100;
+	static constexpr int NAME_OFFSET_Y = 37;
+	static constexpr int HP_TEXT_OFFSET_Y = 20;
+	static constexpr int HP_BAR_OFFSET_Y = 5;
+
+	//DrawStatus 用の描画位置・オフセット定数
+	static constexpr int STATUS_NAME_X = 230;
+	static constexpr int STATUS_NAME_Y = 590;
+
+	// 左側：基本ステータス
+	static constexpr int BASE_PARAM_X = 245;
+	static constexpr int BASE_PARAM_START_Y = 615;
+	static constexpr int BASE_PARAM_LINE_HEIGHT = 25;
+
+	// 右側：技能ステータス
+	static constexpr int SKILL_PARAM_X = 1065;
+	static constexpr int SKILL_PARAM_START_Y = 510;
+	static constexpr int SKILL_PARAM_LINE_HEIGHT = 35;
+
+	// 中央右：職業・状態異常
+	static constexpr int JOB_STATUS_X = 900;
+	static constexpr int JOB_NAME_Y = 590;
+	static constexpr int CONDITION_LABEL_Y = 640;
+	static constexpr int CONDITION_VALUE_X = 955;
+
+	// 計算用定数
+	static constexpr int MAGIC_RANK_DIVISOR = 50; // 魔術ランク計算用（魔力 / 50 + 1）
 
 	// 技能計算の除数
 	constexpr static int PHARMACY_DIVISOR = 7;       // 薬学ボーナス除数
@@ -49,6 +87,11 @@ public:
 	static constexpr int SKILL_BASE_Y = 310;       // 技能ステータスの表示起点Y
 	static constexpr int LINE_HEIGHT = 30;         // 行間
 	static constexpr int JOB_BONUS_OFFSET_X = 100; // 職業ボーナスの描画Xオフセット
+
+	//ルートボーナス
+	static constexpr float DEFAULT_SKILL_MULTIPLIER = 1.0f;
+	static constexpr float ROUTE_SPECIALTY_MULTIPLIER = 1.8f; // 特化ルート用（1.8倍）
+	static constexpr float ROUTE_SELFLESS_MULTIPLIER = 1.5f;  // 無欲ルート用（1.5倍）
 
 	int level_ = 1;
 	int exp_ = 0;
@@ -123,6 +166,9 @@ public:
 
 	int Attack();//攻撃処理
 	int MagicAttack();//魔法攻撃処理
+
+	STATUS_EFFECT GetStatusEffect() const;	//状態異常を取得
+	void SetStatusEffect(STATUS_EFFECT effect);	//状態以上をセットする
 
 	//回復処理
 	void Heal(int amount);
