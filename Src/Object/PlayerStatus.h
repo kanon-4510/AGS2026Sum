@@ -88,6 +88,10 @@ public:
 	static constexpr int LINE_HEIGHT = 30;         // 行間
 	static constexpr int JOB_BONUS_OFFSET_X = 100; // 職業ボーナスの描画Xオフセット
 
+	// ラベル描画位置と、数字を揃えたいX座標（位置に合わせて数値を調整してください）
+	static constexpr int LABEL_X = STATUS_X;        // 項目名のX座標
+	static constexpr int VALUE_X = STATUS_X + 120;  // 数字の描画開始X座標（固定）
+
 	//ルートボーナス
 	static constexpr float DEFAULT_SKILL_MULTIPLIER = 1.0f;
 	static constexpr float ROUTE_SPECIALTY_MULTIPLIER = 1.8f; // 特化ルート用（1.8倍）

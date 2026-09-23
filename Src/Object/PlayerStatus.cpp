@@ -109,25 +109,25 @@ void PlayerStatus::DrawStatus()
 	int baseY = BASE_PARAM_START_Y;
 	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, "レベル %2d", level_);
 	baseY += BASE_PARAM_LINE_HEIGHT;
-	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, " 筋力 %d", power_ + GetJobBonus().power);
+	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, "  筋力 %d", power_ + GetJobBonus().power);
 	baseY += BASE_PARAM_LINE_HEIGHT;
-	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, " 魔力 %d", MagicAttack());
+	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, "  魔力 %d", MagicAttack());
 	baseY += BASE_PARAM_LINE_HEIGHT;
 	DrawFormatString(BASE_PARAM_X, baseY, Color::WHITE, "素早さ %d", GetSpeed());
 
 	// 技能ステータス描画（Y座標を行高で計算）
 	int skillY = SKILL_PARAM_START_Y;
-	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "  治癒力:%+3d", pharmacy_ / PHARMACY_DIVISOR);
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "    治癒力:%+3d", pharmacy_ / PHARMACY_DIVISOR);
 	skillY += SKILL_PARAM_LINE_HEIGHT;
 	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "会心発生率:%3d%%", martialArts_ / MARTIAL_ARTS_DIVISOR);
 	skillY += SKILL_PARAM_LINE_HEIGHT;
 	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "魔術ランク:%3d", (magicKnowledge_ / MAGIC_RANK_DIVISOR) + 1);
 	skillY += SKILL_PARAM_LINE_HEIGHT;
-	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "  守備力:%3d", faith_ / FAITH_DIVISOR);
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "    守備力:%3d", faith_ / FAITH_DIVISOR);
 	skillY += SKILL_PARAM_LINE_HEIGHT;
 	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "獲得経験値:%+3d", archaeology_ / ARCHAEOLOGY_DIVISOR);
 	skillY += SKILL_PARAM_LINE_HEIGHT;
-	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "  回避率:%3d%%", astrology_ / ASTROLOGY_DIVISOR);
+	DrawFormatString(SKILL_PARAM_X, skillY, Color::WHITE, "    回避率:%3d%%", astrology_ / ASTROLOGY_DIVISOR);
 
 	// 職業・状態異常のラベル
 	DrawFormatString(JOB_STATUS_X, JOB_NAME_Y, Color::WHITE, "%s", job.c_str());
